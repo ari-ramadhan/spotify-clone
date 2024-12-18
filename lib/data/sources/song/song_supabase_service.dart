@@ -20,36 +20,18 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
           .from('songs')
           .select('*')
           .order('release_date', ascending: false)
-          .limit(4);
+          .limit(5);
 
       final List<SongModel> data = item.map((item) {
         return SongModel.fromJson(item);
       }).toList();
-
-
-      // print(supabase.auth.currentUser!.);
-      // data.forEach((element) {
-      //   songs.insert(data.indexOf(element), element.toEntity());
-      //   print(element.id.toString());
-      // });
 
       for (final songModel in data) {
         final isFavorite = await isFavoriteSong(songModel.id!);
 
         songs.add(SongWithFavorite(songModel.toEntity(), isFavorite));
       }
-      // for (final songModel in data) {
-      //   final isFavorite = await isFavoriteSong(songModel.id!);
-      //   SongModel result = SongModel(
-      //       id: songModel.id,
-      //       title: songModel.title,
-      //       artist: songModel.artist,
-      //       duration: songModel.duration,
-      //       isFavorite: isFavorite,
-      //       releaseDate: songModel.releaseDate);
 
-      //   songs.insert(data.indexOf(songModel),  result.toEntity());
-      // }
 
       return Right(songs);
     } catch (e) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:spotify_clone/common/helpers/is_dark_mode.dart';
 import 'package:spotify_clone/common/widgets/favorite_button/favorite_button.dart';
 import 'package:spotify_clone/core/configs/theme/app_colors.dart';
@@ -31,28 +32,28 @@ class _PlaylistState extends State<Playlist> {
 
           if (state is PlaylistLoaded) {
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+              padding: EdgeInsets.symmetric(vertical: 35.h, horizontal: 22.w).copyWith(right: 15.w, top: 20.h),
               child: Column(
                 children: [
-                  const Row(
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         'Playlist',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 15.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
                         'See more',
                         style: TextStyle(
-                            fontSize: 12, fontWeight: FontWeight.w400),
+                            fontSize: 11.sp, fontWeight: FontWeight.w400),
                       ),
                     ],
                   ),
-                  const SizedBox(
-                    height: 20,
+                  SizedBox(
+                    height: 16.h,
                   ),
                   _songs(state.songs)
                 ],
@@ -75,7 +76,7 @@ class _PlaylistState extends State<Playlist> {
 
           var songTitle = songs[index].song.title;
           if (songs[index].song.title.length > 25) {
-            songTitle = "${songTitle.substring(0, 20)}..";
+            songTitle = "${songTitle.substring(0, 22)}..";
           }
 
           return GestureDetector(
@@ -91,8 +92,8 @@ class _PlaylistState extends State<Playlist> {
                 Row(
                   children: [
                     Container(
-                      height: 45,
-                      width: 45,
+                      height: 35.h,
+                      width: 35.w,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: context.isDarkMode
@@ -106,8 +107,8 @@ class _PlaylistState extends State<Playlist> {
                             : const Color(0xff555555),
                       ),
                     ),
-                    const SizedBox(
-                      width: 10,
+                    SizedBox(
+                      width: 14.w,
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -115,16 +116,16 @@ class _PlaylistState extends State<Playlist> {
                         Text(
                           songTitle,
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w700, fontSize: 16),
+                          style: TextStyle(
+                              fontWeight: FontWeight.w700, fontSize: 14.sp),
                         ),
                         const SizedBox(
                           height: 5,
                         ),
                         Text(
                           songs[index].song.artist,
-                          style: const TextStyle(
-                              fontWeight: FontWeight.w400, fontSize: 12),
+                          style: TextStyle(
+                              fontWeight: FontWeight.w400, fontSize: 11.sp),
                         ),
                       ],
                     )
@@ -137,8 +138,8 @@ class _PlaylistState extends State<Playlist> {
                         .duration
                         .toString()
                         .replaceAll('.', ':')),
-                    const SizedBox(
-                      width: 20,
+                    SizedBox(
+                      width: 10.w,
                     ),
                     FavoriteButton(songs: songs[index])
                   ],
@@ -148,8 +149,8 @@ class _PlaylistState extends State<Playlist> {
           );
         },
         separatorBuilder: (context, index) {
-          return const SizedBox(
-            height: 20,
+          return  SizedBox(
+            height: 13.h,
           );
         },
         itemCount: songs.length);

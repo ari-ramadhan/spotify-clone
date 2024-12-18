@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:spotify_clone/common/helpers/is_dark_mode.dart';
 import 'package:spotify_clone/common/widgets/appbar/app_bar.dart';
 import 'package:spotify_clone/common/widgets/favorite_button/favorite_button.dart';
@@ -18,14 +19,14 @@ class SongPlayerPage extends StatelessWidget {
     return Scaffold(
       appBar: BasicAppbar(
         onTap: () async {
-          await context
-                    .read<SongPlayerCubit>().close;
+          // await context
+          //           .read<SongPlayerCubit>().close;
           Navigator.pop(context);
         },
         title: Text(
           'Now playing',
           style: TextStyle(
-            fontSize: 18,
+            fontSize: 16.sp,
             color: context.isDarkMode ? Colors.white : Colors.black
           ),
         ),
@@ -42,16 +43,16 @@ class SongPlayerPage extends StatelessWidget {
           ..loadSong(
               '${AppURLs.supabaseSongStorage}${songEntity.song.artist} - ${songEntity.song.title}.mp3'),
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 24),
+          padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 24.w),
           child: Column(
             children: [
               _songCover(context),
-              const SizedBox(
-                height: 20,
+              SizedBox(
+                height: 20.h,
               ),
               _songDetail(),
-              const SizedBox(
-                height: 30,
+              SizedBox(
+                height: 24.h,
               ),
               _songPlayer(context)
             ],
@@ -63,7 +64,7 @@ class SongPlayerPage extends StatelessWidget {
 
   Widget _songCover(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height / 2.2,
+      height: ScreenUtil().screenHeight / 2.4,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(30),
           image: DecorationImage(
@@ -89,17 +90,17 @@ class SongPlayerPage extends StatelessWidget {
           children: [
             Text(
               title,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19.sp),
             ),
-            const SizedBox(
-              height: 5,
+            SizedBox(
+              height: 4.3.h,
             ),
             Text(
               songEntity.song.artist,
-              style: const TextStyle(
+              style: TextStyle(
                   fontWeight: FontWeight.w400,
                   letterSpacing: 0.6,
-                  fontSize: 20),
+                  fontSize: 18.sp),
             ),
           ],
         ),

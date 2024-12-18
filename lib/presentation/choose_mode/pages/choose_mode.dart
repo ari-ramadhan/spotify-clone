@@ -1,3 +1,5 @@
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:spotify_clone/common/helpers/is_dark_mode.dart';
 import 'package:spotify_clone/presentation/auth/pages/signup_or_signin.dart';
 import 'package:spotify_clone/presentation/choose_mode/bloc/theme_cubit.dart';
 import 'dart:ui';
@@ -10,18 +12,22 @@ import '../../../core/configs/assets/app_vectors.dart';
 import '../../../core/configs/theme/app_colors.dart';
 
 class ChooseModePage extends StatelessWidget {
-  const ChooseModePage({super.key});
+  ChooseModePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+
+    final isDarkMode = context.isDarkMode;
+    final svgColor = isDarkMode ? AppColors.primary : Colors.white;
+
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: AppColors.lightBackground,
       body: Stack(
         children: [
           Container(
-            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 40),
-            decoration: const BoxDecoration(
+            padding: EdgeInsets.symmetric(vertical: 40.h, horizontal: 10.w),
+            decoration: BoxDecoration(
               image: DecorationImage(
                 fit: BoxFit.fill,
                 image: AssetImage(
@@ -34,25 +40,25 @@ class ChooseModePage extends StatelessWidget {
             color: Colors.black.withOpacity(0.15),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 40),
+            padding: EdgeInsets.symmetric(vertical: 30.h, horizontal: 30.w),
             child: Column(
               children: [
                 Align(
                   alignment: Alignment.topCenter,
                   child: SvgPicture.asset(AppVectors.logo),
                 ),
-                const Spacer(),
-                const Text(
+                Spacer(),
+                Text(
                   'Choose Mode',
                   style: TextStyle(
                     letterSpacing: 0.6,
                     fontWeight: FontWeight.w400,
                     color: Colors.white,
-                    fontSize: 22,
+                    fontSize: 20.sp,
                   ),
                 ),
-                const SizedBox(
-                  height: 40,
+                SizedBox(
+                  height: 30.h,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -64,39 +70,41 @@ class ChooseModePage extends StatelessWidget {
                             context
                                 .read<ThemeCubit>()
                                 .updateTheme(ThemeMode.dark);
+                            // mode = 'dark';
                           },
                           child: ClipOval(
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                               child: Container(
-                                height: 80,
-                                width: 80,
+                                height: 70.h,
+                                width: 70.w,
                                 decoration: BoxDecoration(
-                                    color: const Color(0xff30393C)
-                                        .withOpacity(0.5),
+                                    color: Color(0xff30393C).withOpacity(0.5),
                                     shape: BoxShape.circle),
                                 child: SvgPicture.asset(
                                   AppVectors.darkIcon,
                                   fit: BoxFit.none,
+                                  color: isDarkMode ? AppColors.primary : Colors.white
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          height: 15,
+                        SizedBox(
+                          height: 10.h,
                         ),
-                        const Text(
+                        Text(
                           'Dark Mode',
                           style: TextStyle(
                               fontWeight: FontWeight.w500,
-                              fontSize: 17,
-                              color: AppColors.grey),
+                              fontSize: 15.sp,
+                              color:isDarkMode ? AppColors.primary : AppColors.grey
+                              ),
                         )
                       ],
                     ),
-                    const SizedBox(
-                      width: 40,
+                    SizedBox(
+                      width: 40.w,
                     ),
                     Column(
                       children: [
@@ -105,41 +113,42 @@ class ChooseModePage extends StatelessWidget {
                             context
                                 .read<ThemeCubit>()
                                 .updateTheme(ThemeMode.light);
+                            // mode = 'light';
                           },
                           child: ClipOval(
                             child: BackdropFilter(
                               filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                               child: Container(
-                                height: 80,
-                                width: 80,
+                                height: 70.h,
+                                width: 70.w,
                                 decoration: BoxDecoration(
-                                    color: const Color(0xff30393C)
-                                        .withOpacity(0.5),
+                                    color: Color(0xff30393C).withOpacity(0.5),
                                     shape: BoxShape.circle),
                                 child: SvgPicture.asset(
                                   AppVectors.lightIcon,
                                   fit: BoxFit.none,
+                                  color: !isDarkMode ? AppColors.primary : Colors.white
                                 ),
                               ),
                             ),
                           ),
                         ),
-                        const SizedBox(
-                          height: 15,
+                        SizedBox(
+                          height: 10.h,
                         ),
-                        const Text(
+                        Text(
                           'Light Mode',
                           style: TextStyle(
                               fontWeight: FontWeight.w500,
-                              fontSize: 17,
-                              color: AppColors.grey),
+                              fontSize: 15.sp,
+                              color: !isDarkMode ? AppColors.primary : AppColors.grey),
                         )
                       ],
                     ),
                   ],
                 ),
-                const SizedBox(
-                  height: 50,
+                SizedBox(
+                  height: 40.h,
                 ),
                 BasicAppButton(
                     onPressed: () {
@@ -147,7 +156,7 @@ class ChooseModePage extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              const SignupOrSigninPage(),
+                              SignupOrSigninPage(),
                         ),
                       );
                     },

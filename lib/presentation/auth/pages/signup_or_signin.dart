@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:spotify_clone/common/helpers/is_dark_mode.dart';
 import 'package:spotify_clone/common/widgets/appbar/app_bar.dart';
@@ -33,42 +34,43 @@ class SignupOrSigninPage extends StatelessWidget {
           Align(
             alignment: Alignment.topCenter,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 35),
+              padding: EdgeInsets.symmetric(horizontal: 30.w),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   SvgPicture.asset(AppVectors.logo),
-                  const SizedBox(
-                    height: 55,
+                  SizedBox(
+                    height: 40.h,
                   ),
-                  const Text(
+                  Text(
                     'Enjoy Listening to Music',
                     style: TextStyle(
-                      fontSize: 27,
+                      // fontSize: 27,
+                      fontSize: 24.sp,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(
-                    height: 21,
+                  SizedBox(
+                    height: 19.h,
                   ),
-                  const Text(
+                  Text(
                     'Spotify is a proprietary Swedish audio streaming and media services provider',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 16.sp,
                       letterSpacing: 0.5,
                       fontWeight: FontWeight.w400,
                       // color: Colors.grey,
                     ),
                   ),
-                  const SizedBox(
-                    height: 30,
+                  SizedBox(
+                    height: 24.h,
                   ),
                   Row(
                     children: [
                       Expanded(
                         child: BasicAppButton(
-                          height: 70,
+                          height: 57.h,
                           title: 'Register',
                           onPressed: () {
                             Navigator.push(
@@ -80,8 +82,8 @@ class SignupOrSigninPage extends StatelessWidget {
                           },
                         ),
                       ),
-                      const SizedBox(
-                        width: 20,
+                      SizedBox(
+                        width: 17.w,
                       ),
                       Expanded(
                         child: TextButton(
@@ -97,7 +99,7 @@ class SignupOrSigninPage extends StatelessWidget {
                             'Sign in',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 20,
+                                fontSize: 18.sp,
                                 color: context.isDarkMode
                                     ? Colors.white
                                     : Colors.black),
@@ -106,8 +108,8 @@ class SignupOrSigninPage extends StatelessWidget {
                       )
                     ],
                   ),
-                  const SizedBox(
-                    height: 150,
+                  SizedBox(
+                    height: 134.h,
                   )
                 ],
               ),

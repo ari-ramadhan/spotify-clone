@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:spotify_clone/common/bloc/favorite_button/favorite_button_cubit.dart';
 import 'package:spotify_clone/common/bloc/favorite_button/favorite_button_state.dart';
 import 'package:spotify_clone/core/configs/theme/app_colors.dart';
@@ -31,7 +32,7 @@ class FavoriteButton extends StatelessWidget {
                 songs.isFavorite
                     ? Icons.favorite_rounded
                     : Icons.favorite_outline_rounded,
-                size: isBigger ? 35 : 25,
+                size: isBigger ? 32.sp : 22.sp,
                 color:
                     songs.isFavorite ? AppColors.primary : AppColors.darkGrey,
               ),
@@ -48,7 +49,7 @@ class FavoriteButton extends StatelessWidget {
                 state.isFavorite
                     ? Icons.favorite_rounded
                     : Icons.favorite_outline_rounded,
-                size: isBigger ? 35 : 25,
+                size: isBigger ? 35.sp : 25.sp,
                 color:
                     state.isFavorite ? AppColors.primary : AppColors.darkGrey,
               ),

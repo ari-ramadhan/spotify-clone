@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:spotify_clone/common/widgets/appbar/app_bar.dart';
 import 'package:spotify_clone/common/widgets/button/basic_app_button.dart';
@@ -24,7 +25,7 @@ class SignInPage extends StatelessWidget {
       appBar: BasicAppbar(
         title: SvgPicture.asset(
           AppVectors.logo,
-          height: 40,
+          height: 40.h,
           width: 40,
         ),
       ),
