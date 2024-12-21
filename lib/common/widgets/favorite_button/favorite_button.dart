@@ -32,7 +32,7 @@ class FavoriteButton extends StatelessWidget {
                 songs.isFavorite
                     ? Icons.favorite_rounded
                     : Icons.favorite_outline_rounded,
-                size: isBigger ? 32.sp : 22.sp,
+                size: isBigger ? 28.h : 21.h,
                 color:
                     songs.isFavorite ? AppColors.primary : AppColors.darkGrey,
               ),
@@ -49,7 +49,7 @@ class FavoriteButton extends StatelessWidget {
                 state.isFavorite
                     ? Icons.favorite_rounded
                     : Icons.favorite_outline_rounded,
-                size: isBigger ? 35.sp : 25.sp,
+                size: isBigger ? 28.h : 21.h,
                 color:
                     state.isFavorite ? AppColors.primary : AppColors.darkGrey,
               ),

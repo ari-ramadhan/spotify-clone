@@ -10,7 +10,7 @@ import 'package:spotify_clone/presentation/auth/pages/sign_in.dart';
 import 'package:spotify_clone/presentation/auth/pages/sign_up.dart';
 
 class SignupOrSigninPage extends StatelessWidget {
-  const SignupOrSigninPage({Key? key}) : super(key: key);
+  const SignupOrSigninPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +46,7 @@ class SignupOrSigninPage extends StatelessWidget {
                     'Enjoy Listening to Music',
                     style: TextStyle(
                       // fontSize: 27,
-                      fontSize: 24.sp,
+                      fontSize: 21.sp,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -57,7 +57,7 @@ class SignupOrSigninPage extends StatelessWidget {
                     'Spotify is a proprietary Swedish audio streaming and media services provider',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      fontSize: 16.sp,
+                      fontSize: 15.sp,
                       letterSpacing: 0.5,
                       fontWeight: FontWeight.w400,
                       // color: Colors.grey,

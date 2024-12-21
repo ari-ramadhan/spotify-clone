@@ -8,6 +8,7 @@ abstract class SongSupabaseService {
   Future<Either> getPlaylist();
   Future<Either> addOrRemoveFavoriteSong(int songId);
   Future<bool> isFavoriteSong(int songId);
+  Future<Either> getUserFavoriteSongs();
 }
 
 class SongSupabaseServiceImpl extends SongSupabaseService {
@@ -32,10 +33,9 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
         songs.add(SongWithFavorite(songModel.toEntity(), isFavorite));
       }
 
-
       return Right(songs);
     } catch (e) {
-      return Left('An error occured, Please try again');
+      return const Left('An error occured, Please try again');
     }
   }
 
@@ -53,10 +53,6 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
         return SongModel.fromJson(item);
       }).toList();
 
-      // data.forEach(
-      //     (element) {
-      //       songs.insert(data.indexOf(element), element.toEntity());
-      //     });
       for (final songModel in data) {
         final isFavorite = await isFavoriteSong(songModel.id!);
 
@@ -65,7 +61,7 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
 
       return Right(songs);
     } catch (e) {
-      return Left('An error occured, Please try again');
+      return const Left('An error occured, Please try again');
     }
   }
 
@@ -105,7 +101,7 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
 
       return Right(isFavorite);
     } catch (e) {
-      return Left('An error has occured');
+      return const Left('An error has occured');
     }
   }
 
@@ -125,6 +121,29 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
       }
     } catch (e) {
       return false;
+    }
+  }
+
+  @override
+  Future<Either> getUserFavoriteSongs() async {
+    try {
+      List<SongEntity> anotherSong = [];
+
+      var songIdQuery = await supabase
+          .from('favorites')
+          .select('*')
+          .eq('user_id', supabase.auth.currentUser!.id);
+
+
+      for (final element in songIdQuery) {
+        var songItem  = await supabase.from('songs').select('*').eq('id', element['song_id']).single();
+        SongModel songModel = SongModel.fromJson(songItem);
+
+        anotherSong.add(songModel.toEntity());
+      }
+      return Right(anotherSong);
+    } catch (e) {
+      return const Left('An error occured while fetching your favorite songs');
     }
   }
 }

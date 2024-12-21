@@ -4,11 +4,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:spotify_clone/common/widgets/button/basic_app_button.dart';
 import 'package:spotify_clone/core/configs/assets/app_images.dart';
 import 'package:spotify_clone/core/configs/assets/app_vectors.dart';
-import 'package:spotify_clone/core/configs/theme/app_colors.dart';
 import 'package:spotify_clone/presentation/choose_mode/pages/choose_mode.dart';
 
 class GetStartedPage extends StatelessWidget {
-  const GetStartedPage({Key? key}) : super(key: key);
+  const GetStartedPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +42,7 @@ class GetStartedPage extends StatelessWidget {
                   Text(
                     'Enjoy Listening to Music',
                     style: TextStyle(
-                        fontSize: 22.sp,
+                        fontSize: 20.sp,
                         fontWeight: FontWeight.w500,
                         color: Colors.white,
                         letterSpacing: 0.5),
@@ -73,7 +72,7 @@ class GetStartedPage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => ChooseModePage(),
+                          builder: (context) => const ChooseModePage(),
                         ),
                       );
                     },

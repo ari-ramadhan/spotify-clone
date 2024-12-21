@@ -6,6 +6,7 @@ import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:spotify_clone/core/configs/constants/app_key.dart';
 import 'package:spotify_clone/core/configs/theme/app_theme.dart';
+import 'package:spotify_clone/data/repository/auth/auth_service.dart';
 import 'package:spotify_clone/presentation/choose_mode/bloc/theme_cubit.dart';
 import 'package:spotify_clone/presentation/home/pages/home.dart';
 import 'package:spotify_clone/presentation/splash/pages/splash.dart';
@@ -28,19 +29,40 @@ Future<void> main() async {
 
   await initializeDependencies();
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 // Get a reference your Supabase client
 final supabase = Supabase.instance.client;
+final AuthService _authService = AuthService();
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  bool _isLoggedIn = false;
+
+  Future<void> _checkLoginStatus() async {
+    bool isLoggedIn = await _authService.checkLoginStatus();
+    if (!mounted) return;
+    setState(() {
+      _isLoggedIn = isLoggedIn;
+    });
+  }
+
+  @override
+  void initState() {
+    _checkLoginStatus();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(
-
       builder: (context, child) {
         return MultiBlocProvider(
           providers: [
@@ -52,15 +74,13 @@ class MyApp extends StatelessWidget {
               darkTheme: AppTheme.darkTheme,
               themeMode: mode,
               debugShowCheckedModeBanner: false,
-              // home: HomePage(),
-              home: const SplashPage(),
+              // home: const HomePage(),
+              home: _isLoggedIn ? const HomePage() : const SplashPage(),
               // home: SplashPage(),
             ),
           ),
         );
       },
     );
-
-    ;
   }
 }

@@ -12,7 +12,7 @@ import 'package:spotify_clone/presentation/song_player/bloc/song_player_state.da
 
 class SongPlayerPage extends StatelessWidget {
   final SongWithFavorite songEntity;
-  const SongPlayerPage({Key? key, required this.songEntity}) : super(key: key);
+  const SongPlayerPage({super.key, required this.songEntity});
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +39,7 @@ class SongPlayerPage extends StatelessWidget {
         ),
       ),
       body: BlocProvider(
+
         create: (context) => SongPlayerCubit()
           ..loadSong(
               '${AppURLs.supabaseSongStorage}${songEntity.song.artist} - ${songEntity.song.title}.mp3'),
@@ -93,14 +94,14 @@ class SongPlayerPage extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 19.sp),
             ),
             SizedBox(
-              height: 4.3.h,
+              height: 3.h,
             ),
             Text(
               songEntity.song.artist,
               style: TextStyle(
                   fontWeight: FontWeight.w400,
-                  letterSpacing: 0.6,
-                  fontSize: 18.sp),
+                  // letterSpacing: 0.6,
+                  fontSize: 16.4.sp),
             ),
           ],
         ),
@@ -111,6 +112,7 @@ class SongPlayerPage extends StatelessWidget {
 
   Widget _songPlayer(BuildContext context) {
     return BlocBuilder<SongPlayerCubit, SongPlayerState>(
+
       builder: (context, state) {
         if (state is SongPlayerLoading) {
           return const CircularProgressIndicator();
@@ -119,8 +121,9 @@ class SongPlayerPage extends StatelessWidget {
           return Column(
             children: [
               Slider(
-                thumbColor: AppColors.primary,
-                activeColor: Colors.grey,
+                thumbColor: AppColors.grey,
+                activeColor: AppColors.grey,
+                inactiveColor: AppColors.darkGrey,
                 value: context
                     .read<SongPlayerCubit>()
                     .songPosition
@@ -173,8 +176,6 @@ class SongPlayerPage extends StatelessWidget {
               const SizedBox(
                 height: 30,
               ),
-              songEntity.song.artist.contains('Nadin') ?
-              const Text('ini lagu kesukaan bubbyy kuuuu jela cantikk :) <3') : const SizedBox.shrink()
             ],
           );
         }

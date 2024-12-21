@@ -14,9 +14,9 @@ class NewsSongsCubit extends Cubit<NewsSongsState> {
         emit(NewsSongsLoadFailure());
       },
       (data) {
-        emit(
-          NewsSongsLoaded(songs: data)
-        );
+        if (!isClosed) {
+          emit(NewsSongsLoaded(songs: data));
+        }
       },
     );
   }

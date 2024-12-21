@@ -10,7 +10,7 @@ import 'package:spotify_clone/presentation/home/bloc/play_list_state.dart';
 import 'package:spotify_clone/presentation/song_player/pages/song_player.dart';
 
 class Playlist extends StatefulWidget {
-  const Playlist({Key? key}) : super(key: key);
+  const Playlist({super.key});
 
   @override
   State<Playlist> createState() => _PlaylistState();
@@ -119,8 +119,8 @@ class _PlaylistState extends State<Playlist> {
                           style: TextStyle(
                               fontWeight: FontWeight.w700, fontSize: 14.sp),
                         ),
-                        const SizedBox(
-                          height: 5,
+                        SizedBox(
+                          height: 3.h,
                         ),
                         Text(
                           songs[index].song.artist,

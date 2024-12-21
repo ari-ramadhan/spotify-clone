@@ -7,12 +7,12 @@ import 'package:spotify_clone/common/widgets/appbar/app_bar.dart';
 import 'package:spotify_clone/core/configs/assets/app_images.dart';
 import 'package:spotify_clone/core/configs/assets/app_vectors.dart';
 import 'package:spotify_clone/core/configs/theme/app_colors.dart';
-import 'package:spotify_clone/main.dart';
 import 'package:spotify_clone/presentation/home/widgets/news_songs.dart';
 import 'package:spotify_clone/presentation/home/widgets/playlist.dart';
+import 'package:spotify_clone/presentation/profile/pages/profile.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -32,6 +32,23 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: BasicAppbar(
+        action: Padding(
+          padding: EdgeInsets.only(right: 5.w),
+          child: IconButton(
+            // color: Colors.green,
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ProfilePage(),
+                  ));
+            },
+            icon: Icon(
+              Icons.person,
+              color: context.isDarkMode ? Colors.white : Colors.black,
+            ),
+          ),
+        ),
         hideBackButton: true,
         title: SvgPicture.asset(
           AppVectors.logo,
@@ -48,7 +65,7 @@ class _HomePageState extends State<HomePage>
             ),
             _tabs(),
             SizedBox(
-              height: 203.h,
+              height: 190.h,
               child: TabBarView(
                 controller: _tabController,
                 children: [
@@ -77,36 +94,37 @@ class _HomePageState extends State<HomePage>
         carouselController: CarouselSliderController(),
         items: items.map(
           (e) {
-            return Container(
-              child: Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(top: 26.h),
-                    child: Align(
-                      child: SvgPicture.asset(
-                        e['card'],
-                        height: 135.h,
-                      ),
+            return Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                Container(
+                  padding: EdgeInsets.only(top: 26.h),
+                  child: Align(
+                    child: SvgPicture.asset(
+                      e['card'],
+                      height: 135.h,
                     ),
                   ),
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: Container(
-                      padding: EdgeInsets.only(top: e['artist'] == AppImages.homeArtist3 ? 10.h : 0),
-                      child: Padding(
-                        padding: EdgeInsets.only(right: 10.w),
-                        child: Container(
-                          height: e['artist'] == AppImages.homeArtist3 ? 121.h : 131.h,
-                          child: Image.asset(
-                            e['artist'],
-                          ),
+                ),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Container(
+                    padding: EdgeInsets.only(
+                        top: e['artist'] == AppImages.homeArtist3 ? 10.h : 0),
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 10.w),
+                      child: SizedBox(
+                        height: e['artist'] == AppImages.homeArtist3
+                            ? 121.h
+                            : 131.h,
+                        child: Image.asset(
+                          e['artist'],
                         ),
                       ),
                     ),
-                  )
-                ],
-              ),
+                  ),
+                )
+              ],
             );
           },
         ).toList(),
@@ -126,8 +144,9 @@ class _HomePageState extends State<HomePage>
       indicatorPadding: EdgeInsets.symmetric(horizontal: 30.w),
       labelColor: context.isDarkMode ? Colors.white : Colors.black,
       padding: EdgeInsets.symmetric(
-          vertical: 14.h,
-          horizontal: _tabController.index == 0 ? 10.sp : 16.sp).copyWith(bottom: 17.h),
+              vertical: 14.h,
+              horizontal: _tabController.index == 0 ? 10.sp : 16.sp)
+          .copyWith(bottom: 17.h),
       tabs: [
         Padding(
           padding: EdgeInsets.symmetric(
@@ -135,7 +154,7 @@ class _HomePageState extends State<HomePage>
           ).copyWith(left: 0),
           child: Text(
             'News',
-            style: TextStyle(fontSize: 17.2.sp, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500),
           ),
         ),
         Padding(
@@ -144,7 +163,7 @@ class _HomePageState extends State<HomePage>
           ),
           child: Text(
             'Videos',
-            style: TextStyle(fontSize: 17.2.sp, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500),
           ),
         ),
         Padding(
@@ -153,7 +172,7 @@ class _HomePageState extends State<HomePage>
           ),
           child: Text(
             'Artist',
-            style: TextStyle(fontSize: 17.2.sp, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500),
           ),
         ),
         Padding(
@@ -162,7 +181,7 @@ class _HomePageState extends State<HomePage>
           ),
           child: Text(
             'Podcast',
-            style: TextStyle(fontSize: 17.2.sp, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500),
           ),
         ),
       ],

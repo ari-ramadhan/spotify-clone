@@ -4,7 +4,7 @@ import 'package:spotify_clone/core/configs/assets/app_vectors.dart';
 import 'package:spotify_clone/presentation/intro/pages/get_started.dart';
 
 class SplashPage extends StatefulWidget {
-  const SplashPage({Key? key}) : super(key: key);
+  const SplashPage({super.key});
 
   @override
   State<SplashPage> createState() => _SplashPageState();
@@ -15,6 +15,11 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
     redirect();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override
@@ -30,10 +35,13 @@ class _SplashPageState extends State<SplashPage> {
       const Duration(seconds: 2),
     );
 
+    // Check if the widget is still mounted before navigating
+    if (!mounted) return;
+
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => GetStartedPage(),
+        builder: (context) => const GetStartedPage(),
       ),
     );
   }

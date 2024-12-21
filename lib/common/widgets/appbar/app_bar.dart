@@ -7,14 +7,14 @@ class BasicAppbar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? action;
   final bool? hideBackButton;
   final VoidCallback ? onTap;
-  const BasicAppbar({Key? key, this.title, this.hideBackButton = false, this.action, this.onTap})
-      : super(key: key);
+  final Color? backgroundColor;
+  const BasicAppbar({super.key, this.title, this.hideBackButton = false, this.action, this.onTap, this.backgroundColor, });
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
       title: title ?? const Text(''),
-      backgroundColor: Colors.transparent,
+      backgroundColor: backgroundColor ?? Colors.transparent,
       elevation: 0,
       actions: [
         action ?? Container()
@@ -45,6 +45,5 @@ class BasicAppbar extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  // TODO: implement preferredSize
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }

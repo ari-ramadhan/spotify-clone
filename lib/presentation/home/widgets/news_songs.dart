@@ -10,7 +10,7 @@ import 'package:spotify_clone/presentation/home/bloc/news_songs_state.dart';
 import 'package:spotify_clone/presentation/song_player/pages/song_player.dart';
 
 class NewsSongs extends StatelessWidget {
-  const NewsSongs({Key? key}) : super(key: key);
+  const NewsSongs({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +56,7 @@ class NewsSongs extends StatelessWidget {
                 // left: index == 0 ? 0 : 0,
                 right: index == (songs.length - 1) ? 10.w : 0),
             child: SizedBox(
-              width: 135.w,
+              width: 126.w,
 
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,13 +82,13 @@ class NewsSongs extends StatelessWidget {
                             shape: BoxShape.circle,
                             color: context.isDarkMode
                                 ? AppColors.darkGrey
-                                : Color(0xffE6E6E6),
+                                : const Color(0xffE6E6E6),
                           ),
                           child: Icon(
                             Icons.play_arrow_rounded,
                             color: context.isDarkMode
-                                ? Color(0xff959595)
-                                : Color(0xff555555),
+                                ? const Color(0xff959595)
+                                : const Color(0xff555555),
                           ),
                         ),
                       ),
@@ -98,7 +98,7 @@ class NewsSongs extends StatelessWidget {
                     height: 8.h,
                   ),
                   Padding(
-                    padding: EdgeInsets.only(left: 0),
+                    padding: const EdgeInsets.only(left: 0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -112,14 +112,14 @@ class NewsSongs extends StatelessWidget {
                           ),
                         ),
                         SizedBox(
-                          height: 3.h,
+                          height: 2.h,
                         ),
                         Text(
                           songs[index].song.artist,
                           style: TextStyle(
                               fontSize: 12.7.sp,
                               fontWeight: FontWeight.w400,
-                              color: context.isDarkMode ? Color(0xffC6C6C6) : Color(0xff000000)),
+                              color: context.isDarkMode ? const Color(0xffC6C6C6) : const Color(0xff000000)),
                         ),
                       ],
                     ),

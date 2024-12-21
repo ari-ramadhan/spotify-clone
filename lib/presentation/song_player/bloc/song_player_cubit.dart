@@ -27,28 +27,54 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
     emit(SongPlayerLoaded());
   }
 
+  // Future<void> loadSong(String url) async {
+  //   try {
+  //     await audioPlayer.setUrl(url);
+  //     emit(SongPlayerLoaded());
+  //   } catch (e) {
+  //     if (!isClosed) {
+  //       emit(SongPlayerFailure());
+  //     }
+  //   }
+  // }
+
   Future<void> loadSong(String url) async {
-    try {
+  try {
+    if (!isClosed) {
       await audioPlayer.setUrl(url);
       emit(SongPlayerLoaded());
-    } catch (e) {
+    }
+  } catch (e) {
+    if (!isClosed) {
       emit(SongPlayerFailure());
     }
   }
+}
+
+
+  // void playOrPauseSong() {
+  //   if (audioPlayer.playing) {
+  //     audioPlayer.stop();
+  //   } else {
+  //     audioPlayer.play();
+  //   }
+
+  //   emit(SongPlayerLoaded());
+  // }
 
   void playOrPauseSong() {
-    if (audioPlayer.playing) {
-      audioPlayer.stop();
-    } else {
-      audioPlayer.play();
-    }
-
-    emit(SongPlayerLoaded());
+  if (audioPlayer.playing) {
+    audioPlayer.pause();
+  } else {
+    audioPlayer.play();
   }
+  emit(SongPlayerLoaded());
+}
+
 
   @override
-  Future<void> close() {
-    audioPlayer.dispose();
+  Future<void> close() async {
+    await audioPlayer.dispose();
     return super.close();
   }
 }

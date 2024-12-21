@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:spotify_clone/common/helpers/is_dark_mode.dart';
 import 'package:spotify_clone/presentation/auth/pages/signup_or_signin.dart';
@@ -12,13 +14,12 @@ import '../../../core/configs/assets/app_vectors.dart';
 import '../../../core/configs/theme/app_colors.dart';
 
 class ChooseModePage extends StatelessWidget {
-  ChooseModePage({super.key});
+  const ChooseModePage({super.key});
 
   @override
   Widget build(BuildContext context) {
 
     final isDarkMode = context.isDarkMode;
-    final svgColor = isDarkMode ? AppColors.primary : Colors.white;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -27,7 +28,7 @@ class ChooseModePage extends StatelessWidget {
         children: [
           Container(
             padding: EdgeInsets.symmetric(vertical: 40.h, horizontal: 10.w),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               image: DecorationImage(
                 fit: BoxFit.fill,
                 image: AssetImage(
@@ -47,7 +48,7 @@ class ChooseModePage extends StatelessWidget {
                   alignment: Alignment.topCenter,
                   child: SvgPicture.asset(AppVectors.logo),
                 ),
-                Spacer(),
+                const Spacer(),
                 Text(
                   'Choose Mode',
                   style: TextStyle(
@@ -79,7 +80,7 @@ class ChooseModePage extends StatelessWidget {
                                 height: 70.h,
                                 width: 70.w,
                                 decoration: BoxDecoration(
-                                    color: Color(0xff30393C).withOpacity(0.5),
+                                    color: const Color(0xff30393C).withOpacity(0.5),
                                     shape: BoxShape.circle),
                                 child: SvgPicture.asset(
                                   AppVectors.darkIcon,
@@ -122,7 +123,7 @@ class ChooseModePage extends StatelessWidget {
                                 height: 70.h,
                                 width: 70.w,
                                 decoration: BoxDecoration(
-                                    color: Color(0xff30393C).withOpacity(0.5),
+                                    color: const Color(0xff30393C).withOpacity(0.5),
                                     shape: BoxShape.circle),
                                 child: SvgPicture.asset(
                                   AppVectors.lightIcon,
@@ -156,7 +157,7 @@ class ChooseModePage extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (BuildContext context) =>
-                              SignupOrSigninPage(),
+                              const SignupOrSigninPage(),
                         ),
                       );
                     },
