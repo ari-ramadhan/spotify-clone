@@ -5,10 +5,11 @@ import 'package:spotify_clone/common/helpers/is_dark_mode.dart';
 class BasicAppbar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? title;
   final Widget? action;
+  final Widget? leading;
   final bool? hideBackButton;
   final VoidCallback ? onTap;
   final Color? backgroundColor;
-  const BasicAppbar({super.key, this.title, this.hideBackButton = false, this.action, this.onTap, this.backgroundColor, });
+  const BasicAppbar({super.key, this.leading, this.title, this.hideBackButton = false, this.action, this.onTap, this.backgroundColor, });
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +22,7 @@ class BasicAppbar extends StatelessWidget implements PreferredSizeWidget {
       ],
       centerTitle: true,
       leading: hideBackButton!
-          ? const SizedBox.shrink()
+          ? leading ?? const SizedBox.shrink()
           : IconButton(
               onPressed: onTap ?? () {
                 Navigator.pop(context);

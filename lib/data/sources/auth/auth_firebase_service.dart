@@ -81,14 +81,14 @@ class AuthSupabaseServiceImpl extends AuthSupabaseService {
       // print(data);
 
       UserModel userModel = UserModel.fromJson(data);
-      userModel.imageUrl = AppURLs.defaultProfile;
+      // userModel.imageUrl = AppURLs.defaultProfile;
 
-      UserEntity userEntity = userModel.toEntity();
+      // UserEntity userEntity = userModel.toEntity();
 
       // print(userEntity.fullName);
       // print(userEntity.email);
 
-      return Right(userEntity);
+      return Right(userModel);
     } catch (e) {
       return const Left('An error has occured');
     }

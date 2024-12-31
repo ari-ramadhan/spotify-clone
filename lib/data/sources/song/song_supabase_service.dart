@@ -9,6 +9,8 @@ abstract class SongSupabaseService {
   Future<Either> addOrRemoveFavoriteSong(int songId);
   Future<bool> isFavoriteSong(int songId);
   Future<Either> getUserFavoriteSongs();
+  Future<Either> getArtistSongs(int artistId);
+  Future<Either> getAlbumSongs(String albumId);
 }
 
 class SongSupabaseServiceImpl extends SongSupabaseService {
@@ -47,7 +49,7 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
       var item = await supabase
           .from('songs')
           .select('*')
-          .order('release_date', ascending: true);
+          .order('release_date', ascending: true).limit(7);
 
       final List<SongModel> data = item.map((item) {
         return SongModel.fromJson(item);
@@ -134,9 +136,12 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
           .select('*')
           .eq('user_id', supabase.auth.currentUser!.id);
 
-
       for (final element in songIdQuery) {
-        var songItem  = await supabase.from('songs').select('*').eq('id', element['song_id']).single();
+        var songItem = await supabase
+            .from('songs')
+            .select('*')
+            .eq('id', element['song_id'])
+            .single();
         SongModel songModel = SongModel.fromJson(songItem);
 
         anotherSong.add(songModel.toEntity());
@@ -144,6 +149,56 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
       return Right(anotherSong);
     } catch (e) {
       return const Left('An error occured while fetching your favorite songs');
+    }
+  }
+
+  @override
+  Future<Either> getArtistSongs(int artistId) async {
+    try {
+      List<SongWithFavorite> songs = [];
+
+      var item = await supabase
+          .from('songs')
+          .select('*')
+          .match({'artist_id': artistId});
+
+      final List<SongModel> data = item.map((item) {
+        return SongModel.fromJson(item);
+      }).toList();
+
+      for (final songModel in data) {
+        final isFavorite = await isFavoriteSong(songModel.id!);
+
+        songs.add(SongWithFavorite(songModel.toEntity(), isFavorite));
+      }
+
+      return Right(songs);
+    } catch (e) {
+      return const Left('An error occured, Please try again');
+    }
+  }
+
+  @override
+  Future<Either> getAlbumSongs(String albumId) async {
+    try {
+      List<SongWithFavorite> songs = [];
+
+      var item =
+          await supabase.from('songs').select('*').match({'album_id': albumId});
+
+      final List<SongModel> data = item.map((item) {
+        return SongModel.fromJson(item);
+      }).toList();
+
+      for (final songModel in data) {
+        final isFavorite = await isFavoriteSong(songModel.id!);
+
+        songs.add(SongWithFavorite(songModel.toEntity(), isFavorite));
+      }
+
+      return Right(songs);
+    } catch (e) {
+      return const Left('An error occured, Please try again');
     }
   }
 }

@@ -74,9 +74,9 @@ class _MyAppState extends State<MyApp> {
               darkTheme: AppTheme.darkTheme,
               themeMode: mode,
               debugShowCheckedModeBanner: false,
-              // home: const HomePage(),
+              // home: Debug(),
               home: _isLoggedIn ? const HomePage() : const SplashPage(),
-              // home: SplashPage(),
+              // home: ArtistPage(),
             ),
           ),
         );

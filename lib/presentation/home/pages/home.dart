@@ -32,6 +32,15 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: BasicAppbar(
+        leading: Container(
+          margin: EdgeInsets.only(left: 13.w),
+          child: IconButton.outlined(
+            onPressed: () {},
+            icon: Icon(
+              Icons.search_rounded,
+            ),
+          ),
+        ),
         action: Padding(
           padding: EdgeInsets.only(right: 5.w),
           child: IconButton(
@@ -59,10 +68,40 @@ class _HomePageState extends State<HomePage>
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: carousel(),
-            ),
+            // Container(
+            //   margin: EdgeInsets.symmetric(horizontal: 24.w),
+            //   padding: EdgeInsets.symmetric(
+            //     horizontal: 7.w,
+            //     vertical: 1.h,
+            //   ),
+            //   decoration: BoxDecoration(
+            //     borderRadius: BorderRadius.circular(25.w),
+            //     color: Colors.grey.withOpacity(0.2),
+            //   ),
+            //   child:
+            // Container(
+            //   margin: EdgeInsets.symmetric(horizontal: 24.w),
+            //   child: TextField(
+            //     decoration: InputDecoration(
+
+            //       contentPadding: EdgeInsets.symmetric(horizontal: 20.w),
+            //       filled: true,
+            //       fillColor: Colors.white.withOpacity(0.23),
+            //       enabledBorder: OutlineInputBorder(
+            //         gapPadding: 0.sp,
+            //         borderRadius: BorderRadius.circular(25.w),
+            //         borderSide: BorderSide.none,
+            //       ),
+            //       focusedBorder: OutlineInputBorder(
+            //         gapPadding: 0.sp,
+            //         borderRadius: BorderRadius.circular(25.w),
+            //         borderSide: BorderSide.none,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // ),
+            carousel(),
             _tabs(),
             SizedBox(
               height: 190.h,
@@ -70,11 +109,32 @@ class _HomePageState extends State<HomePage>
                 controller: _tabController,
                 children: [
                   const NewsSongs(),
-                  Container(),
-                  Container(),
-                  Container(),
+                  Container(
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Comming soon..',
+                      style: TextStyle(fontSize: 20.sp, color: Colors.grey),
+                    ),
+                  ),
+                  Container(
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Comming soon..',
+                      style: TextStyle(fontSize: 20.sp, color: Colors.grey),
+                    ),
+                  ),
+                  Container(
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Comming soon..',
+                      style: TextStyle(fontSize: 20.sp, color: Colors.grey),
+                    ),
+                  ),
                 ],
               ),
+            ),
+            SizedBox(
+              height: 10.h,
             ),
             const Playlist()
           ],
@@ -94,37 +154,40 @@ class _HomePageState extends State<HomePage>
         carouselController: CarouselSliderController(),
         items: items.map(
           (e) {
-            return Stack(
-              alignment: Alignment.bottomCenter,
-              children: [
-                Container(
-                  padding: EdgeInsets.only(top: 26.h),
-                  child: Align(
-                    child: SvgPicture.asset(
-                      e['card'],
-                      height: 135.h,
-                    ),
-                  ),
-                ),
-                Align(
-                  alignment: Alignment.topRight,
-                  child: Container(
-                    padding: EdgeInsets.only(
-                        top: e['artist'] == AppImages.homeArtist3 ? 10.h : 0),
-                    child: Padding(
-                      padding: EdgeInsets.only(right: 10.w),
-                      child: SizedBox(
-                        height: e['artist'] == AppImages.homeArtist3
-                            ? 121.h
-                            : 131.h,
-                        child: Image.asset(
-                          e['artist'],
-                        ),
+            return Padding(
+              padding: EdgeInsets.symmetric(horizontal: 24.w),
+              child: Stack(
+                alignment: Alignment.bottomCenter,
+                children: [
+                  Container(
+                    padding: EdgeInsets.only(top: 26.h),
+                    child: Align(
+                      child: SvgPicture.asset(
+                        e['card'],
+                        height: 135.h,
                       ),
                     ),
                   ),
-                )
-              ],
+                  Align(
+                    alignment: Alignment.topRight,
+                    child: Container(
+                      padding: EdgeInsets.only(
+                          top: e['artist'] == AppImages.homeArtist3 ? 10.h : 0),
+                      child: Padding(
+                        padding: EdgeInsets.only(right: 10.w),
+                        child: SizedBox(
+                          height: e['artist'] == AppImages.homeArtist3
+                              ? 121.h
+                              : 131.h,
+                          child: Image.asset(
+                            e['artist'],
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                ],
+              ),
             );
           },
         ).toList(),
@@ -154,7 +217,7 @@ class _HomePageState extends State<HomePage>
           ).copyWith(left: 0),
           child: Text(
             'News',
-            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 16.2.sp, fontWeight: FontWeight.w500),
           ),
         ),
         Padding(
@@ -163,7 +226,7 @@ class _HomePageState extends State<HomePage>
           ),
           child: Text(
             'Videos',
-            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 16.2.sp, fontWeight: FontWeight.w500),
           ),
         ),
         Padding(
@@ -172,7 +235,7 @@ class _HomePageState extends State<HomePage>
           ),
           child: Text(
             'Artist',
-            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 16.2.sp, fontWeight: FontWeight.w500),
           ),
         ),
         Padding(
@@ -181,7 +244,7 @@ class _HomePageState extends State<HomePage>
           ),
           child: Text(
             'Podcast',
-            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 16.2.sp, fontWeight: FontWeight.w500),
           ),
         ),
       ],

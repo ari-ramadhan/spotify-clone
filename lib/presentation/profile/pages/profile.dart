@@ -176,10 +176,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         Container(
                           height: 70.w,
                           width: 70.w,
-                          decoration: const BoxDecoration(
+                          decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             image: DecorationImage(
-                              fit: BoxFit.fill,
+                              fit: BoxFit.cover,
                               image: AssetImage(AppImages.defaultProfile),
                             ),
                           ),

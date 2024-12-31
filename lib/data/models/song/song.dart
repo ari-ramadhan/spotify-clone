@@ -6,6 +6,7 @@ class SongModel {
   String? artist;
   num? duration;
   String? releaseDate;
+  int? artistId;
   // bool? isFavorite;
 
   SongModel(
@@ -21,6 +22,7 @@ class SongModel {
     artist = data['artist'];
     duration = data['duration'];
     releaseDate = data['release_date'];
+    artistId = data['artist_id'];
     id = data['id'];
   }
 }
@@ -33,6 +35,7 @@ extension SongModelX on SongModel {
         id: id!,
         title: title!,
         artist: artist!,
+        artistId: artistId!,
         // isFavorite: isFavorite!,
         duration: duration!,
         releaseDate: releaseDate!);

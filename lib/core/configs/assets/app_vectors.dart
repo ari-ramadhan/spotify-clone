@@ -12,5 +12,8 @@ class AppVectors {
   static const String homeTopCard1 = '${basePath}home_top_card1$format';
   static const String homeTopCard2 = '${basePath}home_top_card2$format';
   static const String homeTopCard3 = '${basePath}home_top_card3$format';
+  static const String instagram = '${basePath}instagram$format';
+  static const String twitter = '${basePath}twitter$format';
+  static const String facebook = '${basePath}facebook$format';
 
 }
