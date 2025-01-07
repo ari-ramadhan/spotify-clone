@@ -1,4 +1,6 @@
 // import 'package:dartz/dartz.dart';
+import 'dart:ui';
+
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/album_song_tile/album_tile_widget.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
@@ -74,17 +76,19 @@ class _ArtistPageState extends State<ArtistPage>
                       height: 100.h,
                       decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
                         colors: [
                           AppColors.medDarkBackground.withOpacity(1),
                           AppColors.medDarkBackground.withOpacity(0),
                         ],
                       )),
-                      padding: EdgeInsets.only(left: 10.w, top: 20.h),
+                      padding: EdgeInsets.only(left: 10.w, top: 10.h),
                       child: Align(
                         alignment: Alignment.topLeft,
                         child: Container(
+                          height: 35.h,
+                          width: 35.w,
                           decoration: BoxDecoration(
                             color: Colors.grey.withOpacity(0.3),
                             shape: BoxShape.circle,
@@ -93,8 +97,9 @@ class _ArtistPageState extends State<ArtistPage>
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            icon: const Icon(
+                            icon: Icon(
                               Icons.arrow_back_ios_rounded,
+                              size: 15.h,
                             ),
                           ),
                         ),
@@ -111,90 +116,119 @@ class _ArtistPageState extends State<ArtistPage>
     );
   }
 
-  Container artistAboutCard(ArtistEntity artist) {
+  Widget artistAboutCard(ArtistEntity artist) {
+    return ClipRRect(
+        borderRadius: const BorderRadius.all(Radius.circular(25)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 30, sigmaY: 30),
+          child: Container(
+            // width: 450,
+            // height: 250,
+            margin: EdgeInsets.symmetric(horizontal: 8.w),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+            decoration: BoxDecoration(
+              color: Colors.grey.withOpacity(0.1),
+              borderRadius: const BorderRadius.all(
+                Radius.circular(
+                  25,
+                ),
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'about',
+                      style: TextStyle(
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary.withBlue(80)),
+                      textAlign: TextAlign.justify,
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 20.h,
+                ),
+                Container(
+                  padding: EdgeInsets.only(left: 5.w, top: 3.h, bottom: 3.h),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: [
+                        Colors.white10.withOpacity(0.05),
+                        Colors.white10.withOpacity(0.0),
+                      ],
+                    ),
+                    border: Border(
+                      left: BorderSide(
+                          color: AppColors.primary.withOpacity(0.8),
+                          width: 3.w),
+                    ),
+                  ),
+                  child: Text(
+                    artist.description!,
+                    style:
+                        TextStyle(fontSize: 14.sp, fontStyle: FontStyle.italic),
+                    textAlign: TextAlign.justify,
+                  ),
+                ),
+                SizedBox(
+                  height: 10.h,
+                ),
+                Text(
+                  'Social media',
+                  style:
+                      TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500),
+                  textAlign: TextAlign.justify,
+                ),
+                SizedBox(
+                  height: 6.h,
+                ),
+                Wrap(
+                  direction: Axis.horizontal,
+                  runSpacing: 8.h,
+                  spacing: 10.w,
+                  children: [
+                    socialMediaChips(
+                        AppVectors.instagram, 'Instagram', Colors.redAccent),
+                    socialMediaChips(
+                        AppVectors.twitter, 'Twitter', Colors.lightBlue),
+                    socialMediaChips(
+                        AppVectors.facebook, 'Facebook', Colors.blue.shade600),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ));
+  }
+
+  Container socialMediaChips(String svgAsset, String socialMedia, Color color) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 8.w),
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 4.w)
+          .copyWith(right: 12.w),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            AppColors.medDarkBackground,
-            Color.fromARGB(235, 54, 54, 54),
-          ],
-          stops: [
-            0,
-            1,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(15.h),
-        boxShadow: [
-          BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 10.0,
-              offset: const Offset(0, 4) // changes position of shadow
-              ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+          borderRadius: BorderRadius.circular(15.sp), color: color),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'about',
-                style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.justify,
-              ),
-              Text(
-                'musician since ${artist.careerStart}',
-                style: const TextStyle(fontStyle: FontStyle.italic),
-              )
-            ],
+          SvgPicture.asset(
+            svgAsset,
+            height: 16.h,
+            width: 16.h,
           ),
           SizedBox(
-            height: 20.h,
+            width: 5.w,
           ),
           Text(
-            artist.description!,
-            style: TextStyle(fontSize: 15.sp),
-            textAlign: TextAlign.justify,
-          ),
-          SizedBox(
-            height: 10.h,
-          ),
-          Text(
-            'Social media :',
-            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500),
-            textAlign: TextAlign.justify,
-          ),
-          SizedBox(
-            height: 10.h,
-          ),
-          Row(
-            children: [
-              SizedBox(
-                  height: 40.h,
-                  width: 40.h,
-                  child: SvgPicture.asset(AppVectors.instagram)),
-              SizedBox(
-                width: 5.w,
-              ),
-              SizedBox(
-                  height: 40.h,
-                  width: 40.h,
-                  child: SvgPicture.asset(AppVectors.twitter)),
-              SizedBox(
-                width: 5.w,
-              ),
-              SizedBox(
-                  height: 40.h,
-                  width: 40.h,
-                  child: SvgPicture.asset(AppVectors.facebook)),
-            ],
-          ),
+            socialMedia,
+            style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w500),
+          )
         ],
       ),
     );
@@ -265,14 +299,20 @@ class _ArtistPageState extends State<ArtistPage>
       child: BlocBuilder<ArtistSongsCubit, ArtistSongsState>(
         builder: (context, state) {
           if (state is ArtistSongsLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
+            return SizedBox(
+              height: 70.h,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
             );
           }
 
           if (state is ArtistSongsFailure) {
-            return const Center(
-              child: Text('Error! try again'),
+            return SizedBox(
+              height: 70.h,
+              child: const Center(
+                child: Text('Error! try again'),
+              ),
             );
           }
 
@@ -281,17 +321,21 @@ class _ArtistPageState extends State<ArtistPage>
               height: (state.songEntity.length * 40.h) +
                   ((state.songEntity.length - 1) * 13.h),
               child: TabBarView(
+
                 controller: _tabController,
                 children: [
                   ListView.separated(
+
                     itemCount: state.songEntity.length,
-                    padding: EdgeInsets.zero,
+                    padding: EdgeInsets.only(left: 30.w),
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
                       SongWithFavorite songs = state.songEntity[index];
                       return SongTileWidget(
-                        songEntity: songs,
+                        songList: state.songEntity,
+                        onSelectionChanged: (isSelected){},
+                        index: index,
                       );
                     },
                     separatorBuilder: (context, index) {
@@ -308,7 +352,9 @@ class _ArtistPageState extends State<ArtistPage>
                     itemBuilder: (context, index) {
                       SongWithFavorite songs = state.songEntity[index];
                       return SongTileWidget(
-                        songEntity: songs,
+                        songList: state.songEntity,
+                        index: index,
+                        onSelectionChanged: (isSelected){},
                       );
                     },
                     separatorBuilder: (context, index) {
@@ -350,7 +396,7 @@ class _ArtistPageState extends State<ArtistPage>
               Container(
                 margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 3.h)
                     .copyWith(left: 0),
-                padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 4.h),
+                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
                 decoration: BoxDecoration(
                     color: AppColors.primary,
                     border: Border.all(
@@ -464,18 +510,16 @@ class _ArtistPageState extends State<ArtistPage>
                   SizedBox(
                     height: 20.h,
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(left: 30.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _tabs(),
-                        SizedBox(
-                          height: 7.h,
-                        ),
-                        artistPickedList(artist)
-                      ],
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                          padding: EdgeInsets.only(left: 30.w), child: _tabs()),
+                      SizedBox(
+                        height: 7.h,
+                      ),
+                      artistPickedList(artist)
+                    ],
                   ),
                   SizedBox(
                     height: 20.h,
@@ -504,6 +548,9 @@ class _ArtistPageState extends State<ArtistPage>
                       similarArtist(artistId)
                     ],
                   ),
+                  SizedBox(
+                    height: 20.h,
+                  )
                 ],
               )
             ],
@@ -550,92 +597,151 @@ class _ArtistPageState extends State<ArtistPage>
                                 GestureDetector(
                                   onTap: () {
                                     Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ArtistPage(
-                                              artistId: artistList.id!),
-                                        ));
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ArtistPage(
+                                            artistId: artistList.id!),
+                                      ),
+                                    );
                                   },
-                                  child: Column(
-                                    children: [
-                                      Stack(
-                                        alignment: Alignment.bottomCenter,
-                                        children: [
-                                          Container(
-                                            height: 125.h,
-                                            width: 115.w,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                10.w,
+                                  child: Container(
+                                    margin: EdgeInsets.symmetric(vertical: 5.h),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: 10.w,
+                                      vertical: 10.h,
+                                    ),
+                                    decoration: BoxDecoration(
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.3,
                                               ),
-                                              image: DecorationImage(
-                                                fit: BoxFit.cover,
-                                                image: NetworkImage(
-                                                  '${AppURLs.supabaseArtistStorage}${artistList.name!.toLowerCase()}.jpg',
-                                                ),
+                                              // spreadRadius: 1,
+                                              blurRadius: 10,
+                                              offset: const Offset(3,
+                                                  3) // changes position of shadow
                                               ),
+                                        ],
+                                        color: const Color.fromARGB(
+                                            115, 54, 54, 54),
+                                        borderRadius:
+                                            BorderRadius.circular(10.sp)),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Center(
+                                          child: CircleAvatar(
+                                            radius: 50.sp,
+                                            backgroundImage: NetworkImage(
+                                              '${AppURLs.supabaseArtistStorage}${artistList.name!.toLowerCase()}.jpg',
                                             ),
                                           ),
-                                          Container(
-                                            height: 50.h,
-                                            width: 115.w,
-                                            padding: EdgeInsets.only(
-                                                bottom: 8.h, left: 10.w),
-                                            decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.only(
-                                                bottomLeft:
-                                                    Radius.circular(10.w),
-                                                bottomRight:
-                                                    Radius.circular(10.w),
-                                              ),
-                                              color: Colors.white,
-                                              gradient: LinearGradient(
-                                                end: Alignment.topCenter,
-                                                begin: Alignment.bottomCenter,
-                                                colors: [
-                                                  AppColors.primary
-                                                      .withOpacity(1),
-                                                  AppColors.primary
-                                                      .withOpacity(0.7),
-                                                  AppColors.primary
-                                                      .withOpacity(0),
-                                                ],
-                                              ),
-                                            ),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.end,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                SizedBox(
-                                                  height: 5.h,
-                                                ),
-                                                Text(
-                                                  artistList.name!,
-                                                  // textAlign: TextAlign.center,
-                                                  style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      fontSize: 12.sp,
-                                                      letterSpacing: 0.2),
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                                    ],
+                                        ),
+                                        SizedBox(
+                                          height: 18.h,
+                                        ),
+                                        Text(
+                                          artistList.name!,
+                                          style: TextStyle(
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 4.h,
+                                        ),
+                                        Text(
+                                          'Artist',
+                                          style: TextStyle(
+                                            fontSize: 11.sp,
+                                            color: Colors.white70,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
+                                  // child: Column(
+                                  //   children: [
+                                  //     Stack(
+                                  //       alignment: Alignment.bottomCenter,
+                                  //       children: [
+                                  //         Container(
+                                  //           height: 125.h,
+                                  //           width: 115.w,
+                                  //           decoration: BoxDecoration(
+                                  //             borderRadius:
+                                  //                 BorderRadius.circular(
+                                  //               10.w,
+                                  //             ),
+                                  //             image: DecorationImage(
+                                  //               fit: BoxFit.cover,
+                                  //               image: NetworkImage(
+                                  //                 '${AppURLs.supabaseArtistStorage}${artistList.name!.toLowerCase()}.jpg',
+                                  //               ),
+                                  //             ),
+                                  //           ),
+                                  //         ),
+                                  //         Container(
+                                  //           height: 50.h,
+                                  //           width: 115.w,
+                                  //           padding: EdgeInsets.only(
+                                  //               bottom: 8.h, left: 10.w),
+                                  //           decoration: BoxDecoration(
+                                  //             borderRadius: BorderRadius.only(
+                                  //               bottomLeft:
+                                  //                   Radius.circular(10.w),
+                                  //               bottomRight:
+                                  //                   Radius.circular(10.w),
+                                  //             ),
+                                  //             color: Colors.white,
+                                  //             gradient: LinearGradient(
+                                  //               end: Alignment.topCenter,
+                                  //               begin: Alignment.bottomCenter,
+                                  //               colors: [
+                                  //                 AppColors.primary
+                                  //                     .withOpacity(1),
+                                  //                 AppColors.primary
+                                  //                     .withOpacity(0.7),
+                                  //                 AppColors.primary
+                                  //                     .withOpacity(0),
+                                  //               ],
+                                  //             ),
+                                  //           ),
+                                  //           child: Column(
+                                  //             mainAxisAlignment:
+                                  //                 MainAxisAlignment.end,
+                                  //             crossAxisAlignment:
+                                  //                 CrossAxisAlignment.start,
+                                  //             children: [
+                                  //               SizedBox(
+                                  //                 height: 5.h,
+                                  //               ),
+                                  //               Text(
+                                  //                 artistList.name!,
+                                  //                 // textAlign: TextAlign.center,
+                                  //                 style: TextStyle(
+                                  //                     color: Colors.white,
+                                  //                     fontWeight:
+                                  //                         FontWeight.w600,
+                                  //                     fontSize: 12.sp,
+                                  //                     letterSpacing: 0.2),
+                                  //               ),
+                                  //             ],
+                                  //           ),
+                                  //         )
+                                  //       ],
+                                  //     ),
+                                  //   ],
+                                  // ),
                                 ),
                                 SizedBox(
                                   width: 14.w,
                                 )
                               ],
                             )
-                          : SizedBox.shrink(),
+                          : const SizedBox.shrink(),
                     );
                   },
                 ),
@@ -655,14 +761,20 @@ class _ArtistPageState extends State<ArtistPage>
       child: BlocBuilder<AlbumListCubit, AlbumListState>(
         builder: (context, state) {
           if (state is AlbumListLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
+            return SizedBox(
+              height: 70.h,
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
             );
           }
 
           if (state is AlbumListFailure) {
-            return const Center(
-              child: Text('Error! try again'),
+            return SizedBox(
+              height: 70.h,
+              child: const Center(
+                child: Text('Error! try again'),
+              ),
             );
           }
 

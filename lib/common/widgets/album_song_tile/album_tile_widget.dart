@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/domain/entity/album/album.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
+import 'package:spotify_clone/presentation/album/page/all_songs.dart';
 import 'package:spotify_clone/presentation/album/page/artist_album.dart';
 
 class AlbumTileWidget extends StatelessWidget {
@@ -27,7 +28,14 @@ class AlbumTileWidget extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         isAllSong
-            ? print('its all song')
+            ? Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AllSongsPage(
+                    artist: artist,
+                  ),
+                ),
+              )
             : isOnAlbumPage
                 ? Navigator.pushReplacement(
                     context,
@@ -50,7 +58,7 @@ class AlbumTileWidget extends StatelessWidget {
       },
       child: Container(
         padding:
-            EdgeInsets.only(left: leftPadding, right: rightPadding ?? 22.w),
+            EdgeInsets.only(left: leftPadding, right: rightPadding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,

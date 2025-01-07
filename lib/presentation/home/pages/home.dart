@@ -32,11 +32,12 @@ class _HomePageState extends State<HomePage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: BasicAppbar(
+
         leading: Container(
           margin: EdgeInsets.only(left: 13.w),
           child: IconButton.outlined(
             onPressed: () {},
-            icon: Icon(
+            icon: const Icon(
               Icons.search_rounded,
             ),
           ),
@@ -68,39 +69,6 @@ class _HomePageState extends State<HomePage>
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Container(
-            //   margin: EdgeInsets.symmetric(horizontal: 24.w),
-            //   padding: EdgeInsets.symmetric(
-            //     horizontal: 7.w,
-            //     vertical: 1.h,
-            //   ),
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(25.w),
-            //     color: Colors.grey.withOpacity(0.2),
-            //   ),
-            //   child:
-            // Container(
-            //   margin: EdgeInsets.symmetric(horizontal: 24.w),
-            //   child: TextField(
-            //     decoration: InputDecoration(
-
-            //       contentPadding: EdgeInsets.symmetric(horizontal: 20.w),
-            //       filled: true,
-            //       fillColor: Colors.white.withOpacity(0.23),
-            //       enabledBorder: OutlineInputBorder(
-            //         gapPadding: 0.sp,
-            //         borderRadius: BorderRadius.circular(25.w),
-            //         borderSide: BorderSide.none,
-            //       ),
-            //       focusedBorder: OutlineInputBorder(
-            //         gapPadding: 0.sp,
-            //         borderRadius: BorderRadius.circular(25.w),
-            //         borderSide: BorderSide.none,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // ),
             carousel(),
             _tabs(),
             SizedBox(
@@ -136,7 +104,7 @@ class _HomePageState extends State<HomePage>
             SizedBox(
               height: 10.h,
             ),
-            const Playlist()
+            const AllSongPage()
           ],
         ),
       ),

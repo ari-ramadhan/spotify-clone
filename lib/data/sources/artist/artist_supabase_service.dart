@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/data/models/artist/artist.dart';
+// ignore: unused_import
 import 'package:spotify_clone/data/models/song/song.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
 
@@ -20,11 +21,10 @@ class ArtistSupabaseServiceImpl extends ArtistSupabaseService {
       ArtistModel artistModel = ArtistModel.fromJson(data.first);
       artistEntity = artistModel.toEntity();
 
-      print(artistEntity.name);
 
       return Right(artistEntity);
     } catch (e) {
-      return Left('error occured when ');
+      return const Left('error occured when ');
     }
   }
 
@@ -45,7 +45,7 @@ class ArtistSupabaseServiceImpl extends ArtistSupabaseService {
 
       return Right(artistList);
     } catch (e) {
-      return Left('error occured when fetching artist list');
+      return const Left('error occured when fetching artist list');
     }
   }
 }

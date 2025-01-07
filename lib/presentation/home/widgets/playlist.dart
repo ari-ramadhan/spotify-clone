@@ -6,32 +6,32 @@ import 'package:spotify_clone/common/widgets/favorite_button/favorite_button.dar
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
 import 'package:spotify_clone/core/configs/theme/app_colors.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
-import 'package:spotify_clone/presentation/home/bloc/play_list_cubit.dart';
-import 'package:spotify_clone/presentation/home/bloc/play_list_state.dart';
+import 'package:spotify_clone/presentation/home/bloc/allSong_cubit.dart';
+import 'package:spotify_clone/presentation/home/bloc/allSong_state.dart';
 import 'package:spotify_clone/presentation/song_player/pages/song_player.dart';
 
-class Playlist extends StatefulWidget {
-  const Playlist({super.key});
+class AllSongPage extends StatefulWidget {
+  const AllSongPage({super.key});
 
   @override
-  State<Playlist> createState() => _PlaylistState();
+  State<AllSongPage> createState() => _AllSongPageState();
 }
 
-class _PlaylistState extends State<Playlist> {
+class _AllSongPageState extends State<AllSongPage> {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => PlayListCubit()..getPlaylist(),
-      child: BlocBuilder<PlayListCubit, PlayListState>(
+      create: (context) => AllSongCubit()..getAllSong(),
+      child: BlocBuilder<AllSongCubit, AllSongState>(
         builder: (context, state) {
-          if (state is PlaylistLoading) {
+          if (state is AllSongLoading) {
             return Container(
                 padding: const EdgeInsets.only(top: 30),
                 alignment: Alignment.center,
                 child: const CircularProgressIndicator());
           }
 
-          if (state is PlaylistLoaded) {
+          if (state is AllSongLoaded) {
             return Padding(
               padding: EdgeInsets.symmetric(vertical: 35.h, horizontal: 22.w)
                   .copyWith(right: 15.w, top: 20.h),
@@ -83,8 +83,10 @@ class _PlaylistState extends State<Playlist> {
         }
 
         return SongTileWidget(
-          songEntity: songs[index],
+          songList: songs,
           isOnHome: true,
+          index: index,
+          onSelectionChanged: (isSelected) {}
         );
       },
       separatorBuilder: (context, index) {

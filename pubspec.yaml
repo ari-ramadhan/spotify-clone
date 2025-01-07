@@ -40,6 +40,7 @@ dependencies:
   hydrated_bloc: ^9.1.5
   just_audio: ^0.9.42
   path_provider: ^2.1.5
+  persistent_bottom_nav_bar: ^6.2.1
   shared_preferences: ^2.3.3
   supabase_flutter: ^2.8.1
 

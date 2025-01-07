@@ -8,7 +8,8 @@ import 'package:spotify_clone/core/configs/constants/app_key.dart';
 import 'package:spotify_clone/core/configs/theme/app_theme.dart';
 import 'package:spotify_clone/data/repository/auth/auth_service.dart';
 import 'package:spotify_clone/presentation/choose_mode/bloc/theme_cubit.dart';
-import 'package:spotify_clone/presentation/home/pages/home.dart';
+import 'package:spotify_clone/presentation/home/pages/home_navigation.dart';
+import 'package:spotify_clone/presentation/song_player/bloc/song_player_cubit.dart';
 import 'package:spotify_clone/presentation/splash/pages/splash.dart';
 import 'package:spotify_clone/service_locator.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -67,6 +68,7 @@ class _MyAppState extends State<MyApp> {
         return MultiBlocProvider(
           providers: [
             BlocProvider(create: (_) => ThemeCubit()),
+            BlocProvider(create: (_) => SongPlayerCubit()),
           ],
           child: BlocBuilder<ThemeCubit, ThemeMode>(
             builder: (context, mode) => MaterialApp(
@@ -75,7 +77,7 @@ class _MyAppState extends State<MyApp> {
               themeMode: mode,
               debugShowCheckedModeBanner: false,
               // home: Debug(),
-              home: _isLoggedIn ? const HomePage() : const SplashPage(),
+              home: _isLoggedIn ? const HomeNavigation() : const SplashPage(),
               // home: ArtistPage(),
             ),
           ),

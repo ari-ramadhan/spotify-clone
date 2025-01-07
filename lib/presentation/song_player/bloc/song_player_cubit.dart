@@ -4,77 +4,83 @@ import 'package:spotify_clone/presentation/song_player/bloc/song_player_state.da
 
 class SongPlayerCubit extends Cubit<SongPlayerState> {
   AudioPlayer audioPlayer = AudioPlayer();
-
   Duration songDuration = Duration.zero;
   Duration songPosition = Duration.zero;
 
-  SongPlayerCubit() : super(SongPlayerLoading()) {
-    audioPlayer.positionStream.listen(
-      (position) {
-        songPosition = position;
-        updateSongPlayer();
-      },
-    );
+  List<String> playlist = [];
+  int currentIndex = 0;
 
-    audioPlayer.durationStream.listen(
-      (duration) {
-        songDuration = duration!;
-      },
-    );
+  SongPlayerCubit() : super(SongPlayerLoading()) {
+    audioPlayer.positionStream.listen((position) {
+      songPosition = position;
+      updateSongPlayer();
+    });
+
+    audioPlayer.durationStream.listen((duration) {
+      songDuration = duration ?? Duration.zero;
+    });
+  }
+
+  void seekTo(Duration position) {
+    audioPlayer.seek(position);
+    songPosition = position; // Update posisi lagu
+    emit(SongPlayerLoading()); // Memperbarui state jika diperlukan
+  }
+
+  void setPlaylist(List<String> songs, int startIndex) async {
+    playlist = songs;
+    currentIndex = startIndex;
+    await loadSong(playlist[currentIndex]);
+  }
+
+  Future<void> loadSong(String url) async {
+    try {
+      if (!isClosed) {
+        await audioPlayer.setUrl(url);
+        emit(SongPlayerLoaded());
+      }
+    } catch (e) {
+      if (!isClosed) {
+        emit(SongPlayerFailure());
+      }
+    }
+  }
+
+  void playOrPauseSong() {
+    if (audioPlayer.playing) {
+      audioPlayer.pause();
+    } else {
+      audioPlayer.play();
+    }
+    emit(SongPlayerLoaded());
+  }
+
+  void nextSong() {
+    if (currentIndex < playlist.length - 1) {
+      currentIndex++;
+      loadSong(playlist[currentIndex]);
+    }
+  }
+
+  void previousSong() {
+    if (currentIndex > 0) {
+      currentIndex--;
+      loadSong(playlist[currentIndex]);
+    }
   }
 
   void updateSongPlayer() {
     emit(SongPlayerLoaded());
   }
 
-  // Future<void> loadSong(String url) async {
-  //   try {
-  //     await audioPlayer.setUrl(url);
-  //     emit(SongPlayerLoaded());
-  //   } catch (e) {
-  //     if (!isClosed) {
-  //       emit(SongPlayerFailure());
-  //     }
-  //   }
-  // }
-
-  Future<void> loadSong(String url) async {
-  try {
-    if (!isClosed) {
-      await audioPlayer.setUrl(url);
-      emit(SongPlayerLoaded());
-    }
-  } catch (e) {
-    if (!isClosed) {
-      emit(SongPlayerFailure());
-    }
-  }
-}
-
-
-  // void playOrPauseSong() {
-  //   if (audioPlayer.playing) {
-  //     audioPlayer.stop();
-  //   } else {
-  //     audioPlayer.play();
-  //   }
-
-  //   emit(SongPlayerLoaded());
-  // }
-
-  void playOrPauseSong() {
-  if (audioPlayer.playing) {
-    audioPlayer.pause();
-  } else {
-    audioPlayer.play();
-  }
-  emit(SongPlayerLoaded());
-}
-
-
   @override
   Future<void> close() async {
     await audioPlayer.dispose();
     return super.close();
+  }
+
+  void stopSong() {
+    audioPlayer.stop();
+    emit(SongPlayerLoading());
   }
 }

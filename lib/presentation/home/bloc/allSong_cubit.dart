@@ -1,21 +1,21 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:spotify_clone/domain/usecases/song/get_play_list.dart';
-import 'package:spotify_clone/presentation/home/bloc/play_list_state.dart';
+import 'package:spotify_clone/presentation/home/bloc/allSong_state.dart';
 import 'package:spotify_clone/service_locator.dart';
 
-class PlayListCubit extends Cubit<PlayListState> {
-  PlayListCubit() : super(PlaylistLoading());
+class AllSongCubit extends Cubit<AllSongState> {
+  AllSongCubit() : super(AllSongLoading());
 
-  Future<void> getPlaylist() async {
+  Future<void> getAllSong() async {
     var returnedSongs = await sl<GetPlaylistUseCase>().call();
 
     returnedSongs.fold(
       (l) {
-        emit(PlaylistLoadFailure());
+        emit(AllSongLoadFailure());
       },
       (data) {
         if (!isClosed) {
-          emit(PlaylistLoaded(songs: data));
+          emit(AllSongLoaded(songs: data));
         }
       },
     );

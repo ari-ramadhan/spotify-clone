@@ -1,4 +1,3 @@
-import 'package:spotify_clone/domain/entity/song/song.dart';
 
 class PlaylistEntity {
   String? id;

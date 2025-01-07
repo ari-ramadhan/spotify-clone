@@ -11,6 +11,7 @@ abstract class SongSupabaseService {
   Future<Either> getUserFavoriteSongs();
   Future<Either> getArtistSongs(int artistId);
   Future<Either> getAlbumSongs(String albumId);
+  Future<Either> getPlaylistSongs(String playlistId);
 }
 
 class SongSupabaseServiceImpl extends SongSupabaseService {
@@ -129,7 +130,7 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
   @override
   Future<Either> getUserFavoriteSongs() async {
     try {
-      List<SongEntity> anotherSong = [];
+      List<SongWithFavorite> anotherSong = [];
 
       var songIdQuery = await supabase
           .from('favorites')
@@ -142,9 +143,10 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
             .select('*')
             .eq('id', element['song_id'])
             .single();
+
         SongModel songModel = SongModel.fromJson(songItem);
 
-        anotherSong.add(songModel.toEntity());
+        anotherSong.add(SongWithFavorite(songModel.toEntity(), true));
       }
       return Right(anotherSong);
     } catch (e) {
@@ -199,6 +201,38 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
       return Right(songs);
     } catch (e) {
       return const Left('An error occured, Please try again');
+    }
+  }
+
+  @override
+  Future<Either> getPlaylistSongs(String playlistId) async {
+    try {
+
+      List<SongWithFavorite> songs = [];
+
+      var playlistSongs = await supabase
+          .from('playlist_songs')
+          .select('*')
+          .match({'playlist_id': playlistId});
+
+      for (final element in playlistSongs) {
+        var song = await supabase
+            .from('songs')
+            .select('*')
+            .eq('id', element['song_id'])
+            .single();
+
+        SongModel songModel = SongModel.fromJson(song);
+
+        final isFavorite = await isFavoriteSong(songModel.id!);
+
+        songs.add(SongWithFavorite(songModel.toEntity(), isFavorite));
+      }
+
+      return Right(songs);
+    } catch (e) {
+      print(e);
+      return Left('an error occured when fetching playlist song');
     }
   }
 }

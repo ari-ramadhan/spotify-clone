@@ -34,7 +34,14 @@ class SongRepositoryImpl extends SongRepository {
     return await sl<SongSupabaseService>().getArtistSongs(artisId);
   }
 
+  @override
   Future<Either> getAlbumSongs(String albumId) async {
     return await sl<SongSupabaseService>().getAlbumSongs(albumId);
+  }
+
+  @override
+  Future<Either> getPlaylistSongs(String playlistId) async {
+    return await sl<SongSupabaseService>().getPlaylistSongs(playlistId);
+
   }
 }

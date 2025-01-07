@@ -21,4 +21,6 @@ class SongWithFavorite {
   final bool isFavorite;
 
   const SongWithFavorite(this.song, this.isFavorite);
+
+
 }

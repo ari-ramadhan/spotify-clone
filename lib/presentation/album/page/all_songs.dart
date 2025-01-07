@@ -1,29 +1,21 @@
-import 'dart:math';
 
-import 'package:flutter/material.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/album_song_tile/album_tile_widget.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
-import 'package:spotify_clone/domain/entity/album/album.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
-import 'package:spotify_clone/domain/entity/song/song.dart';
-import 'package:spotify_clone/presentation/album/bloc/artist_album/artist_album_cubit.dart';
-import 'package:spotify_clone/presentation/album/bloc/artist_album/artist_album_state.dart';
-import 'package:spotify_clone/presentation/album/page/debug.dart';
+import 'package:spotify_clone/presentation/album/bloc/all_songs/all_songs_cubit.dart';
+import 'package:spotify_clone/presentation/album/bloc/all_songs/all_songs_state.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_cubit.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_state.dart';
 
-class ArtistAlbum extends StatelessWidget {
+class AllSongsPage extends StatelessWidget {
   final ArtistEntity artist;
-  final AlbumEntity album;
-  final bool isAllSong;
-  ArtistAlbum(
-      {Key? key,
-      required this.artist,
-      required this.album,
-      this.isAllSong = false})
-      : super(key: key);
+
+  const AllSongsPage({
+    super.key,
+    required this.artist,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +23,6 @@ class ArtistAlbum extends StatelessWidget {
     AppColors.gradientList.shuffle();
 
     // Mengambil elemen acak
-    Map<String, Color> gradientAcak = AppColors.gradientList.first;
 
     return Scaffold(
       backgroundColor: AppColors.medDarkBackground,
@@ -46,34 +37,17 @@ class ArtistAlbum extends StatelessWidget {
                   children: [
                     // Album Picture
                     Container(
-                      width: double.infinity,
-                      height: 200.h,
-                      decoration: isAllSong
-                          ? BoxDecoration(
-                              image: DecorationImage(
-                                fit: BoxFit.fitWidth,
-                                alignment: const Alignment(0, -0.5),
-                                opacity: 0.7,
-                                image: NetworkImage(
-                                    '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg'),
-                              ),
-                            )
-                          : BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  gradientAcak['primaryGradient']!,
-                                  AppColors.medDarkBackground.withOpacity(0.1),
-                                ],
-                              ),
-                              image: DecorationImage(
-                                image: NetworkImage(
-                                  '${AppURLs.supabaseAlbumStorage}${artist.name} - ${album.name}.jpg',
-                                ),
-                              ),
-                            ),
-                    ),
+                        width: double.infinity,
+                        height: 200.h,
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            fit: BoxFit.fitWidth,
+                            alignment: const Alignment(0, -0.5),
+                            opacity: 0.7,
+                            image: NetworkImage(
+                                '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg'),
+                          ),
+                        )),
                     // Back Button
                     Padding(
                       padding: EdgeInsets.symmetric(vertical: 7.w),
@@ -102,69 +76,27 @@ class ArtistAlbum extends StatelessWidget {
                           SizedBox(
                             height: 18.h,
                           ),
-                          isAllSong
-                              ? Text(
-                                  artist.name!,
-                                  style: TextStyle(
-                                    fontSize: artist.name!.length <= 9
-                                        ? 20.sp
-                                        : 16.sp,
-                                    fontWeight: FontWeight.w500,
-                                    letterSpacing: 0.4,
-                                  ),
-                                )
-                              : const SizedBox.shrink(),
-                          isAllSong
-                              ? Text(
-                                  'All Songs',
-                                  style: TextStyle(
-                                    fontSize: 28.sp,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 0.4,
-                                  ),
-                                )
-                              : Text(
-                                  album.name!,
-                                  style: TextStyle(
-                                    fontSize:
-                                        album.name!.length < 17 ? 28.sp : 22.sp,
-                                    fontWeight: FontWeight.w800,
-                                    letterSpacing: 0.4,
-                                  ),
-                                ),
-                          SizedBox(
-                            height: album.name!.length <= 9 ? 5.h : 5.h,
+                          Text(
+                            artist.name!,
+                            style: TextStyle(
+                              fontSize:
+                                  artist.name!.length <= 9 ? 20.sp : 16.sp,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 0.4,
+                            ),
                           ),
-                          isAllSong
-                              ? const SizedBox.shrink()
-                              : Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      '${artist.name!} ',
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white70,
-                                        height: 1,
-                                      ),
-                                    ),
-                                    Icon(
-                                      Icons.circle,
-                                      color: Colors.white70,
-                                      size: 4.sp,
-                                    ),
-                                    Text(
-                                      ' ${album.createdAt.toString()} ',
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white70,
-                                        height: 1,
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                          Text(
+                            'All Songs',
+                            style: TextStyle(
+                              fontSize: 28.sp,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.4,
+                            ),
+                          ),
+                          // SizedBox(
+                          //   height: album.name!.length <= 9 ? 5.h : 5.h,
+                          // ),
+
                           SizedBox(
                             height: 15.h,
                           ),
@@ -264,10 +196,10 @@ class ArtistAlbum extends StatelessWidget {
                     // Album Songs
                     BlocProvider(
                       create: (context) =>
-                          AlbumSongsCubit()..getAlbumSongs(album.albumId!),
-                      child: BlocBuilder<AlbumSongsCubit, AlbumSongsState>(
+                          AllSongsCubit()..getAllSongs(artist.id!),
+                      child: BlocBuilder<AllSongsCubit, AllSongsState>(
                         builder: (context, state) {
-                          if (state is AlbumSongsLoading) {
+                          if (state is AllSongsLoading) {
                             return Container(
                               height: 100.h,
                               width: double.infinity,
@@ -277,7 +209,7 @@ class ArtistAlbum extends StatelessWidget {
                               ),
                             );
                           }
-                          if (state is AlbumSongsFailure) {
+                          if (state is AllSongsFailure) {
                             return Container(
                               height: 100.h,
                               width: double.infinity,
@@ -285,19 +217,17 @@ class ArtistAlbum extends StatelessWidget {
                               child: const Text('Failed to fetch songs'),
                             );
                           }
-                          if (state is AlbumSongsLoaded) {
+                          if (state is AllSongsLoaded) {
                             return SingleChildScrollView(
                               child: Column(
                                 children: [
                                   ListView.separated(
                                     padding:
-                                        EdgeInsets.only(left: 22.w, top: 5.h, right: 10.w),
+                                        EdgeInsets.only(left: 22.w, top: 5.h),
                                     physics:
                                         const NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
                                     itemBuilder: (context, index) {
-                                      SongWithFavorite songs =
-                                          state.songs[index];
                                       return SongTileWidget(
                                         songList: state.songs,
                                         onSelectionChanged: (isSelected){},
@@ -319,9 +249,8 @@ class ArtistAlbum extends StatelessWidget {
                                           child: const Text(
                                             'No other songs',
                                             style: TextStyle(
-                                              fontStyle: FontStyle.italic,
-                                              color: Colors.white54,
-                                            ),
+                                                fontStyle: FontStyle.italic,
+                                                color: Colors.white54),
                                           ),
                                         )
                                       : const SizedBox.shrink()
@@ -376,20 +305,16 @@ class ArtistAlbum extends StatelessWidget {
                                 children: List.generate(
                                   state.albumEntity.length,
                                   (index) {
-                                    return state.albumEntity[index].albumId !=
-                                            album.albumId
-                                        ? AlbumTileWidget(
-                                            album: albumEntity[index],
-                                            artist: artist,
-                                            isOnAlbumPage: true,
-                                            leftPadding: index == 0 ||
-                                                    albumEntity[index]
-                                                            .albumId !=
-                                                        albumEntity[0].albumId
-                                                ? 24.w
-                                                : 0,
-                                          )
-                                        : Container();
+                                    return AlbumTileWidget(
+                                      album: albumEntity[index],
+                                      artist: artist,
+                                      isOnAlbumPage: true,
+                                      leftPadding: index == 0 ||
+                                              albumEntity[index].albumId !=
+                                                  albumEntity[0].albumId
+                                          ? 24.w
+                                          : 0,
+                                    );
                                   },
                                 ),
                               ),

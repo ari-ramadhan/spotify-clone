@@ -1,4 +1,5 @@
 import 'package:spotify_clone/domain/entity/album/album.dart';
+// ignore: unused_import
 import 'package:spotify_clone/domain/entity/song/song.dart';
 
 class AlbumModel {

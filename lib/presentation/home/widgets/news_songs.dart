@@ -17,121 +17,133 @@ class NewsSongs extends StatelessWidget {
     return BlocProvider(
       create: (context) => NewsSongsCubit()..getNewsSongs(),
       child: SizedBox(
-          // height: 200,
-          child: BlocBuilder<NewsSongsCubit, NewsSongsState>(
-            builder: (context, state) {
-              if (state is NewsSongsLoading) {
-                return Container(
-                    alignment: Alignment.center,
-                    child: const CircularProgressIndicator());
-              }
+        child: BlocBuilder<NewsSongsCubit, NewsSongsState>(
+          builder: (context, state) {
+            if (state is NewsSongsLoading) {
+              return Center(child: const CircularProgressIndicator());
+            }
 
-              if (state is NewsSongsLoaded) {
-                return _songs(state.songs);
-              }
+            if (state is NewsSongsLoaded) {
+              return _songs(context, state.songs);
+            }
 
-              return Container();
-            },
-          )),
+            return const Center(
+              child: Text('No songs available.'),
+            );
+          },
+        ),
+      ),
     );
   }
 
-  Widget _songs(List<SongWithFavorite> songs) {
+  Widget _songs(BuildContext context, List<SongWithFavorite> songs) {
+    if (songs.isEmpty) {
+      return const Center(child: Text('No songs available.'));
+    }
+
     return ListView.separated(
       padding: EdgeInsets.only(left: 24.sp),
       scrollDirection: Axis.horizontal,
       itemCount: songs.length,
-      separatorBuilder: (context, index) {
-        return SizedBox(
-          width: 14.w,
-        );
-      },
+      separatorBuilder: (context, index) => SizedBox(width: 14.w),
       itemBuilder: (context, index) {
         return GestureDetector(
           onTap: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => SongPlayerPage(songEntity: songs[index],)));
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => SongPlayerPage(
+                  songs: songs, // Daftar lengkap lagu
+                  startIndex: index, // Indeks lagu yang dipilih
+                ),
+              ),
+            );
           },
-          child: Padding(
-            padding: EdgeInsets.only(
-                // left: index == 0 ? 0 : 0,
-                right: index == (songs.length - 1) ? 10.w : 0),
-            child: SizedBox(
-              width: 126.w,
+          child: _songItem(context, songs[index], index, songs.length),
+        );
+      },
+    );
+  }
 
+  Widget _songItem(
+    BuildContext context,
+    SongWithFavorite song,
+    int index,
+    int totalSongs,
+  ) {
+    return Padding(
+      padding: EdgeInsets.only(
+        right: index == (totalSongs - 1) ? 10.w : 0,
+      ),
+      child: SizedBox(
+        width: 126.w,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(25.sp),
+                  image: DecorationImage(
+                    fit: BoxFit.cover,
+                    image: NetworkImage(
+                      '${AppURLs.supabaseCoverStorage}${song.song.artist} - ${song.song.title}.jpg',
+                    ),
+                  ),
+                ),
+                child: Align(
+                  alignment: Alignment.bottomRight,
+                  child: Container(
+                    height: 40.h,
+                    width: 40.w,
+                    transform: Matrix4.translationValues(-10.w, 13.h, 0),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: context.isDarkMode
+                          ? AppColors.darkGrey
+                          : const Color(0xffE6E6E6),
+                    ),
+                    child: Icon(
+                      Icons.play_arrow_rounded,
+                      color: context.isDarkMode
+                          ? const Color(0xff959595)
+                          : const Color(0xff555555),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 8.h),
+            Padding(
+              padding: const EdgeInsets.only(left: 0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(25.sp),
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-
-                          image: NetworkImage(
-                              '${AppURLs.supabaseCoverStorage}${songs[index].song.artist} - ${songs[index].song.title}.jpg'),
-                        ),
-                      ),
-                      child: Align(
-                        alignment: Alignment.bottomRight,
-                        child: Container(
-                          height: 35.h,
-                          width: 35.w,
-                          transform: Matrix4.translationValues(-15.w, 13.h, 0),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: context.isDarkMode
-                                ? AppColors.darkGrey
-                                : const Color(0xffE6E6E6),
-                          ),
-                          child: Icon(
-                            Icons.play_arrow_rounded,
-                            color: context.isDarkMode
-                                ? const Color(0xff959595)
-                                : const Color(0xff555555),
-                          ),
-                        ),
-                      ),
+                  Text(
+                    song.song.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  SizedBox(
-                    height: 8.h,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          songs[index].song.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            fontSize: 14.sp,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 2.h,
-                        ),
-                        Text(
-                          songs[index].song.artist,
-                          style: TextStyle(
-                              fontSize: 12.7.sp,
-                              fontWeight: FontWeight.w400,
-                              color: context.isDarkMode ? const Color(0xffC6C6C6) : const Color(0xff000000)),
-                        ),
-                      ],
+                  SizedBox(height: 2.h),
+                  Text(
+                    song.song.artist,
+                    style: TextStyle(
+                      fontSize: 12.7.sp,
+                      fontWeight: FontWeight.w400,
+                      color: context.isDarkMode
+                          ? const Color(0xffC6C6C6)
+                          : const Color(0xff000000),
                     ),
                   ),
                 ],
               ),
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
     );
   }
-
-
 }
