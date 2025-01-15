@@ -24,4 +24,9 @@ class ArtistRepositoryImpl extends ArtistRepository {
     return await sl<ArtistSupabaseService>().isFollowed(artistId);
   }
 
+  @override
+  Future<Either> getRecommendedArtistBasedOnPlaylist(List<String> artistsName) async {
+    return await sl<ArtistSupabaseService>().getRecommendedArtistBasedOnPlaylist(artistsName);
+  }
+
 }

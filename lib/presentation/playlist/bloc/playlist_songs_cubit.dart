@@ -152,11 +152,6 @@ class PlaylistSongsCubit extends Cubit<PlaylistSongsState> {
           emit(PlaylistSongsLoaded(songs: updatedSongs));
 
           print("After emit: ${updatedSongs.map((e) => e.song.title).toList()}");
-        // if (state is PlaylistSongsLoaded) {
-        // } else {
-        //   print("State is not PlaylistSongsLoaded. Emitting new state...");
-        //   await getPlaylistSongs(playlistId); // Ensure stateplayl is refreshed
-        // }
       },
     );
   }

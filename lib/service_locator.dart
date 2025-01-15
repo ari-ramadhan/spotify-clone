@@ -19,6 +19,7 @@ import 'package:spotify_clone/domain/usecases/album/get_artist_album.dart';
 import 'package:spotify_clone/domain/usecases/artist/follow_unfollow_artist.dart';
 import 'package:spotify_clone/domain/usecases/artist/get_all_artist.dart';
 import 'package:spotify_clone/domain/usecases/artist/get_artist_info.dart';
+import 'package:spotify_clone/domain/usecases/artist/get_recommended_artist_based_on_playlist.dart';
 import 'package:spotify_clone/domain/usecases/artist/is_following_artist.dart';
 import 'package:spotify_clone/domain/usecases/auth/get_user.dart';
 import 'package:spotify_clone/domain/usecases/auth/signin.dart';
@@ -114,6 +115,9 @@ Future<void> initializeDependencies () async {
   );
   sl.registerSingleton<IsFollowingArtistUseCase>(
     IsFollowingArtistUseCase()
+  );
+  sl.registerSingleton<GetRecommendedArtistBasedOnPlaylistUseCase>(
+    GetRecommendedArtistBasedOnPlaylistUseCase()
   );
 
   // album

@@ -3,7 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 
-Future<Object?> blurryDialog({required BuildContext context, required String dialogTitle, required Widget content}) {
+Future<Object?> blurryDialog({required BuildContext context, required String dialogTitle, required Widget content, required double horizontalPadding}) {
   return showGeneralDialog(
     barrierDismissible: true,
     barrierLabel: '',
@@ -18,7 +18,7 @@ Future<Object?> blurryDialog({required BuildContext context, required String dia
           alignment: Alignment.bottomCenter,
           child: Container(
             // alignment: Alignment.topLeft,
-            padding: EdgeInsets.symmetric(horizontal: 21.w, vertical: 15.h),
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding.w, vertical: 15.h),
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.sp), color: AppColors.medDarkBackground),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -27,9 +27,12 @@ Future<Object?> blurryDialog({required BuildContext context, required String dia
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Text(
-                      dialogTitle,
-                      style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 21.w),
+                      child: Text(
+                        dialogTitle,
+                        style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
+                      ),
                     ),
                     SizedBox(
                       height: 30.h,

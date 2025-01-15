@@ -10,6 +10,7 @@ abstract class ArtistSupabaseService {
   Future<Either> getAllArtist();
   Future<bool> isFollowed(int artistId);
   Future<Either> followUnfollowArtist(int artistId);
+  Future<Either> getRecommendedArtistBasedOnPlaylist(List<String> artistsName);
 }
 
 class ArtistSupabaseServiceImpl extends ArtistSupabaseService {
@@ -128,6 +129,28 @@ class ArtistSupabaseServiceImpl extends ArtistSupabaseService {
       return Right(followStatus);
     } catch (e) {
       return Left('An error occured when following an artist');
+    }
+  }
+
+  @override
+  Future<Either> getRecommendedArtistBasedOnPlaylist(List<String> artistsName) async {
+    try {
+
+      if (artistsName.isEmpty){
+        return const Left('no artists founded according this playlist');
+      } else {
+        List<ArtistEntity> artistMap = [];
+
+        for (var artist in artistsName){
+          var result = await supabase.from('artist').select().eq('name', artist).single();
+          artistMap.add(ArtistModel.fromJson(result).toEntity());
+        }
+
+        return Right(artistMap);
+      }
+    } catch (e) {
+        return const Left('error occured when getting recommended artist');
+
     }
   }
 }

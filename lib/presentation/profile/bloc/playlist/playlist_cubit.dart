@@ -1,5 +1,9 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:spotify_clone/domain/entity/playlist/playlist.dart';
+import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/domain/usecases/auth/get_user.dart';
+import 'package:spotify_clone/domain/usecases/playlist/add_new_playlist.dart';
 import 'package:spotify_clone/domain/usecases/playlist/get_currentUser_playlist.dart';
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_state.dart';
 import 'package:spotify_clone/presentation/profile/bloc/profile_info/profile_info_state.dart';
@@ -21,5 +25,46 @@ class PlaylistCubit extends Cubit<PlaylistState> {
         }
       },
     );
+  }
+
+  Future<Either> createPlaylist(
+      {required String playlistTitle, required String playlistDesc, required bool isPublic, required List<int> selectedSongsId,}) async {
+    var returnObject = '';
+
+    try {
+      final addSongResult = await sl<AddNewPlaylistUseCase>().call(
+        params: AddNewPlaylistParams(
+          title: playlistTitle,
+          selectedSongs: selectedSongsId,
+          description: '',
+          isPublic: true,
+        ),
+      );
+
+      addSongResult.fold(
+        (l) {
+          emit(PlaylistFailure());
+          returnObject = l;
+        },
+        (r) async {
+          final currentState = state as PlaylistLoaded;
+
+          print("Before emit: ${currentState.playlistModel.map((e) => e.name).toList()}");
+
+          final updatedPlaylists = List<PlaylistEntity>.from(currentState.playlistModel)..add(r);
+
+          emit(PlaylistLoaded(playlistModel: updatedPlaylists));
+
+          print("After emit: ${updatedPlaylists.map((e) => e.name).toList()}");
+
+          returnObject = 'Successfully creating a playlist';
+        },
+      );
+
+      return Right(returnObject);
+    } catch (e) {
+      returnObject = 'an error occured';
+      return Left(returnObject);
+    }
   }
 }
