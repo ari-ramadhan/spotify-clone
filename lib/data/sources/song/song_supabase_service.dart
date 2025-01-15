@@ -213,7 +213,7 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
       var playlistSongs = await supabase
           .from('playlist_songs')
           .select('*')
-          .match({'playlist_id': playlistId});
+          .match({'playlist_id': playlistId}).order('added_at', ascending: false);
 
       for (final element in playlistSongs) {
         var song = await supabase

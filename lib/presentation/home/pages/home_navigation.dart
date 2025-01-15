@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:persistent_bottom_nav_bar/persistent_bottom_nav_bar.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/presentation/home/pages/home.dart';
 
@@ -13,6 +11,7 @@ class HomeNavigation extends StatefulWidget {
 class _HomeNavigationState extends State<HomeNavigation> {
   final List<Widget> _pages = [
     const HomePage(),
+    // Scaffold(),
     Scaffold(
       body: Center(
         child: Container(
@@ -41,6 +40,7 @@ class _HomeNavigationState extends State<HomeNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // backgroundColor: AppColors.black,
       // extendBodyBehindAppBar: true,
       body: _pages[_selectedIndex],
 //       body: PersistentTabView(
@@ -60,57 +60,54 @@ class _HomeNavigationState extends State<HomeNavigation> {
 //         ],
 //         screens: _pages,
 //       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        backgroundColor: Colors.grey.shade900,
-        showUnselectedLabels: true,
-        selectedItemColor: AppColors.primary,
-        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
-        unselectedItemColor: Colors.white70,
-        onTap: (value) {
-          setState(() {
-            _selectedIndex = value;
-          });
-        },
-        items: const [
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.home_rounded,
-              ),
-              label: 'Home'),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.search_rounded,
-              ),
-              label: 'Search'),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.person_rounded,
-              ),
-              label: 'Profile'),
-          BottomNavigationBarItem(
-              icon: Icon(
-                Icons.assistant,
-              ),
-              label: 'Premium'),
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Divider(
+            indent: 0,
+            color: Colors.white,
+            thickness: 0.1,
+            height: 0.1,
+          ),
+          BottomNavigationBar(
+            currentIndex: _selectedIndex,
+            showUnselectedLabels: true,
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: const Color.fromARGB(255, 22, 21, 21),
+            // backgroundColor: const Color.fromARGB(255, 151, 106, 106),
+            selectedItemColor: AppColors.primary,
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
+            unselectedItemColor: Colors.white70,
+            onTap: (value) {
+              setState(() {
+                _selectedIndex = value;
+              });
+            },
+            items: const [
+              BottomNavigationBarItem(
+                  icon: Icon(
+                    Icons.home_rounded,
+                  ),
+                  label: 'Home'),
+              BottomNavigationBarItem(
+                  icon: Icon(
+                    Icons.search_rounded,
+                  ),
+                  label: 'Search'),
+              BottomNavigationBarItem(
+                  icon: Icon(
+                    Icons.my_library_music_sharp,
+                  ),
+                  label: 'My Library'),
+              BottomNavigationBarItem(
+                  icon: Icon(
+                    Icons.assistant,
+                  ),
+                  label: 'Premium'),
+            ],
+          ),
         ],
       ),
-    );
-  }
-
-  PersistentBottomNavBarItem navBarItem(
-      {required IconData icon, required String title}) {
-    return PersistentBottomNavBarItem(
-      icon: Icon(
-        icon,
-      ),
-      title: title,
-      iconSize: 22.sp,
-      activeColorPrimary: AppColors.primary,
-      activeColorSecondary: Colors.white,
-      inactiveColorPrimary: Colors.white60,
-      contentPadding: 1,
-      textStyle: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500),
     );
   }
 }

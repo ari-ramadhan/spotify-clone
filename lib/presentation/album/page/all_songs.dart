@@ -1,4 +1,5 @@
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/album_song_tile/album_tile_widget.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
@@ -44,7 +45,7 @@ class AllSongsPage extends StatelessWidget {
                             fit: BoxFit.fitWidth,
                             alignment: const Alignment(0, -0.5),
                             opacity: 0.7,
-                            image: NetworkImage(
+                            image: CachedNetworkImageProvider(
                                 '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg'),
                           ),
                         )),

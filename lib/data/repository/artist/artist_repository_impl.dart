@@ -14,4 +14,14 @@ class ArtistRepositoryImpl extends ArtistRepository {
     return await sl<ArtistSupabaseService>().getAllArtist();
   }
 
+  @override
+  Future<Either> followUnfollowArtist(int artistId) async {
+    return await sl<ArtistSupabaseService>().followUnfollowArtist(artistId);
+  }
+
+  @override
+  Future<bool> isFollowed(int artistId) async {
+    return await sl<ArtistSupabaseService>().isFollowed(artistId);
+  }
+
 }

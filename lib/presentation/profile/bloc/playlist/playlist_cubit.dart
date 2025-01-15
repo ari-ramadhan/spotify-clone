@@ -16,7 +16,9 @@ class PlaylistCubit extends Cubit<PlaylistState> {
         emit(PlaylistFailure());
       },
       (playlist) {
-        emit(PlaylistLoaded(playlistModel: playlist));
+        if (!isClosed) {
+          emit(PlaylistLoaded(playlistModel: playlist));
+        }
       },
     );
   }

@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
 
@@ -37,18 +39,19 @@ class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
 
   @override
   Widget build(BuildContext context) {
-    Color textColor = isSelected ? Colors.black : Colors.white;
+    Color textColor = Colors.white;
 
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.sp),
-        color: isSelected ? Colors.white : Colors.grey.shade700,
+        color: isSelected ? AppColors.darkGrey : AppColors.darkBackground,
         border: Border.all(color: Colors.white),
       ),
-      padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 4.w, vertical: 4.h),
       child: InkWell(
         onTap: () {
           toggleSelected();
+
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -57,19 +60,19 @@ class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
             Row(
               children: [
                 Container(
-                  height: 34.h,
-                  width: 38.w,
+                  height: 28.h,
+                  width: 31.w,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(7.sp),
                     image: DecorationImage(
                       fit: BoxFit.cover,
-                      image: NetworkImage(
+                      image: CachedNetworkImageProvider(
                           '${AppURLs.supabaseCoverStorage}${widget.songEntity.song.artist} - ${widget.songEntity.song.title}.jpg'),
                     ),
                   ),
                 ),
                 SizedBox(
-                  width: 14.w,
+                  width: 7.w,
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,7 +83,7 @@ class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
                       style: TextStyle(
                           fontWeight: FontWeight.w500,
                           color: textColor,
-                          fontSize: 14.sp),
+                          fontSize: 12.sp),
                     ),
                     SizedBox(
                       height: 3.h,
@@ -90,7 +93,7 @@ class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
                       style: TextStyle(
                           fontWeight: FontWeight.w400,
                           color: textColor,
-                          fontSize: 11.sp),
+                          fontSize: 9.sp),
                     ),
                   ],
                 )
@@ -108,16 +111,19 @@ class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
                   width: 10.w,
                 ),
                 Container(
-                  padding: EdgeInsets.all(4.sp),
+                  padding: EdgeInsets.all(2.sp),
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Color.fromARGB(255, 7, 5, 5),
+                    color: AppColors.darkBackground
                   ),
                   child: Icon(
                     isSelected ? Icons.check : Icons.playlist_add,
                     color: Colors.white,
-                    size: 18.sp,
+                    size: 11.sp,
                   ),
+                ),
+                SizedBox(
+                  width: 7.w,
                 )
               ],
             )

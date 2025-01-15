@@ -8,7 +8,7 @@ import 'package:spotify_clone/core/configs/assets/app_images.dart';
 import 'package:spotify_clone/core/configs/assets/app_vectors.dart';
 import 'package:spotify_clone/core/configs/theme/app_colors.dart';
 import 'package:spotify_clone/presentation/home/widgets/news_songs.dart';
-import 'package:spotify_clone/presentation/home/widgets/playlist.dart';
+import 'package:spotify_clone/presentation/home/widgets/all_song.dart';
 import 'package:spotify_clone/presentation/profile/pages/profile.dart';
 
 class HomePage extends StatefulWidget {
@@ -31,6 +31,7 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // backgroundColor: AppColors.black,
       appBar: BasicAppbar(
 
         leading: Container(

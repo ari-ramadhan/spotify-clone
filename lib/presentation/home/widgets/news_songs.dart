@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,25 +15,20 @@ class NewsSongs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => NewsSongsCubit()..getNewsSongs(),
-      child: SizedBox(
-        child: BlocBuilder<NewsSongsCubit, NewsSongsState>(
-          builder: (context, state) {
-            if (state is NewsSongsLoading) {
-              return Center(child: const CircularProgressIndicator());
-            }
+    return BlocBuilder<NewsSongsCubit, NewsSongsState>(
+      builder: (context, state) {
+        if (state is NewsSongsLoading) {
+          return Center(child: const CircularProgressIndicator());
+        }
 
-            if (state is NewsSongsLoaded) {
-              return _songs(context, state.songs);
-            }
+        if (state is NewsSongsLoaded) {
+          return _songs(context, state.songs);
+        }
 
-            return const Center(
-              child: Text('No songs available.'),
-            );
-          },
-        ),
-      ),
+        return const Center(
+          child: Text('No songs available.'),
+        );
+      },
     );
   }
 
@@ -84,11 +80,15 @@ class NewsSongs extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(25.sp),
                   image: DecorationImage(
-                    fit: BoxFit.cover,
-                    image: NetworkImage(
-                      '${AppURLs.supabaseCoverStorage}${song.song.artist} - ${song.song.title}.jpg',
-                    ),
-                  ),
+                      fit: BoxFit.cover,
+                      image:
+                      CachedNetworkImageProvider(
+                        '${AppURLs.supabaseCoverStorage}${song.song.artist} - ${song.song.title}.jpg',
+                      )
+                      // NetworkImage(
+                      //   '${AppURLs.supabaseCoverStorage}${song.song.artist} - ${song.song.title}.jpg',
+                      // ),
+                      ),
                 ),
                 child: Align(
                   alignment: Alignment.bottomRight,

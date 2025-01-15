@@ -16,13 +16,20 @@ import 'package:spotify_clone/domain/repository/playlist/playlist.dart';
 import 'package:spotify_clone/domain/repository/song/song.dart';
 import 'package:spotify_clone/domain/usecases/album/get_all_songs.dart';
 import 'package:spotify_clone/domain/usecases/album/get_artist_album.dart';
+import 'package:spotify_clone/domain/usecases/artist/follow_unfollow_artist.dart';
 import 'package:spotify_clone/domain/usecases/artist/get_all_artist.dart';
 import 'package:spotify_clone/domain/usecases/artist/get_artist_info.dart';
+import 'package:spotify_clone/domain/usecases/artist/is_following_artist.dart';
 import 'package:spotify_clone/domain/usecases/auth/get_user.dart';
 import 'package:spotify_clone/domain/usecases/auth/signin.dart';
 import 'package:spotify_clone/domain/usecases/auth/signup.dart';
 import 'package:spotify_clone/domain/usecases/playlist/add_new_playlist.dart';
+import 'package:spotify_clone/domain/usecases/playlist/add_songs_to_playlist.dart';
+import 'package:spotify_clone/domain/usecases/playlist/delete_playlist.dart';
+import 'package:spotify_clone/domain/usecases/playlist/delete_song_from_playlist.dart';
 import 'package:spotify_clone/domain/usecases/playlist/get_currentUser_playlist.dart';
+import 'package:spotify_clone/domain/usecases/playlist/add_song_by_keyword.dart';
+import 'package:spotify_clone/domain/usecases/playlist/update_playlist_info.dart';
 import 'package:spotify_clone/domain/usecases/song/add_or_remove_favorite_song.dart';
 import 'package:spotify_clone/domain/usecases/song/get_album_songs.dart';
 import 'package:spotify_clone/domain/usecases/song/get_artist_songs.dart';
@@ -102,6 +109,12 @@ Future<void> initializeDependencies () async {
   sl.registerSingleton<GetAllArtistUseCase>(
     GetAllArtistUseCase()
   );
+  sl.registerSingleton<FollowUnfollowArtistUseCase>(
+    FollowUnfollowArtistUseCase()
+  );
+  sl.registerSingleton<IsFollowingArtistUseCase>(
+    IsFollowingArtistUseCase()
+  );
 
   // album
   sl.registerSingleton<AlbumRepository>(
@@ -126,6 +139,21 @@ Future<void> initializeDependencies () async {
   );
   sl.registerSingleton<AddNewPlaylistUseCase>(
     AddNewPlaylistUseCase()
+  );
+  sl.registerSingleton<UpdatePlaylistInfoUseCase>(
+    UpdatePlaylistInfoUseCase()
+  );
+  sl.registerSingleton<AddSongsToPlaylistUseCase>(
+    AddSongsToPlaylistUseCase()
+  );
+  sl.registerSingleton<DeletePlaylistUseCase>(
+    DeletePlaylistUseCase()
+  );
+  sl.registerSingleton<AddSongByKeywordUseCase>(
+    AddSongByKeywordUseCase()
+  );
+  sl.registerSingleton<DeleteSongFromPlaylistUseCase>(
+    DeleteSongFromPlaylistUseCase()
   );
 
 }

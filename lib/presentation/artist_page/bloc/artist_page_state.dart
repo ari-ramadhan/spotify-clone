@@ -4,7 +4,7 @@ abstract class ArtistPageState {}
 
 class ArtistPageLoading extends ArtistPageState {}
 class ArtistPageLoaded extends ArtistPageState {
-  final ArtistEntity artistEntity;
+  final ArtistWithFollowing artistEntity;
 
   ArtistPageLoaded({required this.artistEntity});
 

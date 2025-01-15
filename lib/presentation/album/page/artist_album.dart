@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/album_song_tile/album_tile_widget.dart';
@@ -54,7 +55,7 @@ class ArtistAlbum extends StatelessWidget {
                                 fit: BoxFit.fitWidth,
                                 alignment: const Alignment(0, -0.5),
                                 opacity: 0.7,
-                                image: NetworkImage(
+                                image: CachedNetworkImageProvider(
                                     '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg'),
                               ),
                             )
@@ -68,7 +69,7 @@ class ArtistAlbum extends StatelessWidget {
                                 ],
                               ),
                               image: DecorationImage(
-                                image: NetworkImage(
+                                image: CachedNetworkImageProvider(
                                   '${AppURLs.supabaseAlbumStorage}${artist.name} - ${album.name}.jpg',
                                 ),
                               ),
@@ -95,12 +96,12 @@ class ArtistAlbum extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 24.w),
+                      padding: EdgeInsets.symmetric(horizontal: 14.w),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SizedBox(
-                            height: 18.h,
+                            height: 10.h,
                           ),
                           isAllSong
                               ? Text(
@@ -127,7 +128,7 @@ class ArtistAlbum extends StatelessWidget {
                                   album.name!,
                                   style: TextStyle(
                                     fontSize:
-                                        album.name!.length < 17 ? 28.sp : 22.sp,
+                                        album.name!.length < 17 ? 23.sp : 18.sp,
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: 0.4,
                                   ),
@@ -184,9 +185,9 @@ class ArtistAlbum extends StatelessWidget {
                       height: 10.h,
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 13.w),
+                      padding: EdgeInsets.symmetric(horizontal: 5.w),
                       child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
@@ -194,6 +195,7 @@ class ArtistAlbum extends StatelessWidget {
                             children: [
                               IconButton(
                                 onPressed: () {},
+                                splashRadius: 18.sp,
                                 icon: Icon(
                                   Icons.playlist_add,
                                   color: AppColors.primary,
@@ -202,6 +204,7 @@ class ArtistAlbum extends StatelessWidget {
                               ),
                               IconButton(
                                 onPressed: () {},
+                                splashRadius: 18.sp,
                                 icon: Icon(
                                   Icons.favorite_outline_rounded,
                                   color: AppColors.primary,
@@ -210,6 +213,7 @@ class ArtistAlbum extends StatelessWidget {
                               ),
                               IconButton(
                                 onPressed: () {},
+                                splashRadius: 18.sp,
                                 icon: Icon(
                                   Icons.more_horiz_rounded,
                                   color: Colors.white70,
@@ -218,41 +222,30 @@ class ArtistAlbum extends StatelessWidget {
                               ),
                             ],
                           ),
+                          GestureDetector(
+                            onTap: () {},
+                            child: Container(
+                              margin: EdgeInsets.only(right: 10.w),
+                              padding: EdgeInsets.all(5.h),
+                              decoration: const BoxDecoration(
+                                  color: AppColors.primary,
+                                  shape: BoxShape.circle),
+                              child: IconButton(
+                                onPressed: () {},
+                                icon: Icon(
+                                  Icons.play_arrow_rounded,
+                                  size: 25.h,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          )
                         ],
                       ),
                     ),
                   ],
                 )
               ],
-            ),
-            Container(
-              height: 1.h,
-              width: double.infinity,
-              color: Colors.transparent,
-              child: OverflowBox(
-                minWidth: 0.0,
-                maxWidth: double.infinity,
-                minHeight: 0.0,
-                alignment: Alignment.centerRight,
-                maxHeight: double.infinity,
-                child: GestureDetector(
-                  onTap: () {},
-                  child: Container(
-                    margin: EdgeInsets.only(right: 10.w),
-                    padding: EdgeInsets.all(5.h),
-                    decoration: const BoxDecoration(
-                        color: AppColors.primary, shape: BoxShape.circle),
-                    child: IconButton(
-                      onPressed: () {},
-                      icon: Icon(
-                        Icons.play_arrow_rounded,
-                        size: 25.h,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
             ),
             // Body Scrollable
             Expanded(
@@ -290,8 +283,8 @@ class ArtistAlbum extends StatelessWidget {
                               child: Column(
                                 children: [
                                   ListView.separated(
-                                    padding:
-                                        EdgeInsets.only(left: 22.w, top: 5.h, right: 10.w),
+                                    padding: EdgeInsets.only(
+                                        left: 13.w, top: 5.h,),
                                     physics:
                                         const NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
@@ -300,7 +293,7 @@ class ArtistAlbum extends StatelessWidget {
                                           state.songs[index];
                                       return SongTileWidget(
                                         songList: state.songs,
-                                        onSelectionChanged: (isSelected){},
+                                        onSelectionChanged: (isSelected) {},
                                         index: index,
                                       );
                                     },
@@ -335,7 +328,7 @@ class ArtistAlbum extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(left: 22.w),
+                      padding: EdgeInsets.only(left: 10.w),
                       child: Text(
                         'Other Album',
                         style: TextStyle(
@@ -373,6 +366,7 @@ class ArtistAlbum extends StatelessWidget {
                             return SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: List.generate(
                                   state.albumEntity.length,
                                   (index) {
@@ -382,11 +376,12 @@ class ArtistAlbum extends StatelessWidget {
                                             album: albumEntity[index],
                                             artist: artist,
                                             isOnAlbumPage: true,
+                                            rightPadding: 14.w,
                                             leftPadding: index == 0 ||
                                                     albumEntity[index]
                                                             .albumId !=
                                                         albumEntity[0].albumId
-                                                ? 24.w
+                                                ? 10.w
                                                 : 0,
                                           )
                                         : Container();

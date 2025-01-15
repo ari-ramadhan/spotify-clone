@@ -12,3 +12,9 @@ class ArtistEntity {
   });
 
 }
+class ArtistWithFollowing {
+  final ArtistEntity artist;
+  final bool isFollowed;
+
+  const ArtistWithFollowing(this.artist, this.isFollowed);
+}

@@ -8,7 +8,7 @@ class SimilarArtistLoading extends SimilarArtistState{}
 class SimilarArtistLoaded extends SimilarArtistState{
 
 
-  final List<ArtistEntity> artistEntity;
+  final List<ArtistWithFollowing> artistEntity;
 
 
   SimilarArtistLoaded({required this.artistEntity});

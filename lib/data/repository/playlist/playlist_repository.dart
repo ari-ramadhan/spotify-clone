@@ -14,5 +14,31 @@ class PlaylistRepositoryImpl extends PlaylistRepository{
     return await sl<PlaylistSupabaseService>().addNewPlaylist(title, description, isPublic, selectedSongId);
   }
 
+  @override
+  Future<Either> updatePlaylistInfo(String playlistId, String title, String desc) async {
+    return await sl<PlaylistSupabaseService>().updatePlaylistInfo(playlistId, title, desc);
+  }
+
+  @override
+  Future<Either> addSongsToPlaylist(String playlistId, List selectedSongId) async {
+    return await sl<PlaylistSupabaseService>().addSongsToPlaylist(playlistId, selectedSongId);
+  }
+
+  @override
+  Future<Either> deletePlaylist(String playlistId) async {
+    return await sl<PlaylistSupabaseService>().deletePlaylist(playlistId);
+  }
+
+  @override
+  Future<Either> addSongByKeyword(String playlistId, String title) async {
+    return await sl<PlaylistSupabaseService>().addSongByKeyword(playlistId, title);
+  }
+
+  @override
+  Future<Either> deleteSongFromPlaylist(String playlistId, int songId) async {
+    return await sl<PlaylistSupabaseService>().deleteSongFromPlaylist(playlistId, songId);
+  }
+
+
 
 }

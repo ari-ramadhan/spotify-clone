@@ -9,7 +9,7 @@ export 'package:spotify_clone/core/configs/assets/app_vectors.dart';
 export 'package:spotify_clone/core/configs/theme/app_colors.dart';
 export 'package:spotify_clone/main.dart';
 export 'package:spotify_clone/presentation/home/widgets/news_songs.dart';
-export 'package:spotify_clone/presentation/home/widgets/playlist.dart';
+export 'package:spotify_clone/presentation/home/widgets/all_song.dart';
 export 'package:spotify_clone/presentation/profile/pages/profile.dart';
 export 'package:flutter/foundation.dart';
 // export 'package:flutter/material.dart';

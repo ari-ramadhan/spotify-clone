@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
@@ -71,10 +72,10 @@ class AlbumTileWidget extends StatelessWidget {
                 image: DecorationImage(
                   fit: BoxFit.cover,
                   image: isAllSong
-                      ? NetworkImage(
+                      ? CachedNetworkImageProvider(
                           '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
                         )
-                      : NetworkImage(
+                      : CachedNetworkImageProvider(
                           '${AppURLs.supabaseAlbumStorage}${artist.name} - ${album.name}.jpg',
                         ),
                 ),

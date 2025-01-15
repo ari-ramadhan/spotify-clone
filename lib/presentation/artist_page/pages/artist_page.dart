@@ -1,12 +1,14 @@
 // import 'package:dartz/dartz.dart';
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/album_song_tile/album_tile_widget.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
+import 'package:spotify_clone/domain/usecases/artist/follow_unfollow_artist.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_cubit.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_state.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/artist_page_cubit.dart';
@@ -15,6 +17,7 @@ import 'package:spotify_clone/presentation/artist_page/bloc/popular_song/artist_
 import 'package:spotify_clone/presentation/artist_page/bloc/popular_song/artist_songs_state.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/similar_artist/similar_artist_cubit.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/similar_artist/similar_artist_state.dart';
+import 'package:spotify_clone/presentation/artist_page/widgets/follow_artist_button.dart';
 
 class ArtistPage extends StatefulWidget {
   final int artistId;
@@ -40,7 +43,7 @@ class _ArtistPageState extends State<ArtistPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.medDarkBackground,
+      // backgroundColor: AppColors.medDarkBackground,
       body: SafeArea(
         child: BlocProvider(
           create: (context) => ArtistPageCubit()..getArtist(widget.artistId),
@@ -180,15 +183,7 @@ class _ArtistPageState extends State<ArtistPage>
                 SizedBox(
                   height: 10.h,
                 ),
-                Text(
-                  'Social media',
-                  style:
-                      TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500),
-                  textAlign: TextAlign.justify,
-                ),
-                SizedBox(
-                  height: 6.h,
-                ),
+
                 Wrap(
                   direction: Axis.horizontal,
                   runSpacing: 8.h,
@@ -321,11 +316,9 @@ class _ArtistPageState extends State<ArtistPage>
               height: (state.songEntity.length * 40.h) +
                   ((state.songEntity.length - 1) * 13.h),
               child: TabBarView(
-
                 controller: _tabController,
                 children: [
                   ListView.separated(
-
                     itemCount: state.songEntity.length,
                     padding: EdgeInsets.only(left: 30.w),
                     physics: const NeverScrollableScrollPhysics(),
@@ -334,7 +327,7 @@ class _ArtistPageState extends State<ArtistPage>
                       SongWithFavorite songs = state.songEntity[index];
                       return SongTileWidget(
                         songList: state.songEntity,
-                        onSelectionChanged: (isSelected){},
+                        onSelectionChanged: (isSelected) {},
                         index: index,
                       );
                     },
@@ -354,7 +347,7 @@ class _ArtistPageState extends State<ArtistPage>
                       return SongTileWidget(
                         songList: state.songEntity,
                         index: index,
-                        onSelectionChanged: (isSelected){},
+                        onSelectionChanged: (isSelected) {},
                       );
                     },
                     separatorBuilder: (context, index) {
@@ -375,42 +368,27 @@ class _ArtistPageState extends State<ArtistPage>
     ;
   }
 
-  Padding artistInfo(ArtistEntity artist) {
+  Padding artistInfo(ArtistWithFollowing artist) {
+    bool followStatus = artist.isFollowed;
+
     return Padding(
       padding: EdgeInsets.only(left: 50.w),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            artist.name!,
+            artist.artist.name!,
             style: TextStyle(
-                fontSize: artist.name!.length > 14 ? 28.sp : 33.sp,
+                fontSize: artist.artist.name!.length > 14 ? 28.sp : 33.sp,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.4),
           ),
           SizedBox(
-            height: artist.name!.length > 14 ? 5.h : 0,
+            height: artist.artist.name!.length > 14 ? 5.h : 0,
           ),
           Row(
             children: [
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 3.h)
-                    .copyWith(left: 0),
-                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
-                decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    border: Border.all(
-                      color: AppColors.primary,
-                    ),
-                    borderRadius: BorderRadius.circular(15.w)),
-                child: Text(
-                  'Follow',
-                  style: TextStyle(
-                      letterSpacing: 0.7,
-                      fontSize: 13.sp,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
+              FollowArtistButton(artistEntity: artist),
               Text(
                 '8.929.322 monthly listeners',
                 style: TextStyle(fontSize: 13.sp),
@@ -422,7 +400,7 @@ class _ArtistPageState extends State<ArtistPage>
     );
   }
 
-  Stack artistPictBackground(ArtistEntity artist, int artistId) {
+  Stack artistPictBackground(ArtistWithFollowing artist, int artistId) {
     return Stack(
       // alignment: Alignment.bottomCenter,
       children: [
@@ -434,8 +412,8 @@ class _ArtistPageState extends State<ArtistPage>
               decoration: BoxDecoration(
                 image: DecorationImage(
                   fit: BoxFit.cover,
-                  image: NetworkImage(
-                    '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
+                  image: CachedNetworkImageProvider(
+                    '${AppURLs.supabaseArtistStorage}${artist.artist.name!.toLowerCase()}.jpg',
                   ),
                 ),
               ),
@@ -506,7 +484,7 @@ class _ArtistPageState extends State<ArtistPage>
                   SizedBox(
                     height: 10.h,
                   ),
-                  albumList(artist),
+                  albumList(artist.artist),
                   SizedBox(
                     height: 20.h,
                   ),
@@ -518,13 +496,13 @@ class _ArtistPageState extends State<ArtistPage>
                       SizedBox(
                         height: 7.h,
                       ),
-                      artistPickedList(artist)
+                      artistPickedList(artist.artist)
                     ],
                   ),
                   SizedBox(
                     height: 20.h,
                   ),
-                  artistAboutCard(artist),
+                  artistAboutCard(artist.artist),
                   SizedBox(
                     height: 20.h,
                   ),
@@ -585,7 +563,7 @@ class _ArtistPageState extends State<ArtistPage>
                 children: List.generate(
                   state.artistEntity.length,
                   (index) {
-                    ArtistEntity artistList = state.artistEntity[index];
+                    ArtistEntity artistList = state.artistEntity[index].artist;
 
                     return Padding(
                       padding: EdgeInsets.only(

@@ -14,7 +14,9 @@ class ProfileInfoCubit extends Cubit<ProfileInfoState> {
         emit(ProfileInfoFailure());
       },
       (userEntity) {
-        emit(ProfileInfoLoaded(userEntity: userEntity));
+        if (!isClosed) {
+          emit(ProfileInfoLoaded(userEntity: userEntity));
+        }
       },
     );
   }

@@ -9,6 +9,7 @@ class PlaylistModel {
   String? userId;
   String? name;
   String? description;
+  int? songCount;
   // bool? isFavorite;
 
   PlaylistModel({
@@ -18,6 +19,7 @@ class PlaylistModel {
     required this.userId,
     required this.name,
     required this.description,
+    required this.songCount,
   });
 
   PlaylistModel.fromJson(Map<String, dynamic> data) {
@@ -38,6 +40,7 @@ extension PlaylistModelX on PlaylistModel {
         isPublic: isPublic!,
         userId: userId!,
         name: name!,
+        songCount: songCount!,
         description: description!);
   }
 }
