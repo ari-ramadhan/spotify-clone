@@ -57,7 +57,7 @@ class PlaylistCubit extends Cubit<PlaylistState> {
 
           print("After emit: ${updatedPlaylists.map((e) => e.name).toList()}");
 
-          returnObject = 'Successfully creating a playlist';
+          returnObject = 'Playlist created';
         },
       );
 

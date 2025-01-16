@@ -8,6 +8,7 @@ import 'package:spotify_clone/domain/entity/artist/artist.dart';
 abstract class ArtistSupabaseService {
   Future<Either> getArtistInfo(int artistId);
   Future<Either> getAllArtist();
+  Future<Either> getFollowedArtists();
   Future<bool> isFollowed(int artistId);
   Future<Either> followUnfollowArtist(int artistId);
   Future<Either> getRecommendedArtistBasedOnPlaylist(List<String> artistsName);
@@ -32,22 +33,6 @@ class ArtistSupabaseServiceImpl extends ArtistSupabaseService {
       return const Left('error occured when ');
     }
   }
-  // @override
-  // Future<Either> getArtistInfo(int artistId) async {
-  //   try {
-  //     ArtistEntity? artistEntity;
-
-  //     var data = await supabase.from('artist').select('*').eq('id', artistId);
-
-  //     ArtistModel artistModel = ArtistModel.fromJson(data.first);
-
-  //     artistEntity = artistModel.toEntity();
-
-  //     return Right(artistEntity);
-  //   } catch (e) {
-  //     return const Left('error occured when ');
-  //   }
-  // }
 
   @override
   Future<Either> getAllArtist() async {
@@ -72,26 +57,28 @@ class ArtistSupabaseServiceImpl extends ArtistSupabaseService {
       return const Left('error occured when fetching artist list');
     }
   }
-  // @override
-  // Future<Either> getAllArtist() async {
-  //   try {
-  //     List<ArtistEntity> artistList = [];
 
-  //     var result = await supabase.from('artist').select('*');
+  @override
+  Future<Either> getFollowedArtists() async {
+    try {
+        print('aa');
+      List<ArtistWithFollowing> artistList = [];
 
-  //     final List<ArtistModel> data = result.map((item) {
-  //       return ArtistModel.fromJson(item);
-  //     }).toList();
+      var artistIdResult = await supabase.from('artist_follower').select().match({
+        'user_id' : supabase.auth.currentUser!.id
+      });
 
-  //     for (final artistModel in data) {
-  //       artistList.add(artistModel.toEntity());
-  //     }
+      for (var artistId in artistIdResult){
+        var artist = await supabase.from('artist').select().eq('id', artistId['artist_id']).single();
+        print(artistId.toString());
+        artistList.add(ArtistWithFollowing(ArtistModel.fromJson(artist).toEntity(), true));
+      }
 
-  //     return Right(artistList);
-  //   } catch (e) {
-  //     return const Left('error occured when fetching artist list');
-  //   }
-  // }
+      return Right(artistList);
+    } catch (e) {
+      return const Left('error occured when fetching artist list');
+    }
+  }
 
   @override
   Future<bool> isFollowed(int artistId) async {

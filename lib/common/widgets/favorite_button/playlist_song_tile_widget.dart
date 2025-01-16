@@ -30,10 +30,8 @@ class PlaylistSongTileWidget extends StatefulWidget {
 class _PlaylistSongTileWidgetState extends State<PlaylistSongTileWidget> {
   @override
   Widget build(BuildContext context) {
-
     final songList = widget.songList[widget.index];
     final song = widget.songList[widget.index].song;
-
 
     SongWithFavorite songEntity = widget.songList[widget.index];
     Color textColor = Colors.white;
@@ -112,8 +110,35 @@ class _PlaylistSongTileWidgetState extends State<PlaylistSongTileWidget> {
                         height: 28.h,
                         // padding: EdgeInsets.zero,
                         textStyle: TextStyle(fontSize: 12.sp),
-                        onTap: () {
-                          context.read<PlaylistSongsCubit>().removeSongFromPlaylist(widget.playlistId, widget.songList[widget.index]);
+                        onTap: () async {
+                          var result =
+                              await context.read<PlaylistSongsCubit>().removeSongFromPlaylist(widget.playlistId, widget.songList[widget.index]);
+                          result.fold(
+                            (l) {
+                              var snackBar = SnackBar(
+                                content: Text(
+                                  l,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: Colors.redAccent,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                            },
+                            (r) {
+                              var snackBar = SnackBar(
+                                content: Text(
+                                  r,
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: AppColors.primary,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                            },
+                          );
                         },
                         value: 'Remove',
                         child: Row(
@@ -135,9 +160,32 @@ class _PlaylistSongTileWidgetState extends State<PlaylistSongTileWidget> {
                       ),
                       PopupMenuItem(
                         height: 28.h,
-                        onTap: () {
-                          context.read<PlaylistSongsCubit>().toggleFavoriteStatus(song.id);
+                        onTap: () async {
+                          final newIsFavorite = await context.read<PlaylistSongsCubit>().toggleFavoriteStatus(song.id);
                           sl<AddOrRemoveFavoriteSongUseCase>().call(params: song.id);
+
+                          if (newIsFavorite != null) {
+                            final snackBarMessage = newIsFavorite ? 'Added to favorites' : 'Removed from favorites';
+
+                            // Tampilkan SnackBar
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  snackBarMessage,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    10.sp
+                                  )
+                                ),
+                                backgroundColor: newIsFavorite ? AppColors.primary : Colors.blue,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          }
                         },
                         textStyle: TextStyle(fontSize: 12.sp),
                         child: Row(

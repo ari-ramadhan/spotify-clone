@@ -143,49 +143,66 @@ class PlaylistSongsCubit extends Cubit<PlaylistSongsState> {
         emit(PlaylistSongsFailure());
       },
       (r) async {
-          final currentState = state as PlaylistSongsLoaded;
+        final currentState = state as PlaylistSongsLoaded;
 
-          print("Before emit: ${currentState.songs.map((e) => e.song.title).toList()}");
+        print("Before emit: ${currentState.songs.map((e) => e.song.title).toList()}");
 
-          final updatedSongs = List<SongWithFavorite>.from(currentState.songs)..addAll(songIds);
+        final updatedSongs = List<SongWithFavorite>.from(currentState.songs)..addAll(songIds);
 
-          emit(PlaylistSongsLoaded(songs: updatedSongs));
+        emit(PlaylistSongsLoaded(songs: updatedSongs));
 
-          print("After emit: ${updatedSongs.map((e) => e.song.title).toList()}");
+        print("After emit: ${updatedSongs.map((e) => e.song.title).toList()}");
       },
     );
   }
 
-  Future<void> removeSongFromPlaylist(String playlistId, SongWithFavorite song) async {
-    if (state is PlaylistSongsLoaded) {
-      final currentState = state as PlaylistSongsLoaded;
+  Future<Either> removeSongFromPlaylist(String playlistId, SongWithFavorite song) async {
+    String message = '';
 
-      final result = await sl<DeleteSongFromPlaylistUseCase>().call(
-        params: DeleteSongFromPlaylistParams(playlistId: playlistId, songId: song.song.id),
-      );
+    try {
+      if (state is PlaylistSongsLoaded) {
+        final currentState = state as PlaylistSongsLoaded;
 
-      result.fold(
-        (l) => emit(PlaylistSongsFailure()),
-        (r) {
-          final updatedSongs = List<SongWithFavorite>.from(currentState.songs)..removeWhere((s) => s.song.id == song.song.id);
-          emit(PlaylistSongsLoaded(songs: updatedSongs));
-        },
-      );
+        final result = await sl<DeleteSongFromPlaylistUseCase>().call(
+          params: DeleteSongFromPlaylistParams(playlistId: playlistId, songId: song.song.id),
+        );
+
+        result.fold(
+          (l) {
+            emit(PlaylistSongsFailure());
+            message = l;
+          },
+          (r) {
+            final updatedSongs = List<SongWithFavorite>.from(currentState.songs)..removeWhere((s) => s.song.id == song.song.id);
+            emit(PlaylistSongsLoaded(songs: updatedSongs));
+            message = r;
+          },
+        );
+      }
+      return Right(message);
+    } catch (e) {
+      message = 'Error while executing function';
+      return Left(message);
     }
   }
-  Future<void> toggleFavoriteStatus(int songId) async {
-  final currentState = state;
-  if (currentState is PlaylistSongsLoaded) {
-    final updatedSongs = currentState.songs.map((song) {
-      if (song.song.id == songId) {
-        return song.copyWith(isFavorite: !song.isFavorite);
-      }
-      return song;
-    }).toList();
 
-    emit(PlaylistSongsLoaded(songs: updatedSongs));
+  Future<bool?> toggleFavoriteStatus(int songId) async {
+    final currentState = state;
+    if (currentState is PlaylistSongsLoaded) {
+      final updatedSongs = currentState.songs.map((song) {
+        if (song.song.id == songId) {
+          return song.copyWith(isFavorite: !song.isFavorite);
+        }
+        return song;
+      }).toList();
+
+      emit(PlaylistSongsLoaded(songs: updatedSongs));
+
+      // Kembalikan status isFavorite terbaru
+      return updatedSongs.firstWhere((song) => song.song.id == songId).isFavorite;
+    }
+    return null;
   }
-}
 }
 
 // import 'package:dartz/dartz.dart';

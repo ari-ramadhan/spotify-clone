@@ -40,26 +40,7 @@ class _HomeNavigationState extends State<HomeNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: AppColors.black,
-      // extendBodyBehindAppBar: true,
       body: _pages[_selectedIndex],
-//       body: PersistentTabView(
-//         context,
-
-//         backgroundColor: Colors.grey.shade900,
-//         confineToSafeArea: true,
-//         resizeToAvoidBottomInset: false,
-//         navBarStyle: NavBarStyle.style7,
-
-// // padding: EdgeInsets.symmetric(vertical: 10.h),
-//         items: [
-//           navBarItem(icon: Icons.home_rounded, title: 'Home'),
-//           navBarItem(icon: Icons.search_rounded, title: 'Search'),
-//           navBarItem(icon: Icons.person_rounded, title: 'Profile'),
-//           navBarItem(icon: Icons.ac_unit_rounded, title: 'Premium'),
-//         ],
-//         screens: _pages,
-//       ),
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -74,7 +55,6 @@ class _HomeNavigationState extends State<HomeNavigation> {
             showUnselectedLabels: true,
             type: BottomNavigationBarType.fixed,
             backgroundColor: const Color.fromARGB(255, 22, 21, 21),
-            // backgroundColor: const Color.fromARGB(255, 151, 106, 106),
             selectedItemColor: AppColors.primary,
             selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500),
             unselectedItemColor: Colors.white70,

@@ -26,6 +26,8 @@ class ArtistAlbum extends StatelessWidget {
       this.isAllSong = false})
       : super(key: key);
 
+  double paddingAddition = 4;
+
   @override
   Widget build(BuildContext context) {
     // Merandomkan list
@@ -96,7 +98,7 @@ class ArtistAlbum extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 14.w),
+                      padding: EdgeInsets.symmetric(horizontal: 13.w + paddingAddition.w),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -185,7 +187,7 @@ class ArtistAlbum extends StatelessWidget {
                       height: 10.h,
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 5.w),
+                      padding: EdgeInsets.symmetric(horizontal: 4.w + paddingAddition.w),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
