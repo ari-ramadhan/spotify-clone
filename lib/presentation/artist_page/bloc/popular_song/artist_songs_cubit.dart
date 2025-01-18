@@ -13,7 +13,10 @@ class ArtistSongsCubit extends Cubit<ArtistSongsState> {
         emit(ArtistSongsFailure());
       },
       (popularSongs) {
+        if (!isClosed){
         emit(ArtistSongsLoaded(songEntity: popularSongs));
+
+        }
       },
     );
   }

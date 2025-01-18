@@ -27,8 +27,7 @@ class ArtistPage extends StatefulWidget {
   _ArtistPageState createState() => _ArtistPageState();
 }
 
-class _ArtistPageState extends State<ArtistPage>
-    with SingleTickerProviderStateMixin {
+class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -71,8 +70,7 @@ class _ArtistPageState extends State<ArtistPage>
                   children: [
                     SingleChildScrollView(
                       padding: EdgeInsets.zero,
-                      child: artistPictBackground(
-                          state.artistEntity, widget.artistId),
+                      child: artistPictBackground(state.artistEntity, widget.artistId),
                     ),
                     Container(
                       width: ScreenUtil().screenWidth,
@@ -145,10 +143,7 @@ class _ArtistPageState extends State<ArtistPage>
                   children: [
                     Text(
                       'about',
-                      style: TextStyle(
-                          fontSize: 24.sp,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.primary.withBlue(80)),
+                      style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold, color: AppColors.primary.withBlue(80)),
                       textAlign: TextAlign.justify,
                     ),
                   ],
@@ -168,33 +163,26 @@ class _ArtistPageState extends State<ArtistPage>
                       ],
                     ),
                     border: Border(
-                      left: BorderSide(
-                          color: AppColors.primary.withOpacity(0.8),
-                          width: 3.w),
+                      left: BorderSide(color: AppColors.primary.withOpacity(0.8), width: 3.w),
                     ),
                   ),
                   child: Text(
                     artist.description!,
-                    style:
-                        TextStyle(fontSize: 14.sp, fontStyle: FontStyle.italic),
+                    style: TextStyle(fontSize: 14.sp, fontStyle: FontStyle.italic),
                     textAlign: TextAlign.justify,
                   ),
                 ),
                 SizedBox(
                   height: 10.h,
                 ),
-
                 Wrap(
                   direction: Axis.horizontal,
                   runSpacing: 8.h,
                   spacing: 10.w,
                   children: [
-                    socialMediaChips(
-                        AppVectors.instagram, 'Instagram', Colors.redAccent),
-                    socialMediaChips(
-                        AppVectors.twitter, 'Twitter', Colors.lightBlue),
-                    socialMediaChips(
-                        AppVectors.facebook, 'Facebook', Colors.blue.shade600),
+                    socialMediaChips(AppVectors.instagram, 'Instagram', Colors.redAccent),
+                    socialMediaChips(AppVectors.twitter, 'Twitter', Colors.lightBlue),
+                    socialMediaChips(AppVectors.facebook, 'Facebook', Colors.blue.shade600),
                   ],
                 ),
               ],
@@ -205,10 +193,8 @@ class _ArtistPageState extends State<ArtistPage>
 
   Container socialMediaChips(String svgAsset, String socialMedia, Color color) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 4.w)
-          .copyWith(right: 12.w),
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15.sp), color: color),
+      padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 4.w).copyWith(right: 12.w),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.sp), color: color),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -311,16 +297,17 @@ class _ArtistPageState extends State<ArtistPage>
             );
           }
 
+
           if (state is ArtistSongsLoaded) {
+          int songsLength = state.songEntity.take(5).length;
             return SizedBox(
-              height: (state.songEntity.length * 40.h) +
-                  ((state.songEntity.length - 1) * 13.h),
+              height: (songsLength * 40.h) + ((songsLength - 1) * 13.h),
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  ListView.separated(
-                    itemCount: state.songEntity.length,
-                    padding: EdgeInsets.only(left: 30.w),
+                  ListView.builder(
+                    itemCount: songsLength,
+                    padding: EdgeInsets.only(left: 15.w),
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
@@ -329,17 +316,13 @@ class _ArtistPageState extends State<ArtistPage>
                         songList: state.songEntity,
                         onSelectionChanged: (isSelected) {},
                         index: index,
-                      );
-                    },
-                    separatorBuilder: (context, index) {
-                      return SizedBox(
-                        height: 13.h,
                       );
                     },
                   ),
-                  ListView.separated(
-                    itemCount: state.songEntity.length,
-                    padding: EdgeInsets.zero,
+                  ListView.builder(
+                    itemCount: songsLength,
+                    // padding: EdgeInsets.zero,
+                    padding: EdgeInsets.only(left: 15.w),
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
@@ -348,11 +331,6 @@ class _ArtistPageState extends State<ArtistPage>
                         songList: state.songEntity,
                         index: index,
                         onSelectionChanged: (isSelected) {},
-                      );
-                    },
-                    separatorBuilder: (context, index) {
-                      return SizedBox(
-                        height: 13.h,
                       );
                     },
                   ),
@@ -378,10 +356,7 @@ class _ArtistPageState extends State<ArtistPage>
         children: [
           Text(
             artist.artist.name!,
-            style: TextStyle(
-                fontSize: artist.artist.name!.length > 14 ? 28.sp : 33.sp,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0.4),
+            style: TextStyle(fontSize: artist.artist.name!.length > 14 ? 28.sp : 33.sp, fontWeight: FontWeight.bold, letterSpacing: 0.4),
           ),
           SizedBox(
             height: artist.artist.name!.length > 14 ? 5.h : 0,
@@ -491,8 +466,7 @@ class _ArtistPageState extends State<ArtistPage>
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(
-                          padding: EdgeInsets.only(left: 30.w), child: _tabs()),
+                      Padding(padding: EdgeInsets.only(left: 30.w), child: _tabs()),
                       SizedBox(
                         height: 7.h,
                       ),
@@ -577,8 +551,7 @@ class _ArtistPageState extends State<ArtistPage>
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => ArtistPage(
-                                            artistId: artistList.id!),
+                                        builder: (context) => ArtistPage(artistId: artistList.id!),
                                       ),
                                     );
                                   },
@@ -588,25 +561,18 @@ class _ArtistPageState extends State<ArtistPage>
                                       horizontal: 10.w,
                                       vertical: 10.h,
                                     ),
-                                    decoration: BoxDecoration(
-                                        boxShadow: [
-                                          BoxShadow(
-                                              color: Colors.black.withOpacity(
-                                                0.3,
-                                              ),
-                                              // spreadRadius: 1,
-                                              blurRadius: 10,
-                                              offset: const Offset(3,
-                                                  3) // changes position of shadow
-                                              ),
-                                        ],
-                                        color: const Color.fromARGB(
-                                            115, 54, 54, 54),
-                                        borderRadius:
-                                            BorderRadius.circular(10.sp)),
+                                    decoration: BoxDecoration(boxShadow: [
+                                      BoxShadow(
+                                          color: Colors.black.withOpacity(
+                                            0.3,
+                                          ),
+                                          // spreadRadius: 1,
+                                          blurRadius: 10,
+                                          offset: const Offset(3, 3) // changes position of shadow
+                                          ),
+                                    ], color: const Color.fromARGB(115, 54, 54, 54), borderRadius: BorderRadius.circular(10.sp)),
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Center(
                                           child: CircleAvatar(
@@ -764,7 +730,7 @@ class _ArtistPageState extends State<ArtistPage>
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: List.generate(
-                  albumList.length + 1,
+                  albumList.length + 2,
                   (index) {
                     return index == 0
                         ? AlbumTileWidget(
@@ -777,14 +743,23 @@ class _ArtistPageState extends State<ArtistPage>
                             ? AlbumTileWidget(
                                 album: albumList[0],
                                 rightPadding: 22.w,
-                                isAllSong: true,
+                                isNonAlbum: true,
+                                nonAlbumTitle: 'Single',
                                 artist: artist,
                               )
-                            : AlbumTileWidget(
-                                rightPadding: 22.w,
-                                album: albumList[index],
-                                artist: artist,
-                              );
+                            : index == (state.albumEntity.length + 1)
+                                ? AlbumTileWidget(
+                                    album: albumList[0],
+                                    rightPadding: 22.w,
+                                    isNonAlbum: true,
+                                    nonAlbumTitle: 'All Song',
+                                    artist: artist,
+                                  )
+                                : AlbumTileWidget(
+                                    rightPadding: 22.w,
+                                    album: albumList[index],
+                                    artist: artist,
+                                  );
                   },
                 ),
               ),

@@ -5,8 +5,10 @@ import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget_selectab
 import 'package:spotify_clone/core/configs/constants/app_methods.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/data/repository/auth/auth_service.dart';
+import 'package:spotify_clone/domain/entity/artist/artist.dart';
 import 'package:spotify_clone/domain/entity/playlist/playlist.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
+import 'package:spotify_clone/presentation/artist_page/pages/artist_page.dart';
 import 'package:spotify_clone/presentation/intro/pages/get_started.dart';
 import 'package:spotify_clone/presentation/playlist/pages/playlist.dart';
 import 'package:spotify_clone/presentation/profile/bloc/favorite_song/favorite_song_cubit.dart';
@@ -17,6 +19,7 @@ import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_state.dart';
 import 'package:spotify_clone/presentation/profile/bloc/profile_info/profile_info_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/profile_info/profile_info_state.dart';
+import 'package:spotify_clone/presentation/profile/pages/my_favorite.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -280,8 +283,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                     if (state is FavoriteSongLoaded) {
                                       return MaterialButton(
                                         splashColor: Colors.transparent,
-                                        onPressed: () {},
-                                        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+                                        onPressed: () {
+                                          Navigator.push(context, MaterialPageRoute(builder: (context) => MyFavorite(),));
+                                        },
+                                        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 5.h),
                                         child: Row(
                                           children: [
                                             Container(
@@ -331,6 +336,21 @@ class _ProfilePageState extends State<ProfilePage> {
                                 ),
                                 // list of playlist
                                 (() {
+                                  if (state is PlaylistLoading) {
+                                    return Container(
+                                      alignment: Alignment.center,
+                                      height: 100.h,
+                                      child: CircularProgressIndicator(
+                                        color: AppColors.primary,
+                                      ),
+                                    );
+                                  }
+                                  if (state is PlaylistFailure) {
+                                    return Center(
+                                      child: Text('Failed to fetch your library'),
+                                    );
+                                  }
+
                                   if (state is PlaylistLoaded) {
                                     return state.playlistModel.isNotEmpty
                                         ? Column(
@@ -374,50 +394,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                           ElementTitleWidget(elementTitle: 'Artists followed', list: state.artists, limit: 4),
                                           ListView.builder(
                                             shrinkWrap: true,
+                                            physics: NeverScrollableScrollPhysics(),
                                             itemCount: state.artists.length,
                                             itemBuilder: (context, index) {
                                               var artist = state.artists[index].artist;
 
-                                              return MaterialButton(
-                                                onPressed: () {},
-                                                padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
-                                                child: Row(
-                                                  children: [
-                                                    Container(
-                                                      height: 40.h,
-                                                      width: 44.w,
-                                                      decoration: BoxDecoration(
-                                                        shape: BoxShape.circle,
-                                                        image: DecorationImage(
-                                                          fit: BoxFit.cover,
-                                                          image: NetworkImage(
-                                                            '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    SizedBox(
-                                                      width: 12.w,
-                                                    ),
-                                                    Column(
-                                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                                      children: [
-                                                        Text(
-                                                          artist.name!,
-                                                          style: TextStyle(fontSize: 14.sp),
-                                                        ),
-                                                        SizedBox(
-                                                          height: 3.h,
-                                                        ),
-                                                        Text(
-                                                          'Artist',
-                                                          style: TextStyle(fontSize: 10.sp, color: Colors.white70),
-                                                        ),
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                              );
+                                              return ArtistTileWidget(artist: artist);
                                             },
                                           )
                                         ],
@@ -489,303 +471,6 @@ class _ProfilePageState extends State<ProfilePage> {
       ],
     );
   }
-
-  // Widget playlistsList() {
-  //   return BlocProvider(
-  //     create: (_) => PlaylistCubit()..getCurrentuserPlaylist(),
-  //     child: BlocBuilder<PlaylistCubit, PlaylistState>(
-  //       builder: (context, state) {
-  //         if (state is PlaylistLoading) {
-  //           return const Center(
-  //             child: CircularProgressIndicator(),
-  //           );
-  //         }
-
-  //         if (state is PlaylistFailure) {
-  //           return const Center(
-  //             child: Text('Please try again'),
-  //           );
-  //         }
-
-  //         if (state is PlaylistLoaded) {
-  //           return ListView.separated(
-  //             physics: const NeverScrollableScrollPhysics(),
-  //             shrinkWrap: true,
-  //             itemBuilder: (context, index) {
-  //               var playlist = state.playlistModel[index];
-
-  //               return GestureDetector(
-  //                 onTap: () {
-  //                   Navigator.push(
-  //                       context,
-  //                       MaterialPageRoute(
-  //                         builder: (context) => PlaylistPage(
-  //                           playlistEntity: playlist,
-  //                         ),
-  //                       ));
-  //                 },
-  //                 child: Row(
-  //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                   children: [
-  //                     Row(
-  //                       children: [
-  //                         Container(
-  //                           height: 35.h,
-  //                           width: 38.w,
-  //                           decoration: BoxDecoration(
-  //                               gradient: const RadialGradient(
-  //                                 colors: [Color(0xff424648), Color(0xff1c2022)],
-  //                                 stops: [0, 1],
-  //                                 center: Alignment(0.0, -0.4),
-  //                               ),
-  //                               borderRadius: BorderRadius.all(Radius.circular(6.sp))),
-  //                           child: Padding(
-  //                             padding: EdgeInsets.all(8.sp),
-  //                             child: SvgPicture.asset(
-  //                               AppVectors.playlist,
-  //                               color: Colors.white,
-  //                               fit: BoxFit.cover,
-  //                             ),
-  //                           ),
-  //                         ),
-  //                         SizedBox(
-  //                           width: 12.w,
-  //                         ),
-  //                         Column(
-  //                           crossAxisAlignment: CrossAxisAlignment.start,
-  //                           children: [
-  //                             Text(
-  //                               playlist.name!,
-  //                               style: TextStyle(fontSize: 14.sp),
-  //                             ),
-  //                             SizedBox(
-  //                               height: 3.h,
-  //                             ),
-  //                             Text(
-  //                               playlist.songCount == 0 ? 'Playlist | empty song' : 'Playlist | ${playlist.songCount} songs',
-  //                               style: TextStyle(fontSize: 10.sp, color: Colors.white70),
-  //                             ),
-  //                           ],
-  //                         ),
-  //                       ],
-  //                     ),
-  //                     IconButton(
-  //                       onPressed: () {},
-  //                       splashRadius: 22.sp,
-  //                       icon: Icon(
-  //                         Icons.add_circle_outline_rounded,
-  //                         size: 26.sp,
-  //                         color: AppColors.primary,
-  //                       ),
-  //                     )
-  //                   ],
-  //                 ),
-  //               );
-  //             },
-  //             separatorBuilder: (context, index) {
-  //               return SizedBox(
-  //                 height: 10.h,
-  //               );
-  //             },
-  //             itemCount: state.playlistModel.length,
-  //           );
-  //         }
-
-  //         return Container();
-  //       },
-  //     ),
-  //   );
-  // }
-
-  // Future<dynamic> showAddPlaylistModal(BuildContext context, String songId) {
-  //   List<SongWithFavorite> selectedSongs = [];
-
-  //   return showModalBottomSheet(
-  //     context: context,
-  //     isScrollControlled: true,
-  //     useSafeArea: true,
-  //     isDismissible: true,
-  //     // backgroundColor: AppColors.medDarkBackground,
-  //     backgroundColor: const Color(0xff192a56),
-  //     constraints: BoxConstraints(minHeight: ScreenUtil().screenHeight * 0.8),
-  //     shape: RoundedRectangleBorder(
-  //       borderRadius: BorderRadius.only(
-  //         topLeft: Radius.circular(
-  //           18.sp,
-  //         ),
-  //         topRight: Radius.circular(
-  //           18.sp,
-  //         ),
-  //       ),
-  //     ),
-  //     builder: (BuildContext context) {
-  //       // return DraggableScrollableSheet(
-  //       //   expand: false,
-  //       //   builder: (BuildContext context, ScrollController scrollController) {
-  //       return SingleChildScrollView(
-  //         child: Container(
-  //           padding: const EdgeInsets.all(8),
-  //           child: Column(
-  //             mainAxisSize: MainAxisSize.max,
-  //             mainAxisAlignment: MainAxisAlignment.start,
-  //             children: [
-  //               Row(
-  //                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //                 children: [
-  //                   const CloseButton(),
-  //                   Text(
-  //                     'Add a Playlist',
-  //                     style: TextStyle(
-  //                       fontSize: 20.sp,
-  //                       fontWeight: FontWeight.w500,
-  //                     ),
-  //                   ),
-  //                   SizedBox(
-  //                     width: 30.w,
-  //                   )
-  //                 ],
-  //               ),
-  //               SizedBox(
-  //                 height: 23.h,
-  //               ),
-  //               Padding(
-  //                 padding: EdgeInsets.symmetric(horizontal: 40.w),
-  //                 child: playlistTitleField(),
-  //               ),
-  //               SizedBox(
-  //                 height: 23.h,
-  //               ),
-  //               Wrap(
-  //                 direction: Axis.horizontal,
-  //                 children: selectedSongs.map(
-  //                   (e) {
-  //                     return Container(
-  //                       child: Row(
-  //                         children: [
-  //                           CircleAvatar(
-  //                             radius: 18.sp,
-  //                             backgroundImage: CachedNetworkImageProvider('${AppURLs.supabaseCoverStorage}${e.song.artist} - ${e.song.title}.jpg'),
-  //                           ),
-  //                           SizedBox(
-  //                             width: 5.w,
-  //                           ),
-  //                           Text(e.song.title)
-  //                         ],
-  //                       ),
-  //                     );
-  //                   },
-  //                 ).toList(),
-  //               ),
-  //               MaterialButton(
-  //                 onPressed: () async {
-  //                   await createPlaylist(context, selectedSongs);
-  //                 },
-  //                 focusColor: Colors.black45,
-  //                 // highlightColor: Colors.black12,
-  //                 splashColor: AppColors.primary,
-  //                 highlightColor: AppColors.primary,
-  //                 shape: RoundedRectangleBorder(
-  //                   borderRadius: BorderRadius.circular(
-  //                     15.sp,
-  //                   ),
-  //                   side: BorderSide(
-  //                     color: Colors.grey.shade200,
-  //                   ),
-  //                 ),
-  //                 child: Text(
-  //                   'Create playlista',
-  //                   style: TextStyle(
-  //                     fontSize: 14.sp,
-  //                   ),
-  //                 ),
-  //               ),
-  //               SizedBox(
-  //                 height: 20.h,
-  //               ),
-  //               Padding(
-  //                 padding: EdgeInsets.symmetric(horizontal: 6.w),
-  //                 child: BlocProvider(
-  //                   create: (context) => FavoriteSongCubit()..getFavoriteSongs(),
-  //                   child: BlocBuilder<FavoriteSongCubit, FavoriteSongState>(
-  //                     builder: (context, state) {
-  //                       if (state is FavoriteSongLoading) {
-  //                         return Container(
-  //                           alignment: Alignment.center,
-  //                           height: 100,
-  //                           child: const CircularProgressIndicator(
-  //                             color: AppColors.primary,
-  //                           ),
-  //                         );
-  //                       }
-  //                       if (state is FavoriteSongFailure) {
-  //                         return Container(alignment: Alignment.center, height: 100, child: const Text('Failed to fetch songs'));
-  //                       }
-  //                       if (state is FavoriteSongLoaded) {
-  //                         return Container(
-  //                           alignment: Alignment.center,
-  //                           child: Column(
-  //                             crossAxisAlignment: CrossAxisAlignment.start,
-  //                             children: [
-  //                               Text(
-  //                                 'From your favorites',
-  //                                 style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500),
-  //                               ),
-  //                               SizedBox(
-  //                                 height: 10.h,
-  //                               ),
-  //                               ListView.separated(
-  //                                 physics: const NeverScrollableScrollPhysics(),
-  //                                 shrinkWrap: true,
-  //                                 itemBuilder: (context, index) {
-  //                                   var songModel = state.songs[index];
-
-  //                                   return SongTileWidgetSelectable(
-  //                                     songEntity: songModel,
-  //                                     onSelectionChanged: (selectedSong) {
-  //                                       setState(() {
-  //                                         if (selectedSong != null) {
-  //                                           // Tambahkan jika tidak ada di daftar
-  //                                           if (!selectedSongs.contains(selectedSong)) {
-  //                                             selectedSongs.add(selectedSong);
-  //                                             print('Added: ${selectedSong.song.title}');
-  //                                           }
-  //                                         } else {
-  //                                           // Hapus berdasarkan id jika ada
-  //                                           selectedSongs.removeWhere((song) => song.song.id == songModel.song.id);
-  //                                           print('Removed: ${songModel.song.title}');
-  //                                         }
-  //                                       });
-
-  //                                       // Debugging: Tampilkan semua ID lagu yang dipilih
-  //                                       print('Current Selected Songs: ${selectedSongs.map((s) => s.song.id).toList()}');
-  //                                     },
-
-  //                                     // isSelected: true,
-  //                                   );
-  //                                 },
-  //                                 separatorBuilder: (context, index) {
-  //                                   return SizedBox(
-  //                                     height: 10.h,
-  //                                   );
-  //                                 },
-  //                                 itemCount: state.songs.length,
-  //                               ),
-  //                             ],
-  //                           ),
-  //                         );
-  //                       }
-  //                       return Container();
-  //                     },
-  //                   ),
-  //                 ),
-  //               )
-  //             ],
-  //           ),
-  //         ),
-  //       );
-  //     },
-  //   );
-  // }
 
   Future<void> createPlaylist(BuildContext context, List<SongWithFavorite> selectedSong) async {
     List<int> selectedSongsId = [];
@@ -1025,6 +710,66 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
+class ArtistTileWidget extends StatelessWidget {
+  final ArtistEntity artist;
+  const ArtistTileWidget({
+    super.key,
+    required this.artist,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialButton(
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ArtistPage(artistId: artist.id!),
+          ),
+        );
+      },
+      splashColor: Colors.transparent,
+      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 5.h),
+      child: Row(
+        children: [
+          Container(
+            height: 40.h,
+            width: 44.w,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              image: DecorationImage(
+                fit: BoxFit.cover,
+                image: NetworkImage(
+                  '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 12.w,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                artist.name!,
+                style: TextStyle(fontSize: 14.sp),
+              ),
+              SizedBox(
+                height: 3.h,
+              ),
+              Text(
+                'Artist',
+                style: TextStyle(fontSize: 10.sp, color: Colors.white70),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}
+
 class ElementTitleWidget extends StatelessWidget {
   final String elementTitle;
   final List<dynamic> list;
@@ -1040,7 +785,7 @@ class ElementTitleWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialButton(
       onPressed: () {},
-      padding: EdgeInsets.symmetric(horizontal: 10.w).copyWith(right: 6.w),
+      padding: EdgeInsets.symmetric(horizontal: 13.w).copyWith(right: 6.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -1083,7 +828,7 @@ class PlaylistTileWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialButton(
       splashColor: Colors.transparent,
-      padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 10.w),
+      padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 14.w),
       onPressed: () {
         Navigator.push(
           context,

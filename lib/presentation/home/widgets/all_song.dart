@@ -30,27 +30,30 @@ class _AllSongPageState extends State<AllSongPage> {
         }
 
         if (state is AllSongLoaded) {
-          return Padding(
-            padding: EdgeInsets.symmetric(vertical: 35.h, horizontal: 22.w)
-                .copyWith(right: 15.w, top: 20.h),
+          return Container(
+            // padding: EdgeInsets.symmetric(vertical: 35.h, horizontal: 22.w)
+            //     .copyWith(right: 15.w, top: 20.h),
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'Playlist',
-                      style: TextStyle(
-                        fontSize: 16.2.sp,
-                        fontWeight: FontWeight.w500,
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 22.w),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Playlist',
+                        style: TextStyle(
+                          fontSize: 16.2.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                    Text(
-                      'See more',
-                      style: TextStyle(
-                          fontSize: 11.sp, fontWeight: FontWeight.w400),
-                    ),
-                  ],
+                      Text(
+                        'See more',
+                        style: TextStyle(
+                            fontSize: 11.sp, fontWeight: FontWeight.w400),
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(
                   height: 16.h,
@@ -67,8 +70,9 @@ class _AllSongPageState extends State<AllSongPage> {
   }
 
   Widget _songs(List<SongWithFavorite> songs) {
-    return ListView.separated(
+    return ListView.builder(
       physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.only(left: 6.w),
       shrinkWrap: true,
       itemCount: songs.length,
       itemBuilder: (context, index) {
@@ -85,11 +89,11 @@ class _AllSongPageState extends State<AllSongPage> {
             index: index,
             onSelectionChanged: (isSelected) {});
       },
-      separatorBuilder: (context, index) {
-        return SizedBox(
-          height: 13.h,
-        );
-      },
+      // separatorBuilder: (context, index) {
+      //   return SizedBox(
+      //     height: 13.h,
+      //   );
+      // },
     );
   }
 }

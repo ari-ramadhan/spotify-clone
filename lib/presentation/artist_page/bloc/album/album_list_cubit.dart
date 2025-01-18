@@ -13,7 +13,9 @@ class AlbumListCubit extends Cubit<AlbumListState> {
         emit(AlbumListFailure());
       },
       (albumEntity) {
-        emit(AlbumListLoaded(albumEntity: albumEntity));
+        if (!isClosed) {
+          emit(AlbumListLoaded(albumEntity: albumEntity));
+        }
       },
     );
   }

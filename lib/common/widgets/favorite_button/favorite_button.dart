@@ -9,11 +9,7 @@ import 'package:spotify_clone/domain/entity/song/song.dart';
 class FavoriteButton extends StatelessWidget {
   final SongWithFavorite songs;
   final bool isBigger;
-  const FavoriteButton({
-    super.key,
-    required this.songs,
-    this.isBigger = false
-  });
+  const FavoriteButton({super.key, required this.songs, this.isBigger = false});
 
   @override
   Widget build(BuildContext context) {
@@ -24,34 +20,26 @@ class FavoriteButton extends StatelessWidget {
           if (state is FavoriteButtonInitial) {
             return IconButton(
               onPressed: () {
-                context
-                    .read<FavoriteButtonCubit>()
-                    .favoriteButtonUpdated(songs.song.id);
+                context.read<FavoriteButtonCubit>().favoriteButtonUpdated(songs.song.id);
               },
+              splashRadius: isBigger ? 28.sp : 21.sp,
               icon: Icon(
-                songs.isFavorite
-                    ? Icons.favorite_rounded
-                    : Icons.favorite_outline_rounded,
+                songs.isFavorite ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
                 size: isBigger ? 28.h : 21.h,
-                color:
-                    songs.isFavorite ? AppColors.primary : AppColors.darkGrey,
+                color: songs.isFavorite ? AppColors.primary : AppColors.darkGrey,
               ),
             );
           }
           if (state is FavoriteButtonUpdated) {
             return IconButton(
               onPressed: () {
-                context
-                    .read<FavoriteButtonCubit>()
-                    .favoriteButtonUpdated(songs.song.id);
+                context.read<FavoriteButtonCubit>().favoriteButtonUpdated(songs.song.id);
               },
+              splashRadius: isBigger ? 28.sp : 21.sp,
               icon: Icon(
-                state.isFavorite
-                    ? Icons.favorite_rounded
-                    : Icons.favorite_outline_rounded,
-                size: isBigger ? 28.h : 21.h,
-                color:
-                    state.isFavorite ? AppColors.primary : AppColors.darkGrey,
+                state.isFavorite ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
+                size: isBigger ? 28.sp : 21.sp,
+                color: state.isFavorite ? AppColors.primary : AppColors.darkGrey,
               ),
             );
           }

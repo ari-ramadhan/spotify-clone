@@ -10,6 +10,7 @@ abstract class SongSupabaseService {
   Future<bool> isFavoriteSong(int songId);
   Future<Either> getUserFavoriteSongs();
   Future<Either> getArtistSongs(int artistId);
+  Future<Either> getArtistSingleSongs(int artistId);
   Future<Either> getAlbumSongs(String albumId);
   Future<Either> getPlaylistSongs(String playlistId);
 }
@@ -20,11 +21,7 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
     try {
       List<SongWithFavorite> songs = [];
 
-      var item = await supabase
-          .from('songs')
-          .select('*')
-          .order('release_date', ascending: false)
-          .limit(5);
+      var item = await supabase.from('songs').select('*').order('release_date', ascending: false).limit(5);
 
       final List<SongModel> data = item.map((item) {
         return SongModel.fromJson(item);
@@ -47,10 +44,7 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
     try {
       List<SongWithFavorite> songs = [];
 
-      var item = await supabase
-          .from('songs')
-          .select('*')
-          .order('release_date', ascending: true).limit(7);
+      var item = await supabase.from('songs').select('*').order('release_date', ascending: true).limit(7);
 
       final List<SongModel> data = item.map((item) {
         return SongModel.fromJson(item);
@@ -73,10 +67,7 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
     try {
       late bool isFavorite;
       // Cek apakah lagu sudah ada di daftar favorit
-      final existingFavorite = await supabase
-          .from('favorites')
-          .select()
-          .match({'user_id': supabase.auth.currentUser!.id, 'song_id': songId});
+      final existingFavorite = await supabase.from('favorites').select().match({'user_id': supabase.auth.currentUser!.id, 'song_id': songId});
 
       if (existingFavorite.isNotEmpty) {
         // Jika sudah ada, hapus
@@ -112,10 +103,7 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
   Future<bool> isFavoriteSong(int songId) async {
     try {
       // Cek apakah lagu sudah ada di daftar favorit
-      final existingFavorite = await supabase
-          .from('favorites')
-          .select()
-          .match({'user_id': supabase.auth.currentUser!.id, 'song_id': songId});
+      final existingFavorite = await supabase.from('favorites').select().match({'user_id': supabase.auth.currentUser!.id, 'song_id': songId});
 
       if (existingFavorite.isNotEmpty) {
         return true;
@@ -132,17 +120,10 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
     try {
       List<SongWithFavorite> anotherSong = [];
 
-      var songIdQuery = await supabase
-          .from('favorites')
-          .select('*')
-          .eq('user_id', supabase.auth.currentUser!.id);
+      var songIdQuery = await supabase.from('favorites').select('*').eq('user_id', supabase.auth.currentUser!.id);
 
       for (final element in songIdQuery) {
-        var songItem = await supabase
-            .from('songs')
-            .select('*')
-            .eq('id', element['song_id'])
-            .single();
+        var songItem = await supabase.from('songs').select('*').eq('id', element['song_id']).single();
 
         SongModel songModel = SongModel.fromJson(songItem);
 
@@ -159,10 +140,7 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
     try {
       List<SongWithFavorite> songs = [];
 
-      var item = await supabase
-          .from('songs')
-          .select('*')
-          .match({'artist_id': artistId});
+      var item = await supabase.from('songs').select('*').match({'artist_id': artistId});
 
       final List<SongModel> data = item.map((item) {
         return SongModel.fromJson(item);
@@ -181,12 +159,37 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
   }
 
   @override
+  Future<Either> getArtistSingleSongs(int artistId) async {
+      print('aaaw2');
+    try {
+      List<SongWithFavorite> songs = [];
+
+      var item = await supabase.from('songs').select('*').match({'artist_id': artistId}).isFilter('album_id', null);
+
+      final List<SongModel> data = item.map((item) {
+        return SongModel.fromJson(item);
+      }).toList();
+
+      for (final songModel in data) {
+        final isFavorite = await isFavoriteSong(songModel.id!);
+
+        songs.add(SongWithFavorite(songModel.toEntity(), isFavorite));
+      }
+
+      print("single song length ${songs.length}");
+
+      return Right(songs);
+    } catch (e) {
+      return const Left('An error occured, Please try again');
+    }
+  }
+
+  @override
   Future<Either> getAlbumSongs(String albumId) async {
     try {
       List<SongWithFavorite> songs = [];
 
-      var item =
-          await supabase.from('songs').select('*').match({'album_id': albumId});
+      var item = await supabase.from('songs').select('*').match({'album_id': albumId});
 
       final List<SongModel> data = item.map((item) {
         return SongModel.fromJson(item);
@@ -207,20 +210,12 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
   @override
   Future<Either> getPlaylistSongs(String playlistId) async {
     try {
-
       List<SongWithFavorite> songs = [];
 
-      var playlistSongs = await supabase
-          .from('playlist_songs')
-          .select('*')
-          .match({'playlist_id': playlistId}).order('added_at', ascending: false);
+      var playlistSongs = await supabase.from('playlist_songs').select('*').match({'playlist_id': playlistId}).order('added_at', ascending: false);
 
       for (final element in playlistSongs) {
-        var song = await supabase
-            .from('songs')
-            .select('*')
-            .eq('id', element['song_id'])
-            .single();
+        var song = await supabase.from('songs').select('*').eq('id', element['song_id']).single();
 
         SongModel songModel = SongModel.fromJson(song);
 

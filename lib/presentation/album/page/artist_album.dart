@@ -187,7 +187,7 @@ class ArtistAlbum extends StatelessWidget {
                       height: 10.h,
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 4.w + paddingAddition.w),
+                      padding: EdgeInsets.symmetric(horizontal: 3.w + paddingAddition.w),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -227,7 +227,7 @@ class ArtistAlbum extends StatelessWidget {
                           GestureDetector(
                             onTap: () {},
                             child: Container(
-                              margin: EdgeInsets.only(right: 10.w),
+                              // margin: EdgeInsets.only(right: 10.w),
                               padding: EdgeInsets.all(5.h),
                               decoration: const BoxDecoration(
                                   color: AppColors.primary,
@@ -252,7 +252,7 @@ class ArtistAlbum extends StatelessWidget {
             // Body Scrollable
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.only(top: 10.h),
+                padding: EdgeInsets.only(top: 5.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -284,9 +284,9 @@ class ArtistAlbum extends StatelessWidget {
                             return SingleChildScrollView(
                               child: Column(
                                 children: [
-                                  ListView.separated(
-                                    padding: EdgeInsets.only(
-                                        left: 13.w, top: 5.h,),
+                                  ListView.builder(
+                                    // padding: EdgeInsets.only(
+                                    //     left: 13.w, top: 5.h,),
                                     physics:
                                         const NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
@@ -297,11 +297,6 @@ class ArtistAlbum extends StatelessWidget {
                                         songList: state.songs,
                                         onSelectionChanged: (isSelected) {},
                                         index: index,
-                                      );
-                                    },
-                                    separatorBuilder: (context, index) {
-                                      return SizedBox(
-                                        height: 13.h,
                                       );
                                     },
                                     itemCount: state.songs.length,
@@ -330,7 +325,7 @@ class ArtistAlbum extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                      padding: EdgeInsets.only(left: 10.w),
+                      padding: EdgeInsets.only(left: 17.w),
                       child: Text(
                         'Other Album',
                         style: TextStyle(
@@ -378,12 +373,12 @@ class ArtistAlbum extends StatelessWidget {
                                             album: albumEntity[index],
                                             artist: artist,
                                             isOnAlbumPage: true,
-                                            rightPadding: 14.w,
+                                            rightPadding: 7.w,
                                             leftPadding: index == 0 ||
                                                     albumEntity[index]
                                                             .albumId !=
                                                         albumEntity[0].albumId
-                                                ? 10.w
+                                                ? 17.w
                                                 : 0,
                                           )
                                         : Container();

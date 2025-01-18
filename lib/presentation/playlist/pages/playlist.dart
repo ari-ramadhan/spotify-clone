@@ -597,7 +597,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                   }
                                   if (state is PlaylistSongsLoaded) {
                                     return Container(
-                                      margin: EdgeInsets.only(right: 10.w),
+                                      // margin: EdgeInsets.only(right: 10.w),
                                       padding: EdgeInsets.all(5.h),
                                       decoration: BoxDecoration(
                                         color: state.songs.isEmpty ? Colors.grey : AppColors.primary,
@@ -663,28 +663,20 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
-                                          ListView.separated(
-                                            padding: EdgeInsets.only(
-                                              left: 13.w + paddingAddition.w,
-                                            ),
+                                          ListView.builder(
+                                            // padding: EdgeInsets.only(
+                                            //   left: 13.w + paddingAddition.w,
+                                            // ),
                                             physics: const NeverScrollableScrollPhysics(),
                                             shrinkWrap: true,
                                             itemBuilder: (context, index) {
                                               var songs = state.songs[index];
                                               bool isFavorite = state.songs[index].isFavorite;
 
-                                              return Padding(
-                                                padding: EdgeInsets.only(right: 2.w + paddingAddition.w),
-                                                child: PlaylistSongTileWidget(
-                                                  index: index,
-                                                  songList: state.songs,
-                                                  playlistId: widget.playlistEntity.id!,
-                                                ),
-                                              );
-                                            },
-                                            separatorBuilder: (context, index) {
-                                              return SizedBox(
-                                                height: 13.h,
+                                              return PlaylistSongTileWidget(
+                                                index: index,
+                                                songList: state.songs,
+                                                playlistId: widget.playlistEntity.id!,
                                               );
                                             },
                                             itemCount: state.songs.length,

@@ -15,7 +15,9 @@ class SimilarArtistCubit extends Cubit<SimilarArtistState> {
         emit(SimilarArtistFailure());
       },
       (similarArtist) {
-        emit(SimilarArtistLoaded(artistEntity: similarArtist));
+        if (!isClosed) {
+          emit(SimilarArtistLoaded(artistEntity: similarArtist));
+        }
       },
     );
   }

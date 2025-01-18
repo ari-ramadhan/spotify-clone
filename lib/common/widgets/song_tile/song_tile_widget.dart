@@ -19,12 +19,7 @@ class SongTileWidget extends StatefulWidget {
   final Function(bool) onSelectionChanged;
 
   const SongTileWidget(
-      {super.key,
-      this.isOnHome = false,
-      required this.index,
-      required this.songList,
-      this.isShowArtist = false,
-      required this.onSelectionChanged});
+      {super.key, this.isOnHome = false, required this.index, required this.songList, this.isShowArtist = false, required this.onSelectionChanged});
 
   @override
   State<SongTileWidget> createState() => _SongTileWidgetState();
@@ -61,106 +56,101 @@ class _SongTileWidgetState extends State<SongTileWidget> {
         );
         // Kode sebelumnya
       },
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Row(
-            children: [
-              widget.isOnHome
-                  ? Container(
-                      height: 35.h,
-                      width: 35.w,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: context.isDarkMode
-                            ? AppColors.darkGrey
-                            : const Color(0xffE6E6E6),
-                      ),
-                      child: Icon(
-                        Icons.play_arrow_rounded,
-                        color: context.isDarkMode
-                            ? const Color(0xff959595)
-                            : const Color(0xff555555),
-                      ),
-                    )
-                  : Container(
-                      height: 40.h,
-                      width: 44.w,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(7.sp),
-                        image: DecorationImage(
-                          fit: BoxFit.cover,
-                          image: CachedNetworkImageProvider(
-                              '${AppURLs.supabaseCoverStorage}${songEntity.song.artist} - ${songEntity.song.title}.jpg'),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 5.h).copyWith(right: 5.w),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Row(
+              children: [
+                widget.isOnHome
+                    ? Container(
+                        height: 35.h,
+                        width: 35.w,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: context.isDarkMode ? AppColors.darkGrey : const Color(0xffE6E6E6),
+                        ),
+                        child: Icon(
+                          Icons.play_arrow_rounded,
+                          color: context.isDarkMode ? const Color(0xff959595) : const Color(0xff555555),
+                        ),
+                      )
+                    : Container(
+                        height: 40.h,
+                        width: 44.w,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(7.sp),
+                          image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image:
+                                CachedNetworkImageProvider('${AppURLs.supabaseCoverStorage}${songEntity.song.artist} - ${songEntity.song.title}.jpg'),
+                          ),
                         ),
                       ),
-                    ),
-              SizedBox(
-                width: 14.w,
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    songEntity.song.title,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        color: textColor,
-                        fontSize: 14.sp),
-                  ),
-                  SizedBox(
-                    height: 3.h,
-                  ),
-                  Text(
-                    widget.isOnHome || widget.isShowArtist
-                        ? songEntity.song.artist
-                        : '239.114',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w400,
-                        color: textColor,
-                        fontSize: 11.sp),
-                  ),
-                ],
-              )
-            ],
-          ),
-          widget.isOnHome
-              ? Row(
-                  children: [
-                    Text(
-                      songEntity.song.duration.toString().replaceAll('.', ':'),
-                      style: TextStyle(
-                        color: textColor,
-                      ),
-                    ),
-                    SizedBox(
-                      width: 10.w,
-                    ),
-                    FavoriteButton(songs: songEntity)
-                  ],
-                )
-              : Row(
-                  children: [
-                    Text(
-                      songEntity.song.duration.toString(),
-                      style: TextStyle(
-                        color: textColor,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () {},
-                      splashRadius: 18.sp,
-                      icon: Icon(
-                        Icons.playlist_add,
-                        size: 17.sp,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ],
+                SizedBox(
+                  width: 14.w,
                 ),
-        ],
+                SizedBox(
+                  width: 180.w,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        songEntity.song.title,
+
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontWeight: FontWeight.w500, color: textColor, fontSize: 14.sp),
+                      ),
+                      SizedBox(
+                        height: 3.h,
+                      ),
+                      Text(
+                        widget.isOnHome || widget.isShowArtist ? songEntity.song.artist : '239.114',
+                        style: TextStyle(fontWeight: FontWeight.w400, color: textColor, fontSize: 11.sp),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+            widget.isOnHome
+                ? Row(
+                    children: [
+                      Text(
+                        songEntity.song.duration.toString().replaceAll('.', ':'),
+                        style: TextStyle(
+                          color: textColor,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 10.w,
+                      ),
+                      FavoriteButton(songs: songEntity)
+                    ],
+                  )
+                : Row(
+                    children: [
+                      Text(
+                        songEntity.song.duration.toString(),
+                        style: TextStyle(
+                          color: textColor,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () {},
+                        splashRadius: 18.sp,
+                        icon: Icon(
+                          Icons.playlist_add,
+                          size: 17.sp,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ],
+                  ),
+          ],
+        ),
       ),
     );
   }

@@ -34,6 +34,7 @@ import 'package:spotify_clone/domain/usecases/playlist/add_song_by_keyword.dart'
 import 'package:spotify_clone/domain/usecases/playlist/update_playlist_info.dart';
 import 'package:spotify_clone/domain/usecases/song/add_or_remove_favorite_song.dart';
 import 'package:spotify_clone/domain/usecases/song/get_album_songs.dart';
+import 'package:spotify_clone/domain/usecases/song/get_artist_single_songs.dart';
 import 'package:spotify_clone/domain/usecases/song/get_artist_songs.dart';
 import 'package:spotify_clone/domain/usecases/song/get_play_list.dart';
 import 'package:spotify_clone/domain/usecases/song/get_playlist_songs.dart';
@@ -122,6 +123,9 @@ Future<void> initializeDependencies () async {
   );
   sl.registerSingleton<GetFollowedArtistsUseCase>(
     GetFollowedArtistsUseCase()
+  );
+  sl.registerSingleton<GetArtistSingleSongs>(
+    GetArtistSingleSongs()
   );
 
   // album
