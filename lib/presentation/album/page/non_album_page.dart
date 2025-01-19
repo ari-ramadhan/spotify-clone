@@ -2,8 +2,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/album_song_tile/album_tile_widget.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
+import 'package:spotify_clone/core/configs/constants/app_methods.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
+import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/presentation/album/bloc/all_songs/all_songs_cubit.dart';
 import 'package:spotify_clone/presentation/album/bloc/all_songs/all_songs_state.dart';
 import 'package:spotify_clone/presentation/album/bloc/single_songs/single_songs_cubit.dart';
@@ -14,7 +16,9 @@ import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_sta
 class NonAlbumPage extends StatelessWidget {
   final ArtistEntity artist;
   final String nonAlbumPageTitle;
-  const NonAlbumPage({super.key, required this.artist, required this.nonAlbumPageTitle});
+  NonAlbumPage({super.key, required this.artist, required this.nonAlbumPageTitle});
+
+  List<SongWithFavorite> songs = [];
 
   @override
   Widget build(BuildContext context) {
@@ -75,17 +79,18 @@ class NonAlbumPage extends StatelessWidget {
                             height: 14.h,
                           ),
                           Text(
-                            artist.name!,
+                            'Artist\'s entire songs',
                             style: TextStyle(
-                              fontSize: artist.name!.length <= 9 ? 20.sp : 16.sp,
+                              fontSize:16.sp,
                               fontWeight: FontWeight.w500,
                               letterSpacing: 0.4,
+                              color: Colors.white70
                             ),
                           ),
                           Text(
                             nonAlbumPageTitle,
                             style: TextStyle(
-                              fontSize: 28.sp,
+                              fontSize: 22.sp,
                               fontWeight: FontWeight.w800,
                               letterSpacing: 0.4,
                             ),
@@ -118,11 +123,23 @@ class NonAlbumPage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  blurryDialogForPlaylist(
+                                    context: context,
+                                    artist: artist,
+                                    songList: songs,
+                                    backgroundImage: '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
+
+                                    // content: Column(
+                                    //   children: [],
+                                    // ),
+                                    // horizontalPadding: 10.w,
+                                  );
+                                },
                                 iconSize: 20.sp,
                                 splashRadius: 20.sp,
                                 icon: Icon(
-                                  Icons.playlist_add,
+                                  Icons.playlist_add_circle_rounded,
                                   color: AppColors.primary,
                                   size: 28.sp,
                                 ),
@@ -172,35 +189,6 @@ class NonAlbumPage extends StatelessWidget {
                 )
               ],
             ),
-            // Container(
-            //   height: 0.h,
-            //   width: double.infinity,
-            //   color: Colors.transparent,
-            //   child: OverflowBox(
-            //     minWidth: 0.0,
-            //     maxWidth: double.infinity,
-            //     minHeight: 0.0,
-            //     alignment: Alignment.centerRight,
-            //     maxHeight: double.infinity,
-            //     child: GestureDetector(
-            //       onTap: () {},
-            //       child: Container(
-            //         margin: EdgeInsets.only(right: 10.w),
-            //         padding: EdgeInsets.all(5.h),
-            //         decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
-            //         child: IconButton(
-            //           onPressed: () {},
-            //           icon: Icon(
-            //             Icons.play_arrow_rounded,
-            //             size: 25.h,
-            //             color: Colors.white,
-            //           ),
-            //         ),
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // Body Scrollable
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.only(top: 2.h),
@@ -208,7 +196,7 @@ class NonAlbumPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Album Songs
-                    nonAlbumPageTitle == 'All Song'
+                    nonAlbumPageTitle.contains('This is')
                         ? BlocProvider(
                             create: (context) => AllSongsCubit()..getAllSongs(artist.id!),
                             child: BlocBuilder<AllSongsCubit, AllSongsState>(
@@ -232,6 +220,8 @@ class NonAlbumPage extends StatelessWidget {
                                   );
                                 }
                                 if (state is AllSongsLoaded) {
+                                  songs = state.songs;
+
                                   return SingleChildScrollView(
                                     child: Column(
                                       children: [

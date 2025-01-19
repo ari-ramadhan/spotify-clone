@@ -606,79 +606,6 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
                                       ],
                                     ),
                                   ),
-                                  // child: Column(
-                                  //   children: [
-                                  //     Stack(
-                                  //       alignment: Alignment.bottomCenter,
-                                  //       children: [
-                                  //         Container(
-                                  //           height: 125.h,
-                                  //           width: 115.w,
-                                  //           decoration: BoxDecoration(
-                                  //             borderRadius:
-                                  //                 BorderRadius.circular(
-                                  //               10.w,
-                                  //             ),
-                                  //             image: DecorationImage(
-                                  //               fit: BoxFit.cover,
-                                  //               image: NetworkImage(
-                                  //                 '${AppURLs.supabaseArtistStorage}${artistList.name!.toLowerCase()}.jpg',
-                                  //               ),
-                                  //             ),
-                                  //           ),
-                                  //         ),
-                                  //         Container(
-                                  //           height: 50.h,
-                                  //           width: 115.w,
-                                  //           padding: EdgeInsets.only(
-                                  //               bottom: 8.h, left: 10.w),
-                                  //           decoration: BoxDecoration(
-                                  //             borderRadius: BorderRadius.only(
-                                  //               bottomLeft:
-                                  //                   Radius.circular(10.w),
-                                  //               bottomRight:
-                                  //                   Radius.circular(10.w),
-                                  //             ),
-                                  //             color: Colors.white,
-                                  //             gradient: LinearGradient(
-                                  //               end: Alignment.topCenter,
-                                  //               begin: Alignment.bottomCenter,
-                                  //               colors: [
-                                  //                 AppColors.primary
-                                  //                     .withOpacity(1),
-                                  //                 AppColors.primary
-                                  //                     .withOpacity(0.7),
-                                  //                 AppColors.primary
-                                  //                     .withOpacity(0),
-                                  //               ],
-                                  //             ),
-                                  //           ),
-                                  //           child: Column(
-                                  //             mainAxisAlignment:
-                                  //                 MainAxisAlignment.end,
-                                  //             crossAxisAlignment:
-                                  //                 CrossAxisAlignment.start,
-                                  //             children: [
-                                  //               SizedBox(
-                                  //                 height: 5.h,
-                                  //               ),
-                                  //               Text(
-                                  //                 artistList.name!,
-                                  //                 // textAlign: TextAlign.center,
-                                  //                 style: TextStyle(
-                                  //                     color: Colors.white,
-                                  //                     fontWeight:
-                                  //                         FontWeight.w600,
-                                  //                     fontSize: 12.sp,
-                                  //                     letterSpacing: 0.2),
-                                  //               ),
-                                  //             ],
-                                  //           ),
-                                  //         )
-                                  //       ],
-                                  //     ),
-                                  //   ],
-                                  // ),
                                 ),
                                 SizedBox(
                                   width: 14.w,
@@ -752,7 +679,7 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
                                     album: albumList[0],
                                     rightPadding: 22.w,
                                     isNonAlbum: true,
-                                    nonAlbumTitle: 'All Song',
+                                    nonAlbumTitle: 'This is ${artist.name}',
                                     artist: artist,
                                   )
                                 : AlbumTileWidget(

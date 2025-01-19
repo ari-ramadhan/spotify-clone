@@ -1,14 +1,7 @@
 import 'package:spotify_clone/common/helpers/export.dart';
-import 'package:spotify_clone/common/widgets/favorite_button/playlist_song_tile_widget.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
-import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget_selectable.dart';
-import 'package:spotify_clone/core/configs/constants/app_methods.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
-import 'package:spotify_clone/domain/entity/playlist/playlist.dart';
-import 'package:spotify_clone/domain/entity/song/song.dart';
-import 'package:spotify_clone/domain/usecases/playlist/delete_playlist.dart';
-import 'package:spotify_clone/domain/usecases/playlist/update_playlist_info.dart';
 import 'package:spotify_clone/presentation/artist_page/pages/artist_page.dart';
 import 'package:spotify_clone/presentation/playlist/bloc/playlist_songs_cubit.dart';
 import 'package:spotify_clone/presentation/playlist/bloc/playlist_songs_state.dart';
@@ -16,10 +9,11 @@ import 'package:spotify_clone/presentation/playlist/bloc/recommended_artist_stat
 import 'package:spotify_clone/presentation/playlist/bloc/recommended_artists_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/favorite_song/favorite_song_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/favorite_song/favorite_song_state.dart';
-import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_state.dart';
 
 class MyFavorite extends StatefulWidget {
+  final int length;
   MyFavorite({
+    required this.length,
     Key? key,
   }) : super(key: key);
 
@@ -107,7 +101,6 @@ class _MyFavoriteState extends State<MyFavorite> {
                                   child: Container(
                                     height: double.infinity,
                                     width: double.infinity,
-
                                     child: Icon(
                                       Icons.favorite_rounded,
                                       color: Colors.white,
@@ -191,6 +184,7 @@ class _MyFavoriteState extends State<MyFavorite> {
                               SizedBox(
                                 height: 5.h,
                               ),
+                              Text('contains ${widget.length} songs')
                             ],
                           ),
                         ),
@@ -292,19 +286,13 @@ class _MyFavoriteState extends State<MyFavorite> {
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           ListView.builder(
-                                            // padding: EdgeInsets.only(
-                                            //   left: 13.w + paddingAddition.w,
-                                            // ),
                                             physics: const NeverScrollableScrollPhysics(),
                                             shrinkWrap: true,
                                             itemBuilder: (context, index) {
-                                              var songs = state.songs[index];
-                                              bool isFavorite = state.songs[index].isFavorite;
-
                                               return SongTileWidget(
                                                 index: index,
                                                 songList: state.songs,
-                                                // playlistId: widget.playlistEntity.id!,
+                                                isShowArtist: true,
                                                 onSelectionChanged: (bool) {},
                                               );
                                             },
@@ -324,6 +312,9 @@ class _MyFavoriteState extends State<MyFavorite> {
                                                   ),
                                                 )
                                               : const SizedBox.shrink(),
+                                          SizedBox(
+                                            height: 15.h,
+                                          ),
                                           Padding(
                                             padding: EdgeInsets.only(left: 12.w, right: 22.w),
                                             child: Text(

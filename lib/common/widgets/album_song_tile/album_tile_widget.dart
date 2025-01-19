@@ -77,8 +77,10 @@ class AlbumTileWidget extends StatelessWidget {
                     image: DecorationImage(
                       fit: BoxFit.cover,
                       image: isNonAlbum
-                          ? CachedNetworkImageProvider(
+                          ? nonAlbumTitle == 'Single' ? CachedNetworkImageProvider(
                               '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
+                            ) : CachedNetworkImageProvider(
+                              '${AppURLs.supabaseThisIsMyStorage}${artist.name!.toLowerCase()}.jpg',
                             )
                           : CachedNetworkImageProvider(
                               '${AppURLs.supabaseAlbumStorage}${artist.name} - ${album.name}.jpg',

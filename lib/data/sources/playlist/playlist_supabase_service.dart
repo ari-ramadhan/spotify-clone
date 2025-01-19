@@ -14,6 +14,7 @@ abstract class PlaylistSupabaseService {
   Future<Either> deletePlaylist(String playlistId);
   Future<Either> addSongByKeyword(String playlistId, String title);
   Future<Either> deleteSongFromPlaylist(String playlistId, int songId);
+  Future<Either> batchAddToPlaylist(String playlistId, List<SongWithFavorite> songList);
 }
 
 class PlaylistSupabaseServiceImpl extends PlaylistSupabaseService {
@@ -82,7 +83,8 @@ class PlaylistSupabaseServiceImpl extends PlaylistSupabaseService {
           isPublic: isPublic,
           userId: supabase.auth.currentUser!.id,
           name: title,
-          description: description, songCount: selectedSongId.length,
+          description: description,
+          songCount: selectedSongId.length,
         );
 
         return Right(playlistEntity);
@@ -93,43 +95,6 @@ class PlaylistSupabaseServiceImpl extends PlaylistSupabaseService {
       return const Left('Error occurred while adding a new playlist');
     }
   }
-
-  // @override
-  // Future<Either> addNewPlaylist(String title, String description, bool isPublic, List selectedSongId) async {
-  //   String message = '';
-
-  //   try {
-  //     // Menambahkan playlist ke tabel playlists
-  //     final response = await supabase
-  //         .from('playlists')
-  //         .insert({'user_id': supabase.auth.currentUser!.id, 'is_public': isPublic, 'name': title, 'description': description})
-  //         .select('id')
-  //         .single(); // Gunakan `select` untuk mengembalikan hanya kolom id
-
-  //     if (response['id'] != null) {
-  //       final playlistId = response['id']; // Ambil playlist ID
-
-  //       // Jika selectedSongId tidak kosong, tambahkan lagu ke tabel playlist_songs
-  //       if (selectedSongId.isNotEmpty) {
-  //         for (var songId in selectedSongId) {
-  //           await supabase.from('playlist_songs').insert({
-  //             'playlist_id': playlistId,
-  //             'song_id': songId,
-  //           });
-  //         }
-  //         message = 'Songs added to the new playlist!';
-  //       } else {
-  //         message = 'A playlist added successfully';
-  //       }
-  //     } else {
-  //       throw Exception('Failed to insert playlist or retrieve playlist ID');
-  //     }
-
-  //     return Right(message);
-  //   } catch (e) {
-  //     return const Left('Error occurred while adding a new playlist');
-  //   }
-  // }
 
   @override
   Future<Either> updatePlaylistInfo(String playlistId, String title, String desc) async {
@@ -210,6 +175,34 @@ class PlaylistSupabaseServiceImpl extends PlaylistSupabaseService {
       return Right('Successfull deleting song from this playlist');
     } catch (e) {
       return Left('error occured while deleting this song');
+    }
+  }
+
+  @override
+  Future<Either> batchAddToPlaylist(String playlistId, List<SongWithFavorite> songList) async {
+    try {
+      if (songList.isEmpty) {
+        return const Left('failed, no songs included');
+      } else {
+        var result = await supabase.from('playlist_songs').select('song_id').eq('playlist_id', playlistId);
+        List currentPlaylistSongIds = result
+            .map(
+              (e) => e['song_id'],
+            )
+            .toList();
+
+        for (var song in songList) {
+          if (!currentPlaylistSongIds.contains(song.song.id)) {
+            await supabase.from('playlist_songs').insert({
+              'playlist_id': playlistId,
+              'song_id': song.song.id,
+            });
+          }
+        }
+      }
+      return const Right('Songs added to your playlist');
+    } catch (e) {
+      return const Left('error occured while adding songs to your playlist');
     }
   }
 }

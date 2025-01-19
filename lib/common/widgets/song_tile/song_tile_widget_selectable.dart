@@ -77,13 +77,16 @@ class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.songEntity.song.title,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          color: textColor,
-                          fontSize: 12.sp),
+                    SizedBox(
+                      width: 180.w,
+                      child: Text(
+                        widget.songEntity.song.title,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: textColor,
+                            fontSize: 12.sp),
+                      ),
                     ),
                     SizedBox(
                       height: 3.h,
@@ -105,6 +108,7 @@ class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
                   widget.songEntity.song.duration.toString(),
                   style: TextStyle(
                     color: textColor,
+                    fontSize: 11.sp
                   ),
                 ),
                 SizedBox(

@@ -27,6 +27,7 @@ import 'package:spotify_clone/domain/usecases/auth/signin.dart';
 import 'package:spotify_clone/domain/usecases/auth/signup.dart';
 import 'package:spotify_clone/domain/usecases/playlist/add_new_playlist.dart';
 import 'package:spotify_clone/domain/usecases/playlist/add_songs_to_playlist.dart';
+import 'package:spotify_clone/domain/usecases/playlist/batch_add_to_playlist.dart';
 import 'package:spotify_clone/domain/usecases/playlist/delete_playlist.dart';
 import 'package:spotify_clone/domain/usecases/playlist/delete_song_from_playlist.dart';
 import 'package:spotify_clone/domain/usecases/playlist/get_currentUser_playlist.dart';
@@ -166,6 +167,9 @@ Future<void> initializeDependencies () async {
   );
   sl.registerSingleton<DeleteSongFromPlaylistUseCase>(
     DeleteSongFromPlaylistUseCase()
+  );
+  sl.registerSingleton<BatchAddToPlaylistUseCase>(
+    BatchAddToPlaylistUseCase()
   );
 
 }

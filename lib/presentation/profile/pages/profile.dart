@@ -8,6 +8,7 @@ import 'package:spotify_clone/data/repository/auth/auth_service.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
 import 'package:spotify_clone/domain/entity/playlist/playlist.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
+import 'package:spotify_clone/presentation/artist_followed/artist_followed.dart';
 import 'package:spotify_clone/presentation/artist_page/pages/artist_page.dart';
 import 'package:spotify_clone/presentation/intro/pages/get_started.dart';
 import 'package:spotify_clone/presentation/playlist/pages/playlist.dart';
@@ -284,7 +285,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                       return MaterialButton(
                                         splashColor: Colors.transparent,
                                         onPressed: () {
-                                          Navigator.push(context, MaterialPageRoute(builder: (context) => MyFavorite(),));
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => MyFavorite(
+                                                length: state.songs.length,
+                                              ),
+                                            ),
+                                          );
                                         },
                                         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 5.h),
                                         child: Row(
@@ -356,6 +364,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         ? Column(
                                             children: [
                                               ElementTitleWidget(
+                                                onTap: () {},
                                                 elementTitle: 'Playlists',
                                                 limit: 4,
                                                 list: state.playlistModel,
@@ -366,7 +375,20 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 itemBuilder: (context, index) {
                                                   var playlist = state.playlistModel[index];
 
-                                                  return PlaylistTileWidget(playlist: playlist);
+                                                  return PlaylistTileWidget(
+                                                    playlist: playlist,
+                                                    onTap: () {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          // fullscreenDialog: true,
+                                                          builder: (context) => PlaylistPage(
+                                                            playlistEntity: playlist,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    },
+                                                  );
                                                 },
                                                 itemCount: state.playlistModel.take(4).length,
                                               ),
@@ -391,7 +413,18 @@ class _ProfilePageState extends State<ProfilePage> {
                                     if (state is FollowedArtistsLoaded) {
                                       return Column(
                                         children: [
-                                          ElementTitleWidget(elementTitle: 'Artists followed', list: state.artists, limit: 4),
+                                          ElementTitleWidget(
+                                            elementTitle: 'Artists followed',
+                                            list: state.artists,
+                                            limit: 4,
+                                            onTap: () {
+                                              Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => ArtistFollowed(),
+                                                  ));
+                                            },
+                                          ),
                                           ListView.builder(
                                             shrinkWrap: true,
                                             physics: NeverScrollableScrollPhysics(),
@@ -774,17 +807,19 @@ class ElementTitleWidget extends StatelessWidget {
   final String elementTitle;
   final List<dynamic> list;
   final double limit;
+  final VoidCallback onTap;
   const ElementTitleWidget({
     required this.elementTitle,
     required this.list,
     required this.limit,
+    required this.onTap,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
     return MaterialButton(
-      onPressed: () {},
+      onPressed: onTap,
       padding: EdgeInsets.symmetric(horizontal: 13.w).copyWith(right: 6.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -817,9 +852,11 @@ class ElementTitleWidget extends StatelessWidget {
 }
 
 class PlaylistTileWidget extends StatelessWidget {
+  final VoidCallback onTap;
   const PlaylistTileWidget({
     super.key,
     required this.playlist,
+    required this.onTap,
   });
 
   final PlaylistEntity playlist;
@@ -829,17 +866,7 @@ class PlaylistTileWidget extends StatelessWidget {
     return MaterialButton(
       splashColor: Colors.transparent,
       padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 14.w),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            // fullscreenDialog: true,
-            builder: (context) => PlaylistPage(
-              playlistEntity: playlist,
-            ),
-          ),
-        );
-      },
+      onPressed: onTap,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

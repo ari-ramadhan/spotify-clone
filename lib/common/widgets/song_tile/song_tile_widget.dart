@@ -45,6 +45,7 @@ class _SongTileWidgetState extends State<SongTileWidget> {
     Color textColor = Colors.white;
 
     return InkWell(
+      splashColor: Colors.transparent,
       onTap: () {
         Navigator.of(context).push(
           MaterialPageRoute(
@@ -108,7 +109,7 @@ class _SongTileWidgetState extends State<SongTileWidget> {
                       ),
                       Text(
                         widget.isOnHome || widget.isShowArtist ? songEntity.song.artist : '239.114',
-                        style: TextStyle(fontWeight: FontWeight.w400, color: textColor, fontSize: 11.sp),
+                        style: TextStyle(fontWeight: FontWeight.w400, color: Colors.white.withOpacity(0.91), fontSize: 11.sp),
                       ),
                     ],
                   ),

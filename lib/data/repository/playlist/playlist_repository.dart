@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:spotify_clone/data/sources/playlist/playlist_supabase_service.dart';
+import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/domain/repository/playlist/playlist.dart';
 import 'package:spotify_clone/service_locator.dart';
 
@@ -37,6 +38,11 @@ class PlaylistRepositoryImpl extends PlaylistRepository{
   @override
   Future<Either> deleteSongFromPlaylist(String playlistId, int songId) async {
     return await sl<PlaylistSupabaseService>().deleteSongFromPlaylist(playlistId, songId);
+  }
+
+  @override
+  Future<Either> batchAddToPlaylist(String playlistId, List<SongWithFavorite> songList) async {
+    return await sl<PlaylistSupabaseService>().batchAddToPlaylist(playlistId, songList);
   }
 
 

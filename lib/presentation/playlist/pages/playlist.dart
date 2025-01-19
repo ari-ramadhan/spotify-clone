@@ -695,8 +695,11 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                                   ),
                                                 )
                                               : const SizedBox.shrink(),
+                                          SizedBox(
+                                            height: 12.h,
+                                          ),
                                           Padding(
-                                            padding: EdgeInsets.only(left: 12.w, right: 22.w),
+                                            padding: EdgeInsets.only(left: 16.w, right: 22.w),
                                             child: Text(
                                               'Check out more from these artists',
                                               style: TextStyle(
