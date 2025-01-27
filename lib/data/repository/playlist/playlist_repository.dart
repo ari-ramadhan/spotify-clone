@@ -6,8 +6,8 @@ import 'package:spotify_clone/service_locator.dart';
 
 class PlaylistRepositoryImpl extends PlaylistRepository{
   @override
-  Future<Either> getCurrentUserPlaylists() async {
-    return await sl<PlaylistSupabaseService>().getCurrentUserPlaylists();
+  Future<Either> getCurrentUserPlaylists(String userId) async {
+    return await sl<PlaylistSupabaseService>().getCurrentUserPlaylists(userId);
   }
 
   @override

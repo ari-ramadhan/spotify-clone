@@ -5,13 +5,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:spotify_clone/common/helpers/is_dark_mode.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/core/configs/theme/app_colors.dart';
+import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
-import 'package:spotify_clone/presentation/home/bloc/news_songs_cubit.dart';
-import 'package:spotify_clone/presentation/home/bloc/news_songs_state.dart';
+import 'package:spotify_clone/presentation/home/bloc/news_song/news_songs_cubit.dart';
+import 'package:spotify_clone/presentation/home/bloc/news_song/news_songs_state.dart';
 import 'package:spotify_clone/presentation/song_player/pages/song_player.dart';
 
 class NewsSongs extends StatelessWidget {
-  const NewsSongs({super.key});
+  const NewsSongs({super.key, });
 
   @override
   Widget build(BuildContext context) {
@@ -80,33 +81,26 @@ class NewsSongs extends StatelessWidget {
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(25.sp),
                   image: DecorationImage(
-                      fit: BoxFit.cover,
-                      image:
-                      CachedNetworkImageProvider(
-                        '${AppURLs.supabaseCoverStorage}${song.song.artist} - ${song.song.title}.jpg',
-                      )
-                      // NetworkImage(
-                      //   '${AppURLs.supabaseCoverStorage}${song.song.artist} - ${song.song.title}.jpg',
-                      // ),
-                      ),
+                    fit: BoxFit.cover,
+                    image: CachedNetworkImageProvider('${AppURLs.supabaseCoverStorage}${song.song.artist} - ${song.song.title}.jpg'),
+                    // NetworkImage(
+                    //   '${AppURLs.supabaseCoverStorage}${song.song.artist} - ${song.song.title}.jpg',
+                    // ),
+                  ),
                 ),
                 child: Align(
                   alignment: Alignment.bottomRight,
                   child: Container(
-                    height: 40.h,
-                    width: 40.w,
-                    transform: Matrix4.translationValues(-10.w, 13.h, 0),
+                    height: 34.w,
+                    width: 34.w,
+                    transform: Matrix4.translationValues(-7.w, 10.h, 0),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: context.isDarkMode
-                          ? AppColors.darkGrey
-                          : const Color(0xffE6E6E6),
+                      color: context.isDarkMode ? AppColors.darkGrey : const Color(0xffE6E6E6),
                     ),
                     child: Icon(
                       Icons.play_arrow_rounded,
-                      color: context.isDarkMode
-                          ? const Color(0xff959595)
-                          : const Color(0xff555555),
+                      color: context.isDarkMode ? const Color(0xff959595) : const Color(0xff555555),
                     ),
                   ),
                 ),
@@ -133,9 +127,7 @@ class NewsSongs extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 12.7.sp,
                       fontWeight: FontWeight.w400,
-                      color: context.isDarkMode
-                          ? const Color(0xffC6C6C6)
-                          : const Color(0xff000000),
+                      color: context.isDarkMode ? const Color(0xffC6C6C6) : const Color(0xff000000),
                     ),
                   ),
                 ],

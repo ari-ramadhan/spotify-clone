@@ -6,8 +6,8 @@ import 'package:spotify_clone/common/widgets/favorite_button/favorite_button.dar
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
 import 'package:spotify_clone/core/configs/theme/app_colors.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
-import 'package:spotify_clone/presentation/home/bloc/allSong_cubit.dart';
-import 'package:spotify_clone/presentation/home/bloc/allSong_state.dart';
+import 'package:spotify_clone/presentation/home/bloc/all_song/allSong_cubit.dart';
+import 'package:spotify_clone/presentation/home/bloc/all_song/allSong_state.dart';
 import 'package:spotify_clone/presentation/song_player/pages/song_player.dart';
 
 class AllSongPage extends StatefulWidget {
@@ -23,10 +23,7 @@ class _AllSongPageState extends State<AllSongPage> {
     return BlocBuilder<AllSongCubit, AllSongState>(
       builder: (context, state) {
         if (state is AllSongLoading) {
-          return Container(
-              padding: const EdgeInsets.only(top: 30),
-              alignment: Alignment.center,
-              child: const CircularProgressIndicator());
+          return Container(padding: const EdgeInsets.only(top: 30), alignment: Alignment.center, child: const CircularProgressIndicator());
         }
 
         if (state is AllSongLoaded) {
@@ -49,14 +46,13 @@ class _AllSongPageState extends State<AllSongPage> {
                       ),
                       Text(
                         'See more',
-                        style: TextStyle(
-                            fontSize: 11.sp, fontWeight: FontWeight.w400),
+                        style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w400),
                       ),
                     ],
                   ),
                 ),
                 SizedBox(
-                  height: 16.h,
+                  height: 5.h,
                 ),
                 _songs(state.songs)
               ],
@@ -84,16 +80,12 @@ class _AllSongPageState extends State<AllSongPage> {
         }
 
         return SongTileWidget(
-            songList: songs,
-            isOnHome: true,
-            index: index,
-            onSelectionChanged: (isSelected) {});
+          songList: songs,
+          isOnHome: true,
+          index: index,
+          onSelectionChanged: (isSelected) {},
+        );
       },
-      // separatorBuilder: (context, index) {
-      //   return SizedBox(
-      //     height: 13.h,
-      //   );
-      // },
     );
   }
 }

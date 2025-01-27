@@ -1,29 +1,33 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
+import 'package:spotify_clone/common/widgets/artist/artist_tile_widget.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget_selectable.dart';
 import 'package:spotify_clone/core/configs/constants/app_methods.dart';
-import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/data/repository/auth/auth_service.dart';
-import 'package:spotify_clone/domain/entity/artist/artist.dart';
+import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/entity/playlist/playlist.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
-import 'package:spotify_clone/presentation/artist_followed/artist_followed.dart';
-import 'package:spotify_clone/presentation/artist_page/pages/artist_page.dart';
 import 'package:spotify_clone/presentation/intro/pages/get_started.dart';
 import 'package:spotify_clone/presentation/playlist/pages/playlist.dart';
 import 'package:spotify_clone/presentation/profile/bloc/favorite_song/favorite_song_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/favorite_song/favorite_song_state.dart';
 import 'package:spotify_clone/presentation/profile/bloc/followed_artists.dart/followed_song_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/followed_artists.dart/followed_song_state.dart';
+import 'package:spotify_clone/presentation/profile/bloc/follower_and_following/follower_cubit.dart';
+import 'package:spotify_clone/presentation/profile/bloc/follower_and_following/follower_state.dart';
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_state.dart';
-import 'package:spotify_clone/presentation/profile/bloc/profile_info/profile_info_cubit.dart';
-import 'package:spotify_clone/presentation/profile/bloc/profile_info/profile_info_state.dart';
 import 'package:spotify_clone/presentation/profile/pages/my_favorite.dart';
+import 'package:spotify_clone/presentation/profile/widgets/FollowUserButton.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  final UserWithStatus userEntity;
+  final bool hideBackButton;
+  const ProfilePage({
+    super.key,
+    required this.userEntity,
+    this.hideBackButton = false,
+  });
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -35,25 +39,51 @@ class _ProfilePageState extends State<ProfilePage> {
 
   List<SongWithFavorite> selectedSongs = [];
 
+  String fullName = '';
+  String email = '';
+  String userId = '';
+  bool isCurrentUser = false;
+
+  Future getUserInfo() async {
+    List<String>? userInfo = await AuthService().getUserLoggedInInfo();
+    if (userInfo != null) {
+      setState(() {
+        userId = userInfo[0];
+        email = userInfo[1];
+        fullName = userInfo[2];
+        isCurrentUser = userInfo[0] == widget.userEntity.userEntity.userId;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getUserInfo();
+  }
+
   @override
   Widget build(BuildContext context) {
     return !isLoading
         ? Scaffold(
             appBar: BasicAppbar(
+              hideBackButton: widget.hideBackButton,
               backgroundColor: context.isDarkMode ? const Color(0xff2c2b2b) : Colors.white,
               title: Text(
                 'Profile',
                 style: TextStyle(color: context.isDarkMode ? Colors.white : Colors.black),
               ),
-              action: IconButton(
-                onPressed: () {
-                  showMenuOptions(context);
-                },
-                icon: Icon(
-                  Icons.more_vert,
-                  color: context.isDarkMode ? Colors.white : Colors.black,
-                ),
-              ),
+              action: isCurrentUser
+                  ? IconButton(
+                      onPressed: () {
+                        showMenuOptions(context);
+                      },
+                      icon: Icon(
+                        Icons.more_vert,
+                        color: context.isDarkMode ? Colors.white : Colors.black,
+                      ),
+                    )
+                  : const SizedBox.shrink(),
             ),
             body: Stack(
               children: [
@@ -62,6 +92,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _profileInfo(context),
+                      // _testing(),
                       SizedBox(
                         height: 0.h,
                       ),
@@ -71,20 +102,22 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: MultiBlocProvider(
                           providers: [
                             BlocProvider(
-                              create: (context) => PlaylistCubit()..getCurrentuserPlaylist(),
+                              create: (context) => PlaylistCubit()..getCurrentuserPlaylist(isCurrentUser ? '' : widget.userEntity.userEntity.userId!),
                             ),
                             BlocProvider(
-                              create: (context) => FavoriteSongCubit()..getFavoriteSongs(),
+                              create: (context) => FavoriteSongCubit()..getFavoriteSongs(isCurrentUser ? '' : widget.userEntity.userEntity.userId!),
                             ),
                             BlocProvider(
-                              create: (context) => FollowedArtistsCubit()..getFollowedArtists(),
+                              create: (context) =>
+                                  FollowedArtistsCubit()..getFollowedArtists(isCurrentUser ? '' : widget.userEntity.userEntity.userId!),
                             ),
                           ],
                           child: BlocBuilder<PlaylistCubit, PlaylistState>(
                             builder: (context, state) => Column(
                               children: [
                                 Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h).copyWith(bottom: 0),
+                                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: isCurrentUser ? 5.h : 10.h)
+                                      .copyWith(bottom: isCurrentUser ? 0 : 10.h),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
@@ -95,186 +128,167 @@ class _ProfilePageState extends State<ProfilePage> {
                                             fontWeight: FontWeight.bold,
                                             color: context.isDarkMode ? AppColors.grey : AppColors.darkGrey),
                                       ),
-                                      MaterialButton(
-                                        onPressed: () async {
-                                          // showAddPlaylistModal(context, '');
-                                          blurryDialog(
-                                              context: context,
-                                              horizontalPadding: 10,
-                                              dialogTitle: 'Create a playlist',
-                                              content: Column(
-                                                mainAxisSize: MainAxisSize.max,
-                                                mainAxisAlignment: MainAxisAlignment.start,
-                                                children: [
-                                                  Padding(
-                                                    padding: EdgeInsets.symmetric(horizontal: 40.w),
-                                                    child: playlistTitleField(),
-                                                  ),
-                                                  SizedBox(
-                                                    height: 23.h,
-                                                  ),
-                                                  Wrap(
-                                                    direction: Axis.horizontal,
-                                                    children: selectedSongs.map(
-                                                      (e) {
-                                                        return Container(
-                                                          child: Row(
-                                                            children: [
-                                                              CircleAvatar(
-                                                                radius: 18.sp,
-                                                                backgroundImage: CachedNetworkImageProvider(
-                                                                    '${AppURLs.supabaseCoverStorage}${e.song.artist} - ${e.song.title}.jpg'),
-                                                              ),
-                                                              SizedBox(
-                                                                width: 5.w,
-                                                              ),
-                                                              Text(e.song.title)
-                                                            ],
+                                      isCurrentUser
+                                          ? MaterialButton(
+                                              onPressed: () async {
+                                                // showAddPlaylistModal(context, '');
+                                                blurryDialog(
+                                                    context: context,
+                                                    horizontalPadding: 10,
+                                                    dialogTitle: 'Create a playlist',
+                                                    content: Column(
+                                                      mainAxisSize: MainAxisSize.max,
+                                                      mainAxisAlignment: MainAxisAlignment.start,
+                                                      children: [
+                                                        Padding(
+                                                          padding: EdgeInsets.symmetric(horizontal: 40.w),
+                                                          child: playlistTitleField(),
+                                                        ),
+                                                        SizedBox(
+                                                          height: 23.h,
+                                                        ),
+                                                        MaterialButton(
+                                                          onPressed: () async {
+                                                            await createPlaylist(context, selectedSongs);
+                                                          },
+                                                          focusColor: Colors.black45,
+                                                          // highlightColor: Colors.black12,
+                                                          splashColor: AppColors.primary,
+                                                          highlightColor: AppColors.primary,
+                                                          shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(
+                                                              15.sp,
+                                                            ),
+                                                            side: BorderSide(
+                                                              color: Colors.grey.shade200,
+                                                            ),
                                                           ),
-                                                        );
-                                                      },
-                                                    ).toList(),
-                                                  ),
-                                                  MaterialButton(
-                                                    onPressed: () async {
-                                                      await createPlaylist(context, selectedSongs);
-                                                    },
-                                                    focusColor: Colors.black45,
-                                                    // highlightColor: Colors.black12,
-                                                    splashColor: AppColors.primary,
-                                                    highlightColor: AppColors.primary,
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(
-                                                        15.sp,
-                                                      ),
-                                                      side: BorderSide(
-                                                        color: Colors.grey.shade200,
-                                                      ),
-                                                    ),
-                                                    child: Text(
-                                                      'Create playlist',
-                                                      style: TextStyle(
-                                                        fontSize: 14.sp,
-                                                      ),
-                                                    ),
+                                                          child: Text(
+                                                            'Create playlist',
+                                                            style: TextStyle(
+                                                              fontSize: 14.sp,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        SizedBox(
+                                                          height: 20.h,
+                                                        ),
+                                                        Padding(
+                                                          padding: EdgeInsets.symmetric(horizontal: 6.w),
+                                                          child: BlocProvider(
+                                                            create: (context) => FavoriteSongCubit()
+                                                              ..getFavoriteSongs(isCurrentUser ? '' : widget.userEntity.userEntity.userId!),
+                                                            child: BlocBuilder<FavoriteSongCubit, FavoriteSongState>(
+                                                              builder: (context, state) {
+                                                                if (state is FavoriteSongLoading) {
+                                                                  return Container(
+                                                                    alignment: Alignment.center,
+                                                                    height: 100,
+                                                                    child: const CircularProgressIndicator(
+                                                                      color: AppColors.primary,
+                                                                    ),
+                                                                  );
+                                                                }
+                                                                if (state is FavoriteSongFailure) {
+                                                                  return Container(
+                                                                      alignment: Alignment.center,
+                                                                      height: 100,
+                                                                      child: const Text('Failed to fetch songs'));
+                                                                }
+                                                                if (state is FavoriteSongLoaded) {
+                                                                  return Container(
+                                                                    alignment: Alignment.center,
+                                                                    child: Column(
+                                                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                                                      children: [
+                                                                        Text(
+                                                                          'From your favorites',
+                                                                          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500),
+                                                                        ),
+                                                                        ListView.separated(
+                                                                          physics: const NeverScrollableScrollPhysics(),
+                                                                          shrinkWrap: true,
+                                                                          padding: EdgeInsets.only(top: 10.w),
+                                                                          itemCount: state.songs.take(5).length,
+                                                                          itemBuilder: (context, index) {
+                                                                            var songModel = state.songs[index];
+
+                                                                            return SongTileWidgetSelectable(
+                                                                              songEntity: songModel,
+                                                                              onSelectionChanged: (selectedSong) {
+                                                                                setState(() {
+                                                                                  if (selectedSong != null) {
+                                                                                    // Tambahkan jika tidak ada di daftar
+                                                                                    if (!selectedSongs.contains(selectedSong)) {
+                                                                                      selectedSongs.add(selectedSong);
+                                                                                      print('Added: ${selectedSong.song.title}');
+                                                                                    }
+                                                                                  } else {
+                                                                                    // Hapus berdasarkan id jika ada
+                                                                                    selectedSongs
+                                                                                        .removeWhere((song) => song.song.id == songModel.song.id);
+                                                                                    print('Removed: ${songModel.song.title}');
+                                                                                  }
+                                                                                });
+
+                                                                                // Debugging: Tampilkan semua ID lagu yang dipilih
+                                                                                print(
+                                                                                    'Current Selected Songs: ${selectedSongs.map((s) => s.song.id).toList()}');
+                                                                              },
+
+                                                                              // isSelected: true,
+                                                                            );
+                                                                          },
+                                                                          separatorBuilder: (context, index) {
+                                                                            return SizedBox(
+                                                                              height: 6.h,
+                                                                            );
+                                                                          },
+                                                                        )
+                                                                      ],
+                                                                    ),
+                                                                  );
+                                                                }
+                                                                return Container();
+                                                              },
+                                                            ),
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ));
+                                              },
+                                              focusColor: Colors.black45,
+                                              // highlightColor: Colors.black12,
+                                              splashColor: AppColors.primary,
+                                              highlightColor: AppColors.primary,
+                                              padding: EdgeInsets.only(right: 10.w, left: 6.w),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.circular(
+                                                  15.sp,
+                                                ),
+                                                side: BorderSide(
+                                                  color: Colors.grey.shade200,
+                                                ),
+                                              ),
+                                              child: Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.add,
+                                                    size: 16.sp,
                                                   ),
                                                   SizedBox(
-                                                    height: 20.h,
+                                                    width: 3.w,
                                                   ),
-                                                  Padding(
-                                                    padding: EdgeInsets.symmetric(horizontal: 6.w),
-                                                    child: BlocProvider(
-                                                      create: (context) => FavoriteSongCubit()..getFavoriteSongs(),
-                                                      child: BlocBuilder<FavoriteSongCubit, FavoriteSongState>(
-                                                        builder: (context, state) {
-                                                          if (state is FavoriteSongLoading) {
-                                                            return Container(
-                                                              alignment: Alignment.center,
-                                                              height: 100,
-                                                              child: const CircularProgressIndicator(
-                                                                color: AppColors.primary,
-                                                              ),
-                                                            );
-                                                          }
-                                                          if (state is FavoriteSongFailure) {
-                                                            return Container(
-                                                                alignment: Alignment.center, height: 100, child: const Text('Failed to fetch songs'));
-                                                          }
-                                                          if (state is FavoriteSongLoaded) {
-                                                            return Container(
-                                                              alignment: Alignment.center,
-                                                              child: Column(
-                                                                crossAxisAlignment: CrossAxisAlignment.start,
-                                                                children: [
-                                                                  Text(
-                                                                    'From your favorites',
-                                                                    style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500),
-                                                                  ),
-                                                                  // SizedBox(
-                                                                  //   height: 10.h,
-                                                                  // ),
-                                                                  ListView.separated(
-                                                                    physics: const NeverScrollableScrollPhysics(),
-                                                                    shrinkWrap: true,
-                                                                    padding: EdgeInsets.only(top: 10.w),
-                                                                    itemCount: state.songs.take(5).length,
-                                                                    itemBuilder: (context, index) {
-                                                                      var songModel = state.songs[index];
-
-                                                                      return SongTileWidgetSelectable(
-                                                                        songEntity: songModel,
-                                                                        onSelectionChanged: (selectedSong) {
-                                                                          setState(() {
-                                                                            if (selectedSong != null) {
-                                                                              // Tambahkan jika tidak ada di daftar
-                                                                              if (!selectedSongs.contains(selectedSong)) {
-                                                                                selectedSongs.add(selectedSong);
-                                                                                print('Added: ${selectedSong.song.title}');
-                                                                              }
-                                                                            } else {
-                                                                              // Hapus berdasarkan id jika ada
-                                                                              selectedSongs.removeWhere((song) => song.song.id == songModel.song.id);
-                                                                              print('Removed: ${songModel.song.title}');
-                                                                            }
-                                                                          });
-
-                                                                          // Debugging: Tampilkan semua ID lagu yang dipilih
-                                                                          print(
-                                                                              'Current Selected Songs: ${selectedSongs.map((s) => s.song.id).toList()}');
-                                                                        },
-
-                                                                        // isSelected: true,
-                                                                      );
-                                                                    },
-                                                                    separatorBuilder: (context, index) {
-                                                                      return SizedBox(
-                                                                        height: 6.h,
-                                                                      );
-                                                                    },
-                                                                  )
-                                                                ],
-                                                              ),
-                                                            );
-                                                          }
-                                                          return Container();
-                                                        },
-                                                      ),
+                                                  Text(
+                                                    'Create playlist',
+                                                    style: TextStyle(
+                                                      fontSize: 12.sp,
                                                     ),
-                                                  )
+                                                  ),
                                                 ],
-                                              ));
-                                        },
-                                        focusColor: Colors.black45,
-                                        // highlightColor: Colors.black12,
-                                        splashColor: AppColors.primary,
-                                        highlightColor: AppColors.primary,
-                                        padding: EdgeInsets.only(right: 10.w, left: 6.w),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            15.sp,
-                                          ),
-                                          side: BorderSide(
-                                            color: Colors.grey.shade200,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              Icons.add,
-                                              size: 16.sp,
-                                            ),
-                                            SizedBox(
-                                              width: 3.w,
-                                            ),
-                                            Text(
-                                              'Create playlist',
-                                              style: TextStyle(
-                                                fontSize: 12.sp,
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
+                                            )
+                                          : const SizedBox.shrink(),
                                     ],
                                   ),
                                 ),
@@ -290,6 +304,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                             MaterialPageRoute(
                                               builder: (context) => MyFavorite(
                                                 length: state.songs.length,
+                                                userEntity: isCurrentUser
+                                                    ? UserEntity(email: email, fullName: fullName, userId: userId)
+                                                    : widget.userEntity.userEntity,
                                               ),
                                             ),
                                           );
@@ -348,13 +365,13 @@ class _ProfilePageState extends State<ProfilePage> {
                                     return Container(
                                       alignment: Alignment.center,
                                       height: 100.h,
-                                      child: CircularProgressIndicator(
+                                      child: const CircularProgressIndicator(
                                         color: AppColors.primary,
                                       ),
                                     );
                                   }
                                   if (state is PlaylistFailure) {
-                                    return Center(
+                                    return const Center(
                                       child: Text('Failed to fetch your library'),
                                     );
                                   }
@@ -384,6 +401,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                                           // fullscreenDialog: true,
                                                           builder: (context) => PlaylistPage(
                                                             playlistEntity: playlist,
+                                                            userEntity: isCurrentUser
+                                                                ? UserEntity(email: email, fullName: fullName, userId: userId)
+                                                                : widget.userEntity.userEntity,
                                                           ),
                                                         ),
                                                       );
@@ -410,33 +430,38 @@ class _ProfilePageState extends State<ProfilePage> {
                                 }()),
                                 BlocBuilder<FollowedArtistsCubit, FollowedArtistsState>(
                                   builder: (context, state) {
-                                    if (state is FollowedArtistsLoaded) {
-                                      return Column(
-                                        children: [
-                                          ElementTitleWidget(
-                                            elementTitle: 'Artists followed',
-                                            list: state.artists,
-                                            limit: 4,
-                                            onTap: () {
-                                              Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) => ArtistFollowed(),
-                                                  ));
-                                            },
-                                          ),
-                                          ListView.builder(
-                                            shrinkWrap: true,
-                                            physics: NeverScrollableScrollPhysics(),
-                                            itemCount: state.artists.length,
-                                            itemBuilder: (context, index) {
-                                              var artist = state.artists[index].artist;
-
-                                              return ArtistTileWidget(artist: artist);
-                                            },
-                                          )
-                                        ],
+                                    if (state is FollowedArtistsFailure) {
+                                      return SizedBox(
+                                        height: 100.h,
+                                        child: const Center(
+                                          child: Text('Failed to get your favorite artists'),
+                                        ),
                                       );
+                                    }
+
+                                    if (state is FollowedArtistsLoaded) {
+                                      return state.artists.isNotEmpty
+                                          ? Column(
+                                              children: [
+                                                ElementTitleWidget(
+                                                  elementTitle: 'Artists followed',
+                                                  list: state.artists,
+                                                  limit: 4,
+                                                  onTap: () {},
+                                                ),
+                                                ListView.builder(
+                                                  shrinkWrap: true,
+                                                  physics: const NeverScrollableScrollPhysics(),
+                                                  itemCount: state.artists.length,
+                                                  itemBuilder: (context, index) {
+                                                    var artist = state.artists[index].artist;
+
+                                                    return ArtistTileWidget(artist: artist);
+                                                  },
+                                                )
+                                              ],
+                                            )
+                                          : const SizedBox.shrink();
                                     }
                                     return Container();
                                   },
@@ -473,9 +498,10 @@ class _ProfilePageState extends State<ProfilePage> {
       menuPadding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(
-          12.h,
+          5.h,
         ),
       ),
+      elevation: 1,
       items: [
         PopupMenuItem(
             onTap: () async {
@@ -522,7 +548,7 @@ class _ProfilePageState extends State<ProfilePage> {
           content: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: const [
+              children: [
                 CircularProgressIndicator(color: Colors.white),
                 SizedBox(height: 10),
                 Text(
@@ -599,85 +625,127 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _profileInfo(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: context.isDarkMode ? const Color(0xff2c2b2b) : Colors.white,
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(60.w),
-          bottomRight: Radius.circular(60.w),
-        ),
-      ),
-      height: ScreenUtil().screenHeight / 3.4,
-      width: double.infinity,
-      child: BlocBuilder<ProfileInfoCubit, ProfileInfoState>(
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+            create: (context) => FollowerCubit()
+              ..getFollowerAndFollowing(
+                isCurrentUser ? userId : widget.userEntity.userEntity.userId!,
+              )),
+      ],
+      child: BlocBuilder<FollowerCubit, FollowerState>(
         builder: (context, state) {
-          if (state is ProfileInfoLoading) {
-            return const Center(
-              child: CircularProgressIndicator(),
+          if (state is FollowerLoading) {
+            return Container(
+              alignment: Alignment.center,
+              height: 100.h,
+              child: const CircularProgressIndicator(
+                color: AppColors.darkGrey,
+              ),
+            );
+          }
+          if (state is FollowerFailure) {
+            return Container(
+              alignment: Alignment.center,
+              height: 100.h,
+              child: const Text('Failed to get follower statistic'),
             );
           }
 
-          if (state is ProfileInfoLoaded) {
-            return Stack(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SvgPicture.asset(AppVectors.profilePattern),
-                    RotatedBox(
-                      quarterTurns: 90,
-                      child: SvgPicture.asset(
-                        AppVectors.profilePattern,
-                      ),
-                    )
-                  ],
-                ),
-                Align(
-                  alignment: Alignment.center,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Container(
-                        height: 80.w,
-                        width: 80.w,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: AssetImage(AppImages.defaultProfile),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10.h,
-                      ),
-                      Text(
-                        state.userEntity.email!,
-                        style: TextStyle(
-                            fontSize: 13.sp,
-                            // color: const Color.fromARGB(255, 204, 204, 204),
-                            fontWeight: FontWeight.w300,
-                            letterSpacing: 0.3),
-                      ),
-                      SizedBox(
-                        height: 14.h,
-                      ),
-                      Text(
-                        state.userEntity.fullName!,
-                        style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w500, letterSpacing: 0.3),
-                      ),
-                    ],
+          if (state is FollowerLoaded) {
+            return Container(
+                decoration: BoxDecoration(
+                  color: context.isDarkMode ? const Color(0xff2c2b2b) : Colors.white,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(60.w),
+                    bottomRight: Radius.circular(60.w),
                   ),
                 ),
-              ],
-            );
+                // height: ScreenUtil().screenHeight / 3.4,
+                width: double.infinity,
+                child: Stack(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        SvgPicture.asset(AppVectors.profilePattern),
+                        RotatedBox(
+                          quarterTurns: 90,
+                          child: SvgPicture.asset(
+                            AppVectors.profilePattern,
+                          ),
+                        )
+                      ],
+                    ),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            height: 10.h,
+                          ),
+                          Container(
+                            height: 80.w,
+                            width: 80.w,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                fit: BoxFit.cover,
+                                image: AssetImage(AppImages.defaultProfile),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: isCurrentUser ? 10.h : 0,
+                          ),
+                          isCurrentUser
+                              ? Text(
+                                  email,
+                                  style: TextStyle(
+                                      fontSize: 13.sp,
+                                      // color: const Color.fromARGB(255, 204, 204, 204),
+                                      fontWeight: FontWeight.w300,
+                                      letterSpacing: 0.3),
+                                )
+                              : const SizedBox.shrink(),
+                          SizedBox(
+                            height: 10.h,
+                          ),
+                          Text(
+                            isCurrentUser ? fullName : widget.userEntity.userEntity.fullName!,
+                            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w500, letterSpacing: 0.3),
+                          ),
+                          SizedBox(
+                            height: 7.h,
+                          ),
+                          !isCurrentUser ? FollowUserButton(user: widget.userEntity) : const SizedBox.shrink(),
+                          SizedBox(
+                            height: 4.h,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              FollowCount(
+                                count: state.followEntity.following!.count,
+                                title: 'Following',
+                              ),
+                              FollowCount(
+                                count: state.followEntity.follower!.count,
+                                title: 'Followers',
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 20.h,
+                          )
+                        ],
+                      ),
+                    ),
+                  ],
+                ));
           }
-
-          if (state is ProfileInfoFailure) {
-            return const Text('Please try again!');
-          }
-
           return Container();
         },
       ),
@@ -689,7 +757,7 @@ class _ProfilePageState extends State<ProfilePage> {
       padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: BlocProvider(
         lazy: false,
-        create: (context) => FavoriteSongCubit()..getFavoriteSongs(),
+        create: (context) => FavoriteSongCubit()..getFavoriteSongs(isCurrentUser ? '' : widget.userEntity.userEntity.userId!),
         child: BlocBuilder<FavoriteSongCubit, FavoriteSongState>(
           builder: (context, state) {
             if (state is FavoriteSongLoading) {
@@ -720,7 +788,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       physics: const NeverScrollableScrollPhysics(),
                       shrinkWrap: true,
                       itemBuilder: (context, index) {
-                        var favoriteSong = state.songs[index];
                         return SongTileWidget(
                           songList: state.songs,
                           index: index,
@@ -743,62 +810,28 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 }
 
-class ArtistTileWidget extends StatelessWidget {
-  final ArtistEntity artist;
-  const ArtistTileWidget({
-    super.key,
-    required this.artist,
-  });
+class FollowCount extends StatelessWidget {
+  final String title;
+  final int count;
+  const FollowCount({super.key, required this.title, required this.count});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialButton(
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ArtistPage(artistId: artist.id!),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Text(
+          count.toString(),
+          style: TextStyle(
+            fontSize: 18.3.sp,
+            fontWeight: FontWeight.w500,
           ),
-        );
-      },
-      splashColor: Colors.transparent,
-      padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 5.h),
-      child: Row(
-        children: [
-          Container(
-            height: 40.h,
-            width: 44.w,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                fit: BoxFit.cover,
-                image: NetworkImage(
-                  '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
-                ),
-              ),
-            ),
-          ),
-          SizedBox(
-            width: 12.w,
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                artist.name!,
-                style: TextStyle(fontSize: 14.sp),
-              ),
-              SizedBox(
-                height: 3.h,
-              ),
-              Text(
-                'Artist',
-                style: TextStyle(fontSize: 10.sp, color: Colors.white70),
-              ),
-            ],
-          )
-        ],
-      ),
+        ),
+        Text(
+          title,
+          style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w300),
+        )
+      ],
     );
   }
 }

@@ -4,13 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
+import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/domain/usecases/playlist/batch_add_to_playlist.dart';
+import 'package:spotify_clone/presentation/playlist/pages/playlist.dart';
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_state.dart';
 
-Future<Object?> blurryDialogForPlaylist(
-    {required String backgroundImage, required BuildContext context, required ArtistEntity artist, required List<SongWithFavorite> songList}) async {
+Future<Object?> blurryDialogForPlaylist({
+  required String backgroundImage,
+  required BuildContext context,
+  required ArtistEntity artist,
+  required List<SongWithFavorite> songList,
+}) async {
   return showGeneralDialog(
     barrierDismissible: true,
     barrierLabel: '',
@@ -75,11 +81,7 @@ Future<Object?> blurryDialogForPlaylist(
                                   // padding: EdgeInsets.symmetric(horizontal: 4.w),
                                   child: Text(
                                     'This is',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white70,
-                                      fontSize: 11.2.sp
-                                    ),
+                                    style: TextStyle(fontWeight: FontWeight.w500, color: Colors.white70, fontSize: 11.2.sp),
                                   ),
                                 ),
                                 Container(
@@ -147,7 +149,7 @@ Future<Object?> blurryDialogForPlaylist(
                       ),
                     ),
                     BlocProvider(
-                      create: (context) => PlaylistCubit()..getCurrentuserPlaylist(),
+                      create: (context) => PlaylistCubit()..getCurrentuserPlaylist(''),
                       child: BlocBuilder<PlaylistCubit, PlaylistState>(
                         builder: (context, state) {
                           if (state is PlaylistLoading) {
@@ -182,7 +184,6 @@ Future<Object?> blurryDialogForPlaylist(
                                               width: 20.sp,
                                               child: const CircularProgressIndicator(
                                                 color: AppColors.primary,
-
                                               ),
                                             ),
                                             SizedBox(
@@ -215,9 +216,31 @@ Future<Object?> blurryDialogForPlaylist(
                                       },
                                       (r) {
                                         var successSnackbar = SnackBar(
-                                          content: Text(
-                                            r,
-                                            style: const TextStyle(color: Colors.white),
+                                          content: Row(
+                                            children: [
+                                              Text(
+                                                r,
+                                                style: const TextStyle(color: Colors.white),
+                                              ),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  Navigator.push(
+                                                    ctx,
+                                                    MaterialPageRoute(
+                                                      builder: (ctx) => PlaylistPage(
+                                                        playlistEntity: playlist,
+                                                        userEntity: UserEntity(),
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                child: const Text(
+                                                  'Playlist',
+                                                  selectionColor: Colors.blue,
+                                                  style: TextStyle(decoration: TextDecoration.underline),
+                                                ),
+                                              )
+                                            ],
                                           ),
                                           backgroundColor: AppColors.primary,
                                           behavior: SnackBarBehavior.floating,

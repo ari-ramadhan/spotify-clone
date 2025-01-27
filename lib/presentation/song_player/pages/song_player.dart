@@ -8,12 +8,16 @@ import 'package:spotify_clone/common/widgets/favorite_button/favorite_button.dar
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/core/configs/theme/app_colors.dart';
 import 'package:spotify_clone/data/models/artist/artist.dart';
+import 'package:spotify_clone/data/repository/auth/auth_service.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
+import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
+import 'package:spotify_clone/domain/usecases/song/add_recent_song.dart';
 import 'package:spotify_clone/main.dart';
 import 'package:spotify_clone/presentation/artist_page/pages/artist_page.dart';
 import 'package:spotify_clone/presentation/song_player/bloc/song_player_cubit.dart';
 import 'package:spotify_clone/presentation/song_player/bloc/song_player_state.dart';
+import 'package:spotify_clone/service_locator.dart';
 
 class SongPlayerPage extends StatefulWidget {
   final List<SongWithFavorite> songs;
@@ -66,14 +70,11 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Akses context di sini lebih aman
-    // Misalnya untuk mengakses Navigator atau lainnya
   }
 
   @override
   void dispose() {
     super.dispose();
-    // Hindari mengakses context di sini
   }
 
   @override
@@ -167,8 +168,12 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                     width: 14.w,
                   ),
                   GestureDetector(
-                    onTap: () {
+                    onTap: () async {
                       context.read<SongPlayerCubit>().playOrPauseSong();
+                      if (context.read<SongPlayerCubit>().audioPlayer.playing){
+                        await sl<AddRecentSongUseCase>().call(params: widget.songs[currentIndex].song.id);
+                      }
+
                     },
                     child: Container(
                       height: 60,

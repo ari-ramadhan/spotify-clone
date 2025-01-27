@@ -8,7 +8,7 @@ import 'package:spotify_clone/domain/entity/artist/artist.dart';
 abstract class ArtistSupabaseService {
   Future<Either> getArtistInfo(int artistId);
   Future<Either> getAllArtist();
-  Future<Either> getFollowedArtists();
+  Future<Either> getFollowedArtists(String userId);
   Future<bool> isFollowed(int artistId);
   Future<Either> followUnfollowArtist(int artistId);
   Future<Either> getRecommendedArtistBasedOnPlaylist(List<String> artistsName);
@@ -59,13 +59,13 @@ class ArtistSupabaseServiceImpl extends ArtistSupabaseService {
   }
 
   @override
-  Future<Either> getFollowedArtists() async {
+  Future<Either> getFollowedArtists(String userId) async {
     try {
         print('aa');
       List<ArtistWithFollowing> artistList = [];
 
       var artistIdResult = await supabase.from('artist_follower').select().match({
-        'user_id' : supabase.auth.currentUser!.id
+        'user_id' : userId == '' ? supabase.auth.currentUser!.id : userId
       });
 
       for (var artistId in artistIdResult){

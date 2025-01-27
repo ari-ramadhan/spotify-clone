@@ -18,28 +18,38 @@ class FavoriteButton extends StatelessWidget {
       child: BlocBuilder<FavoriteButtonCubit, FavoriteButtonState>(
         builder: (context, state) {
           if (state is FavoriteButtonInitial) {
-            return IconButton(
-              onPressed: () {
-                context.read<FavoriteButtonCubit>().favoriteButtonUpdated(songs.song.id);
-              },
-              splashRadius: isBigger ? 28.sp : 21.sp,
-              icon: Icon(
-                songs.isFavorite ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
-                size: isBigger ? 28.h : 21.h,
-                color: songs.isFavorite ? AppColors.primary : AppColors.darkGrey,
+            return SizedBox(
+              height: 21.sp,
+              width: 21.sp,
+              child: IconButton(
+                onPressed: () {
+                  context.read<FavoriteButtonCubit>().favoriteButtonUpdated(songs.song.id);
+                },
+                padding: const EdgeInsets.all(0),
+                splashRadius: isBigger ? 28.sp : 21.sp,
+                icon: Icon(
+                  songs.isFavorite ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
+                  size: isBigger ? 28.sp : 21.sp,
+                  color: songs.isFavorite ? AppColors.primary : AppColors.darkGrey,
+                ),
               ),
             );
           }
           if (state is FavoriteButtonUpdated) {
-            return IconButton(
-              onPressed: () {
-                context.read<FavoriteButtonCubit>().favoriteButtonUpdated(songs.song.id);
-              },
-              splashRadius: isBigger ? 28.sp : 21.sp,
-              icon: Icon(
-                state.isFavorite ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
-                size: isBigger ? 28.sp : 21.sp,
-                color: state.isFavorite ? AppColors.primary : AppColors.darkGrey,
+            return SizedBox(
+              height: 21.sp,
+              width: 21.sp,
+              child: IconButton(
+                onPressed: () {
+                  context.read<FavoriteButtonCubit>().favoriteButtonUpdated(songs.song.id);
+                },
+                padding: const EdgeInsets.all(0),
+                splashRadius: isBigger ? 28.sp : 21.sp,
+                icon: Icon(
+                  state.isFavorite ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
+                  size: isBigger ? 28.sp : 21.sp,
+                  color: state.isFavorite ? AppColors.primary : AppColors.darkGrey,
+                ),
               ),
             );
           }

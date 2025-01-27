@@ -14,6 +14,7 @@ import 'package:spotify_clone/domain/repository/artist/artist.dart';
 import 'package:spotify_clone/domain/repository/auth/auth.dart';
 import 'package:spotify_clone/domain/repository/playlist/playlist.dart';
 import 'package:spotify_clone/domain/repository/song/song.dart';
+import 'package:spotify_clone/domain/repository/user/user.dart';
 import 'package:spotify_clone/domain/usecases/album/get_all_songs.dart';
 import 'package:spotify_clone/domain/usecases/album/get_artist_album.dart';
 import 'package:spotify_clone/domain/usecases/artist/follow_unfollow_artist.dart';
@@ -34,14 +35,22 @@ import 'package:spotify_clone/domain/usecases/playlist/get_currentUser_playlist.
 import 'package:spotify_clone/domain/usecases/playlist/add_song_by_keyword.dart';
 import 'package:spotify_clone/domain/usecases/playlist/update_playlist_info.dart';
 import 'package:spotify_clone/domain/usecases/song/add_or_remove_favorite_song.dart';
+import 'package:spotify_clone/domain/usecases/song/add_recent_song.dart';
 import 'package:spotify_clone/domain/usecases/song/get_album_songs.dart';
 import 'package:spotify_clone/domain/usecases/song/get_artist_single_songs.dart';
 import 'package:spotify_clone/domain/usecases/song/get_artist_songs.dart';
 import 'package:spotify_clone/domain/usecases/song/get_play_list.dart';
 import 'package:spotify_clone/domain/usecases/song/get_playlist_songs.dart';
+import 'package:spotify_clone/domain/usecases/song/get_recent_songs.dart';
 import 'package:spotify_clone/domain/usecases/song/is_favorite_song.dart';
 import 'package:spotify_clone/domain/usecases/song/news_songs.dart';
+import 'package:spotify_clone/domain/usecases/song/search_song_by_keyword.dart';
 import 'package:spotify_clone/domain/usecases/song/user_favorite_songs.dart';
+import 'package:spotify_clone/domain/usecases/user/check_following_status.dart';
+import 'package:spotify_clone/domain/usecases/user/follow_user.dart';
+import 'package:spotify_clone/domain/usecases/user/get_followerAndFollowing.dart';
+import 'data/repository/user/user_repository_impl.dart';
+import 'data/sources/user/user_supabase_service.dart';
 
 final sl = GetIt.instance;
 
@@ -97,6 +106,15 @@ Future<void> initializeDependencies () async {
   );
   sl.registerSingleton<GetPlaylistSongsUseCase>(
     GetPlaylistSongsUseCase()
+  );
+  sl.registerSingleton<SearchSongByKeywordUseCase>(
+    SearchSongByKeywordUseCase()
+  );
+  sl.registerSingleton<GetRecentSongsUseCase>(
+    GetRecentSongsUseCase()
+  );
+  sl.registerSingleton<AddRecentSongUseCase>(
+    AddRecentSongUseCase()
   );
 
 
@@ -171,5 +189,23 @@ Future<void> initializeDependencies () async {
   sl.registerSingleton<BatchAddToPlaylistUseCase>(
     BatchAddToPlaylistUseCase()
   );
+
+  // user
+  sl.registerSingleton<UserRepository>(
+    UserRepositoryImpl()
+  );
+  sl.registerSingleton<UserSupabaseService>(
+    UserSupabaseServiceImpl()
+  );
+  sl.registerSingleton<GetFollowerandfollowingUseCase>(
+    GetFollowerandfollowingUseCase()
+  );
+  sl.registerSingleton<FollowUserUseCase>(
+    FollowUserUseCase()
+  );
+  sl.registerSingleton<CheckFollowingStatusUseCase>(
+    CheckFollowingStatusUseCase()
+  );
+
 
 }

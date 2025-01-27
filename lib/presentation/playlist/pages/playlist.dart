@@ -3,7 +3,9 @@ import 'package:spotify_clone/common/widgets/favorite_button/playlist_song_tile_
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget_selectable.dart';
 import 'package:spotify_clone/core/configs/constants/app_methods.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
+import 'package:spotify_clone/data/repository/auth/auth_service.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
+import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/entity/playlist/playlist.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/domain/usecases/playlist/delete_playlist.dart';
@@ -15,12 +17,15 @@ import 'package:spotify_clone/presentation/playlist/bloc/recommended_artist_stat
 import 'package:spotify_clone/presentation/playlist/bloc/recommended_artists_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/favorite_song/favorite_song_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/favorite_song/favorite_song_state.dart';
+import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_state.dart';
 
 class PlaylistPage extends StatefulWidget {
   final PlaylistEntity playlistEntity;
+  final UserEntity userEntity;
   PlaylistPage({
     Key? key,
+    required this.userEntity,
     required this.playlistEntity,
   }) : super(key: key);
 
@@ -41,6 +46,23 @@ class _PlaylistPageState extends State<PlaylistPage> {
 
   List<SongWithFavorite> exceptionalSongs = [];
   List<SongWithFavorite> selectedSongs = [];
+
+  // String fullName = '';
+  // String email = '';
+  // String userId = '';
+  // bool isCurrentUser = false;
+
+  // Future getUserInfo() async {
+  //   List<String>? userInfo = await AuthService().getUserLoggedInInfo();
+  //   if (userInfo != null) {
+  //     setState(() {
+  //       userId = userInfo[0];
+  //       email = userInfo[1];
+  //       fullName = userInfo[2];
+  //       isCurrentUser = userInfo[0] == widget.userEntity.userId;
+  //     });
+  //   }
+  // }
 
   @override
   void initState() {
@@ -69,7 +91,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
               create: (context) => PlaylistSongsCubit()..getPlaylistSongs(widget.playlistEntity.id!),
             ),
             BlocProvider(
-              create: (context) => FavoriteSongCubit()..getFavoriteSongs(),
+              create: (context) => FavoriteSongCubit()..getFavoriteSongs(''),
             )
           ],
           child: SafeArea(
@@ -159,7 +181,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                             children: [
                               IconButton(
                                 onPressed: () {
-                                  Navigator.of(context).pop();
+                                  Navigator.pop(context, true);
                                 },
                                 icon: Icon(
                                   size: 24.sp,
@@ -171,6 +193,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                   return showMenu(
                                     context: context,
                                     position: RelativeRect.fromLTRB(1, 60.h, 0, 0),
+                                    // color: AppColors.darkBackground,
                                     menuPadding: EdgeInsets.zero,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(
@@ -437,7 +460,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                                       height: 5.h,
                                                     ),
                                                     BlocProvider(
-                                                      create: (context) => FavoriteSongCubit()..getFavoriteSongs(),
+                                                      create: (context) => FavoriteSongCubit()..getFavoriteSongs(''),
                                                       child: BlocBuilder<FavoriteSongCubit, FavoriteSongState>(
                                                         builder: (context, state) {
                                                           if (state is FavoriteSongLoading) {
@@ -670,8 +693,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                             physics: const NeverScrollableScrollPhysics(),
                                             shrinkWrap: true,
                                             itemBuilder: (context, index) {
-                                              var songs = state.songs[index];
-                                              bool isFavorite = state.songs[index].isFavorite;
 
                                               return PlaylistSongTileWidget(
                                                 index: index,
@@ -882,7 +903,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
             behavior: SnackBarBehavior.floating,
           );
           ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
-          Navigator.pop(context);
+          Navigator.pop(context, true);
         },
         (r) {
           var successSnackbar = SnackBar(
@@ -898,7 +919,8 @@ class _PlaylistPageState extends State<PlaylistPage> {
             playlistDesc = _playlistDescController.text;
           });
           ScaffoldMessenger.of(context).showSnackBar(successSnackbar);
-          Navigator.pop(context);
+          context.read<PlaylistCubit>().getCurrentuserPlaylist(supabase.auth.currentUser!.id);
+          Navigator.pop(context, true);
         },
       );
     } else {}

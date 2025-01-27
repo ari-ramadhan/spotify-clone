@@ -13,7 +13,9 @@ class AllSongsCubit extends Cubit<AllSongsState> {
         emit(AllSongsFailure());
       },
       (songs) {
-        emit(AllSongsLoaded(songs: songs));
+        if (!isClosed) {
+          emit(AllSongsLoaded(songs: songs));
+        }
       },
     );
   }

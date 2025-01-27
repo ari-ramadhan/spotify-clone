@@ -6,8 +6,8 @@ import 'package:spotify_clone/service_locator.dart';
 class FollowedArtistsCubit extends Cubit<FollowedArtistsState> {
   FollowedArtistsCubit() : super(FollowedArtistsLoading());
 
-  Future<void> getFollowedArtists() async {
-    var followedArtists = await sl<GetFollowedArtistsUseCase>().call();
+  Future<void> getFollowedArtists(String userId) async {
+    var followedArtists = await sl<GetFollowedArtistsUseCase>().call(params: userId);
 
     followedArtists.fold(
       (l) {

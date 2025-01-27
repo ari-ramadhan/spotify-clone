@@ -18,15 +18,15 @@ class SongRepositoryImpl extends SongRepository {
   Future<Either> addOrRemoveFavoriteSong(int songId) async {
     return await sl<SongSupabaseService>().addOrRemoveFavoriteSong(songId);
   }
-  @override
 
+  @override
   Future<bool> isFavoriteSong(int songId) async {
     return await sl<SongSupabaseService>().isFavoriteSong(songId);
   }
 
   @override
-  Future<Either> getUserFavoriteSongs() async {
-    return await sl<SongSupabaseService>().getUserFavoriteSongs();
+  Future<Either> getUserFavoriteSongs(String userId) async {
+    return await sl<SongSupabaseService>().getUserFavoriteSongs(userId);
   }
 
   @override
@@ -42,6 +42,20 @@ class SongRepositoryImpl extends SongRepository {
   @override
   Future<Either> getPlaylistSongs(String playlistId) async {
     return await sl<SongSupabaseService>().getPlaylistSongs(playlistId);
+  }
 
+  @override
+  Future<Either> searchSongBasedOnKeyword(String keyword) async {
+    return await sl<SongSupabaseService>().searchSongBasedOnKeyword(keyword);
+  }
+
+  @override
+  Future<Either> getRecentSongs() async {
+    return await sl<SongSupabaseService>().getRecentSongs();
+  }
+
+  @override
+  Future<Either> addRecentSongs(int songId) async {
+    return await sl<SongSupabaseService>().addRecentSongs(songId);
   }
 }

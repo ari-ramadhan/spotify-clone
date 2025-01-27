@@ -1,32 +1,16 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/services.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/data/repository/auth/auth_service.dart';
-import 'package:spotify_clone/testing/cubit.dart';
-import 'testing/cubit.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hydrated_bloc/hydrated_bloc.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:spotify_clone/core/configs/constants/app_key.dart';
-import 'package:spotify_clone/core/configs/theme/app_theme.dart';
-import 'package:spotify_clone/data/repository/auth/auth_service.dart';
-import 'package:spotify_clone/presentation/choose_mode/bloc/theme_cubit.dart';
-import 'package:spotify_clone/presentation/home/bloc/allSong_cubit.dart';
-import 'package:spotify_clone/presentation/home/bloc/news_songs_cubit.dart';
+import 'package:spotify_clone/presentation/home/bloc/all_song/allSong_cubit.dart';
+import 'package:spotify_clone/presentation/home/bloc/news_song/news_songs_cubit.dart';
 import 'package:spotify_clone/presentation/home/pages/home_navigation.dart';
 import 'package:spotify_clone/presentation/playlist/bloc/playlist_songs_cubit.dart';
-import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.dart';
-import 'package:spotify_clone/presentation/profile/bloc/profile_info/profile_info_cubit.dart';
 import 'package:spotify_clone/presentation/song_player/bloc/song_player_cubit.dart';
-import 'package:spotify_clone/presentation/splash/pages/splash.dart';
-import 'package:spotify_clone/service_locator.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
 
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: kIsWeb ? HydratedStorage.webStorageDirectory : await getApplicationDocumentsDirectory(),
@@ -55,6 +39,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _isLoggedIn = false;
+  String username = '';
+  String email = '';
 
   Future<void> _checkLoginStatus() async {
     bool isLoggedIn = await _authService.checkLoginStatus();
@@ -78,7 +64,7 @@ class _MyAppState extends State<MyApp> {
           providers: [
             BlocProvider(create: (_) => ThemeCubit()),
             BlocProvider(create: (_) => SongPlayerCubit()),
-            BlocProvider(create: (_) => ProfileInfoCubit()..getUser()),
+            // BlocProvider(create: (_) => ProfileInfoCubit()..getUser()),
             BlocProvider(create: (_) => NewsSongsCubit()..getNewsSongs()),
             BlocProvider(create: (_) => AllSongCubit()..getAllSong()),
             BlocProvider(create: (_) => PlaylistSongsCubit()),

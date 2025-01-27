@@ -16,7 +16,7 @@ class ArtistFollowed extends StatelessWidget {
       body: Column(
         children: [
           BlocProvider(
-            create: (context) => FollowedArtistsCubit()..getFollowedArtists(),
+            create: (context) => FollowedArtistsCubit(),
             child: BlocBuilder<FollowedArtistsCubit, FollowedArtistsState>(
               builder: (context, state) {
                 if (state is FollowedArtistsLoading) {
@@ -64,7 +64,7 @@ class ArtistFollowed extends StatelessWidget {
                           children: [
                             Center(
                               child: CircleAvatar(
-                                radius: 50.sp,
+                                radius: 10.sp,
                                 backgroundImage: NetworkImage(
                                   '${AppURLs.supabaseArtistStorage}${artistList.name!.toLowerCase()}.jpg',
                                 ),

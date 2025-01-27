@@ -6,8 +6,8 @@ import 'package:spotify_clone/service_locator.dart';
 class FavoriteSongCubit extends Cubit<FavoriteSongState> {
   FavoriteSongCubit() : super(FavoriteSongLoading());
 
-  Future<void> getFavoriteSongs() async {
-    var favoriteSongs = await sl<GetUserFavoriteSongUseCase>().call();
+  Future<void> getFavoriteSongs(String userId) async {
+    var favoriteSongs = await sl<GetUserFavoriteSongUseCase>().call(params: userId);
 
     favoriteSongs.fold(
       (l) {

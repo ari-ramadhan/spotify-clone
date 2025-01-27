@@ -7,6 +7,8 @@ class SongModel {
   num? duration;
   String? releaseDate;
   int? artistId;
+  String? albumName;
+  String? albumId;
   // bool? isFavorite;
 
   SongModel(

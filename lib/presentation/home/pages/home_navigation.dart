@@ -1,5 +1,8 @@
 import 'package:spotify_clone/common/helpers/export.dart';
+import 'package:spotify_clone/data/repository/auth/auth_service.dart';
+import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/presentation/home/pages/home.dart';
+import 'package:spotify_clone/presentation/search/search_page.dart';
 
 class HomeNavigation extends StatefulWidget {
   const HomeNavigation({Key? key}) : super(key: key);
@@ -9,25 +12,45 @@ class HomeNavigation extends StatefulWidget {
 }
 
 class _HomeNavigationState extends State<HomeNavigation> {
-  final List<Widget> _pages = [
-    const HomePage(),
-    // Scaffold(),
-    Scaffold(
-      body: Center(
-        child: Container(
-          child: const Text('Hallo'),
-        ),
-      ),
-    ),
-    const ProfilePage(),
-    Scaffold(
-      body: Center(
-        child: Container(
-          child: const Text('Hallo'),
-        ),
-      ),
-    ),
-  ];
+  String fullName = '';
+  String email = '';
+  // String userId = '';
+  bool isCurrentUser = false;
+  Future getUserInfo() async {
+    List<String>? userInfo = await AuthService().getUserLoggedInInfo();
+    if (userInfo != null) {
+      setState(() {
+        // userId = userInfo[0];
+        email = userInfo[1];
+        fullName = userInfo[2];
+      });
+    }
+    return userInfo![0];
+  }
+
+  // final List<Widget> _pages = [
+  //   const HomePage(),
+  //   SearchPage()
+  //   // Scaffold(),
+  //   // Scaffold(
+  //   //   body: Center(
+  //   //     child: Container(
+  //   //       child: const Text('Hallo'),
+  //   //     ),
+  //   //   ),
+  //   // ),
+  //   ,
+  //   ProfilePage(
+  //     userEntity: UserEntity(userId: supabase.auth.currentUser!.id, fullName: fullname),
+  //   ),
+  //   Scaffold(
+  //     body: Center(
+  //       child: Container(
+  //         child: const Text('Hallo'),
+  //       ),
+  //     ),
+  //   ),
+  // ];
 
   int _selectedIndex = 0;
 
@@ -40,7 +63,30 @@ class _HomeNavigationState extends State<HomeNavigation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: _pages[_selectedIndex],
+      body: [
+        const HomePage(),
+        SearchPage()
+        // Scaffold(),
+        // Scaffold(
+        //   body: Center(
+        //     child: Container(
+        //       child: const Text('Hallo'),
+        //     ),
+        //   ),
+        // ),
+        ,
+        ProfilePage(
+          hideBackButton: true,
+          userEntity: UserWithStatus(userEntity: UserEntity(userId: supabase.auth.currentUser!.id, fullName: fullName, email: email), isFollowed: false) ,
+        ),
+        Scaffold(
+          body: Center(
+            child: Container(
+              child: const Text('Hallo'),
+            ),
+          ),
+        ),
+      ][_selectedIndex],
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

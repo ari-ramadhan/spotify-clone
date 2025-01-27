@@ -1,7 +1,9 @@
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
+import 'package:spotify_clone/data/repository/auth/auth_service.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
+import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/presentation/artist_page/pages/artist_page.dart';
 import 'package:spotify_clone/presentation/playlist/bloc/playlist_songs_cubit.dart';
 import 'package:spotify_clone/presentation/playlist/bloc/playlist_songs_state.dart';
@@ -12,8 +14,10 @@ import 'package:spotify_clone/presentation/profile/bloc/favorite_song/favorite_s
 
 class MyFavorite extends StatefulWidget {
   final int length;
+  final UserEntity userEntity;
   MyFavorite({
     required this.length,
+    required this.userEntity,
     Key? key,
   }) : super(key: key);
 
@@ -22,28 +26,30 @@ class MyFavorite extends StatefulWidget {
 }
 
 class _MyFavoriteState extends State<MyFavorite> {
-  // String playlistName = '';
-  // String playlistDesc = '';
-
   double paddingAddition = 4;
 
-  // final TextEditingController _playlistNameController = TextEditingController();
-  // final TextEditingController _playlistDescController = TextEditingController();
+  String fullName = '';
+  String email = '';
+  String userId = '';
+  bool isCurrentUser = false;
 
-  // final _formKey = GlobalKey<FormState>();
-
-  // List<SongWithFavorite> exceptionalSongs = [];
-  // List<SongWithFavorite> selectedSongs = [];
+  Future getUserInfo() async {
+    List<String>? userInfo = await AuthService().getUserLoggedInInfo();
+    if (userInfo != null) {
+      setState(() {
+        userId = userInfo[0];
+        email = userInfo[1];
+        fullName = userInfo[2];
+        isCurrentUser = userInfo[0] == widget.userEntity.userId;
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
-    // selectedSongs.clear();
-    // playlistName = widget.playlistEntity.name!;
-    // playlistDesc = widget.playlistEntity.description!;
   }
 
-  final TextEditingController _controller = TextEditingController();
 
   bool isShowSelectedSongError = false;
   @override
@@ -59,7 +65,7 @@ class _MyFavoriteState extends State<MyFavorite> {
       body: MultiBlocProvider(
           providers: [
             BlocProvider(
-              create: (context) => FavoriteSongCubit()..getFavoriteSongs(),
+              create: (context) => FavoriteSongCubit()..getFavoriteSongs(isCurrentUser ? '' : widget.userEntity.userId!),
             )
           ],
           child: SafeArea(
@@ -369,7 +375,7 @@ class _MyFavoriteState extends State<MyFavorite> {
                                                                     Navigator.pushReplacement(
                                                                       context,
                                                                       MaterialPageRoute(
-                                                                        builder: (context) => ArtistPage(artistId: artistList.id!),
+                                                                        builder: (context) => ArtistPage(artistId: artistList.id!, ),
                                                                       ),
                                                                     );
                                                                   },

@@ -50,7 +50,7 @@ class _PlaylistSongTileWidgetState extends State<PlaylistSongTileWidget> {
       },
       splashColor: Colors.transparent,
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 5.h).copyWith(right: 3.w),
+        padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 6.h).copyWith(right: 3.w),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -74,10 +74,13 @@ class _PlaylistSongTileWidgetState extends State<PlaylistSongTileWidget> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      songEntity.song.title,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(fontWeight: FontWeight.w500, color: textColor, fontSize: 14.sp),
+                    SizedBox(
+                      width: 200.w,
+                      child: Text(
+                        songEntity.song.title,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(fontWeight: FontWeight.w500, color: textColor, fontSize: 14.sp),
+                      ),
                     ),
                     SizedBox(
                       height: 3.h,
@@ -99,12 +102,13 @@ class _PlaylistSongTileWidgetState extends State<PlaylistSongTileWidget> {
                   ),
                 ),
                 SizedBox(
-                    height: 28.w,
-                    width: 28.w,
+                    // height: 28.w,
+                    // width: 28.w,
                     child: PopupMenuButton(
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.sp)),
                       menuPadding: EdgeInsets.zero,
-                      elevation: 0,
+                      // color: AppColors.medDarkBackground,
+                      elevation: 1,
                       iconSize: 16.sp,
                       splashRadius: 15.sp,
                       offset: Offset(-11.w, 32.h),
@@ -175,15 +179,11 @@ class _PlaylistSongTileWidgetState extends State<PlaylistSongTileWidget> {
                                 SnackBar(
                                   content: Text(
                                     snackBarMessage,
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white,
                                     ),
                                   ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      10.sp
-                                    )
-                                  ),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
                                   backgroundColor: newIsFavorite ? AppColors.primary : Colors.blue,
                                   behavior: SnackBarBehavior.floating,
                                 ),

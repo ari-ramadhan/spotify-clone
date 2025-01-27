@@ -7,9 +7,10 @@ import 'package:spotify_clone/common/widgets/appbar/app_bar.dart';
 import 'package:spotify_clone/core/configs/assets/app_images.dart';
 import 'package:spotify_clone/core/configs/assets/app_vectors.dart';
 import 'package:spotify_clone/core/configs/theme/app_colors.dart';
+import 'package:spotify_clone/data/repository/auth/auth_service.dart';
 import 'package:spotify_clone/presentation/home/widgets/news_songs.dart';
 import 'package:spotify_clone/presentation/home/widgets/all_song.dart';
-import 'package:spotify_clone/presentation/profile/pages/profile.dart';
+import 'package:spotify_clone/presentation/home/widgets/recent_songs.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,9 +19,24 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage>
-    with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+
+  String fullName = '';
+  String email = '';
+  String userId = '';
+  bool isCurrentUser = false;
+  Future getUserInfo() async {
+    List<String>? userInfo = await AuthService().getUserLoggedInInfo();
+    if (userInfo != null) {
+      setState(() {
+        userId = userInfo[0];
+        email = userInfo[1];
+        fullName = userInfo[2];
+        // isCurrentUser = userInfo[0] == widget.anotherUserId;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -33,11 +49,11 @@ class _HomePageState extends State<HomePage>
     return Scaffold(
       // backgroundColor: AppColors.black,
       appBar: BasicAppbar(
-
         leading: Container(
           margin: EdgeInsets.only(left: 13.w),
           child: IconButton.outlined(
             onPressed: () {},
+            splashRadius: 20.sp,
             icon: const Icon(
               Icons.search_rounded,
             ),
@@ -46,16 +62,11 @@ class _HomePageState extends State<HomePage>
         action: Padding(
           padding: EdgeInsets.only(right: 5.w),
           child: IconButton(
+            splashRadius: 20.sp,
             // color: Colors.green,
-            onPressed: () {
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ProfilePage(),
-                  ));
-            },
+            onPressed: () {},
             icon: Icon(
-              Icons.person,
+              Icons.notifications,
               color: context.isDarkMode ? Colors.white : Colors.black,
             ),
           ),
@@ -103,9 +114,13 @@ class _HomePageState extends State<HomePage>
               ),
             ),
             SizedBox(
+              height: 15.h,
+            ),
+            const RecentSongs(),
+            SizedBox(
               height: 10.h,
             ),
-            const AllSongPage()
+            const AllSongPage(),
           ],
         ),
       ),
@@ -120,52 +135,53 @@ class _HomePageState extends State<HomePage>
     ];
 
     return CarouselSlider(
-        carouselController: CarouselSliderController(),
-        items: items.map(
-          (e) {
-            return Padding(
-              padding: EdgeInsets.symmetric(horizontal: 24.w),
-              child: Stack(
-                alignment: Alignment.bottomCenter,
-                children: [
-                  Container(
-                    padding: EdgeInsets.only(top: 26.h),
-                    child: Align(
-                      child: SvgPicture.asset(
-                        e['card'],
-                        height: 135.h,
-                      ),
+      carouselController: CarouselSliderController(),
+      items: items.map(
+        (e) {
+          return Padding(
+            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              children: [
+                Container(
+                  padding: EdgeInsets.only(top: 26.h),
+                  child: Align(
+                    child: SvgPicture.asset(
+                      e['card'],
+                      height: 135.h,
                     ),
                   ),
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: Container(
-                      padding: EdgeInsets.only(
-                          top: e['artist'] == AppImages.homeArtist3 ? 10.h : 0),
-                      child: Padding(
-                        padding: EdgeInsets.only(right: 10.w),
-                        child: SizedBox(
-                          height: e['artist'] == AppImages.homeArtist3
-                              ? 121.h
-                              : 131.h,
-                          child: Image.asset(
-                            e['artist'],
-                          ),
+                ),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Container(
+                    padding: EdgeInsets.only(top: e['artist'] == AppImages.homeArtist3 ? 10.h : 0),
+                    child: Padding(
+                      padding: EdgeInsets.only(right: 10.w),
+                      child: SizedBox(
+                        height: e['artist'] == AppImages.homeArtist3 ? 121.h : 131.h,
+                        child: Image.asset(
+                          e['artist'],
                         ),
                       ),
                     ),
-                  )
-                ],
-              ),
-            );
-          },
-        ).toList(),
-        options: CarouselOptions(
-            autoPlay: true,
-            autoPlayInterval: const Duration(seconds: 5),
-            viewportFraction: 1,
-            height: 135.h,
-            autoPlayAnimationDuration: const Duration(milliseconds: 1200)));
+                  ),
+                )
+              ],
+            ),
+          );
+        },
+      ).toList(),
+      options: CarouselOptions(
+        autoPlay: true,
+        autoPlayInterval: const Duration(seconds: 5),
+        viewportFraction: 1,
+        height: 135.h,
+        autoPlayAnimationDuration: const Duration(
+          milliseconds: 1200,
+        ),
+      ),
+    );
   }
 
   Widget _tabs() {
@@ -175,10 +191,7 @@ class _HomePageState extends State<HomePage>
       indicatorColor: AppColors.primary,
       indicatorPadding: EdgeInsets.symmetric(horizontal: 30.w),
       labelColor: context.isDarkMode ? Colors.white : Colors.black,
-      padding: EdgeInsets.symmetric(
-              vertical: 14.h,
-              horizontal: _tabController.index == 0 ? 10.sp : 16.sp)
-          .copyWith(bottom: 17.h),
+      padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: _tabController.index == 0 ? 10.sp : 16.sp).copyWith(bottom: 17.h),
       tabs: [
         Padding(
           padding: EdgeInsets.symmetric(

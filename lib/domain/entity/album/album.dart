@@ -1,3 +1,5 @@
+import 'package:spotify_clone/domain/entity/artist/artist.dart';
+
 class AlbumEntity {
   String? name;
   String? albumId;
@@ -10,4 +12,17 @@ class AlbumEntity {
     required this.createdAt,
     required this.songTotal,
   });
+}
+
+class AlbumWithArtist {
+  final AlbumEntity albumEntity;
+  final ArtistEntity artistEntity;
+
+  const AlbumWithArtist(this.albumEntity, this.artistEntity);
+  AlbumWithArtist copyWith({AlbumEntity? albumEntity, ArtistEntity? artistEntity}) {
+    return AlbumWithArtist(
+      albumEntity ?? this.albumEntity,
+      artistEntity ?? this.artistEntity,
+    );
+  }
 }

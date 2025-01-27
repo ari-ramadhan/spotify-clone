@@ -4,7 +4,9 @@ import 'package:spotify_clone/common/widgets/album_song_tile/album_tile_widget.d
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
 import 'package:spotify_clone/core/configs/constants/app_methods.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
+import 'package:spotify_clone/data/repository/auth/auth_service.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
+import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/presentation/album/bloc/all_songs/all_songs_cubit.dart';
 import 'package:spotify_clone/presentation/album/bloc/all_songs/all_songs_state.dart';
@@ -13,19 +15,26 @@ import 'package:spotify_clone/presentation/album/bloc/single_songs/single_songs_
 import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_cubit.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_state.dart';
 
-class NonAlbumPage extends StatelessWidget {
+class NonAlbumPage extends StatefulWidget {
   final ArtistEntity artist;
   final String nonAlbumPageTitle;
-  NonAlbumPage({super.key, required this.artist, required this.nonAlbumPageTitle});
+  NonAlbumPage({
+    super.key,
+    required this.artist,
+    required this.nonAlbumPageTitle,
+  });
 
+  @override
+  State<NonAlbumPage> createState() => _NonAlbumPageState();
+}
+
+class _NonAlbumPageState extends State<NonAlbumPage> {
   List<SongWithFavorite> songs = [];
 
   @override
   Widget build(BuildContext context) {
     // Merandomkan list
     AppColors.gradientList.shuffle();
-
-    // Mengambil elemen acak
 
     return Scaffold(
       backgroundColor: AppColors.medDarkBackground,
@@ -47,7 +56,7 @@ class NonAlbumPage extends StatelessWidget {
                             fit: BoxFit.fitWidth,
                             alignment: const Alignment(0, -0.5),
                             opacity: 0.7,
-                            image: CachedNetworkImageProvider('${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg'),
+                            image: CachedNetworkImageProvider('${AppURLs.supabaseArtistStorage}${widget.artist.name!.toLowerCase()}.jpg'),
                           ),
                         )),
                     // Back Button
@@ -80,15 +89,10 @@ class NonAlbumPage extends StatelessWidget {
                           ),
                           Text(
                             'Artist\'s entire songs',
-                            style: TextStyle(
-                              fontSize:16.sp,
-                              fontWeight: FontWeight.w500,
-                              letterSpacing: 0.4,
-                              color: Colors.white70
-                            ),
+                            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500, letterSpacing: 0.4, color: Colors.white70),
                           ),
                           Text(
-                            nonAlbumPageTitle,
+                            widget.nonAlbumPageTitle,
                             style: TextStyle(
                               fontSize: 22.sp,
                               fontWeight: FontWeight.w800,
@@ -122,13 +126,13 @@ class NonAlbumPage extends StatelessWidget {
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              IconButton(
+                               IconButton(
                                 onPressed: () {
                                   blurryDialogForPlaylist(
                                     context: context,
-                                    artist: artist,
+                                    artist: widget.artist,
                                     songList: songs,
-                                    backgroundImage: '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
+                                    backgroundImage: '${AppURLs.supabaseArtistStorage}${widget.artist.name!.toLowerCase()}.jpg',
 
                                     // content: Column(
                                     //   children: [],
@@ -196,9 +200,9 @@ class NonAlbumPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Album Songs
-                    nonAlbumPageTitle.contains('This is')
+                    widget.nonAlbumPageTitle.contains('This is')
                         ? BlocProvider(
-                            create: (context) => AllSongsCubit()..getAllSongs(artist.id!),
+                            create: (context) => AllSongsCubit()..getAllSongs(widget.artist.id!),
                             child: BlocBuilder<AllSongsCubit, AllSongsState>(
                               builder: (context, state) {
                                 if (state is AllSongsLoading) {
@@ -259,7 +263,7 @@ class NonAlbumPage extends StatelessWidget {
                             ),
                           )
                         : BlocProvider(
-                            create: (context) => SingleSongsCubit()..getSingleSongs(artist.id!),
+                            create: (context) => SingleSongsCubit()..getSingleSongs(widget.artist.id!),
                             child: BlocBuilder<SingleSongsCubit, SingleSongsState>(
                               builder: (context, state) {
                                 if (state is SingleSongsLoading) {
@@ -317,6 +321,9 @@ class NonAlbumPage extends StatelessWidget {
                               },
                             ),
                           ),
+                    SizedBox(
+                      height: 12.h,
+                    ),
                     Padding(
                       padding: EdgeInsets.only(left: 17.w),
                       child: Text(
@@ -334,7 +341,7 @@ class NonAlbumPage extends StatelessWidget {
 
                     // Other album
                     BlocProvider(
-                      create: (context) => AlbumListCubit()..getAlbum(artist.id!),
+                      create: (context) => AlbumListCubit()..getAlbum(widget.artist.id!),
                       child: BlocBuilder<AlbumListCubit, AlbumListState>(
                         builder: (context, state) {
                           if (state is AlbumListLoading) {
@@ -360,7 +367,7 @@ class NonAlbumPage extends StatelessWidget {
                                   (index) {
                                     return AlbumTileWidget(
                                       album: albumEntity[index],
-                                      artist: artist,
+                                      artist: widget.artist,
                                       isOnAlbumPage: true,
                                       leftPadding: index == 0 || albumEntity[index].albumId != albumEntity[0].albumId ? 17.w : 0,
                                     );

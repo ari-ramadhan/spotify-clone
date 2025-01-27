@@ -6,7 +6,7 @@ import 'package:spotify_clone/domain/entity/playlist/playlist.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
 
 abstract class PlaylistSupabaseService {
-  Future<Either> getCurrentUserPlaylists();
+  Future<Either> getCurrentUserPlaylists(String userId);
   Future<Either> updatePlaylistInfo(String playlistId, String title, String desc);
   Future<Either> addNewPlaylist(String title, String description, bool isPublic, List selectedSongId);
 
@@ -19,11 +19,12 @@ abstract class PlaylistSupabaseService {
 
 class PlaylistSupabaseServiceImpl extends PlaylistSupabaseService {
   @override
-  Future<Either> getCurrentUserPlaylists() async {
+  Future<Either> getCurrentUserPlaylists(String userId) async {
     try {
       List<PlaylistEntity> playlistEntities = [];
 
-      var data = await supabase.from('playlists').select('*').match({'user_id': supabase.auth.currentUser!.id});
+      // if the parameter passed is null, then fetch the current user, else another user
+      var data = await supabase.from('playlists').select('*').match({'user_id': userId.isEmpty ? supabase.auth.currentUser!.id : userId});
 
       final List<PlaylistModel> list = data.map((item) {
         return PlaylistModel.fromJson(item);
@@ -200,7 +201,7 @@ class PlaylistSupabaseServiceImpl extends PlaylistSupabaseService {
           }
         }
       }
-      return const Right('Songs added to your playlist');
+      return const Right('Songs added to your ');
     } catch (e) {
       return const Left('error occured while adding songs to your playlist');
     }

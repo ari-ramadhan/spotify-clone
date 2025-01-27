@@ -7,6 +7,6 @@ abstract class ArtistRepository {
   Future<Either> followUnfollowArtist (int artistId);
   Future<Either> getRecommendedArtistBasedOnPlaylist(List<String> artistsName);
   Future<Either> getAllArtist ();
-  Future<Either> getFollowedArtists ();
+  Future<Either> getFollowedArtists (String params);
 
 }

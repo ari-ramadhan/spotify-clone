@@ -1,6 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/domain/entity/album/album.dart';
@@ -8,7 +6,7 @@ import 'package:spotify_clone/domain/entity/artist/artist.dart';
 import 'package:spotify_clone/presentation/album/page/non_album_page.dart';
 import 'package:spotify_clone/presentation/album/page/artist_album.dart';
 
-class AlbumTileWidget extends StatelessWidget {
+class AlbumTileWidget extends StatefulWidget {
   final AlbumEntity album;
   final ArtistEntity artist;
   final double leftPadding;
@@ -28,26 +26,32 @@ class AlbumTileWidget extends StatelessWidget {
   });
 
   @override
+  State<AlbumTileWidget> createState() => _AlbumTileWidgetState();
+}
+
+class _AlbumTileWidgetState extends State<AlbumTileWidget> {
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        isNonAlbum
+        widget.isNonAlbum
             ? Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => NonAlbumPage(
-                    artist: artist,
-                    nonAlbumPageTitle: nonAlbumTitle,
+                    artist: widget.artist,
+                    nonAlbumPageTitle: widget.nonAlbumTitle,
                   ),
                 ),
               )
-            : isOnAlbumPage
+            : widget.isOnAlbumPage
                 ? Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
                       builder: (context) => ArtistAlbum(
-                        album: album,
-                        artist: artist,
+                        album: widget.album,
+                        artist: widget.artist,
                       ),
                     ),
                   )
@@ -55,14 +59,14 @@ class AlbumTileWidget extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                       builder: (context) => ArtistAlbum(
-                        album: album,
-                        artist: artist,
+                        album: widget.album,
+                        artist: widget.artist,
                       ),
                     ),
                   );
       },
       child: Container(
-        padding: EdgeInsets.only(left: leftPadding, right: rightPadding),
+        padding: EdgeInsets.only(left: widget.leftPadding, right: widget.rightPadding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -76,19 +80,19 @@ class AlbumTileWidget extends StatelessWidget {
                     borderRadius: BorderRadius.circular(15.h),
                     image: DecorationImage(
                       fit: BoxFit.cover,
-                      image: isNonAlbum
-                          ? nonAlbumTitle == 'Single' ? CachedNetworkImageProvider(
-                              '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
+                      image: widget.isNonAlbum
+                          ? widget.nonAlbumTitle == 'Single' ? CachedNetworkImageProvider(
+                              '${AppURLs.supabaseArtistStorage}${widget.artist.name!.toLowerCase()}.jpg',
                             ) : CachedNetworkImageProvider(
-                              '${AppURLs.supabaseThisIsMyStorage}${artist.name!.toLowerCase()}.jpg',
+                              '${AppURLs.supabaseThisIsMyStorage}${widget.artist.name!.toLowerCase()}.jpg',
                             )
                           : CachedNetworkImageProvider(
-                              '${AppURLs.supabaseAlbumStorage}${artist.name} - ${album.name}.jpg',
+                              '${AppURLs.supabaseAlbumStorage}${widget.artist.name} - ${widget.album.name}.jpg',
                             ),
                     ),
                   ),
                 ),
-                isNonAlbum && nonAlbumTitle == 'Single'
+                widget.isNonAlbum && widget.nonAlbumTitle == 'Single'
                     ? Container(
                         alignment: Alignment.center,
                         height: 80.h,
@@ -111,12 +115,12 @@ class AlbumTileWidget extends StatelessWidget {
             SizedBox(
               width: 84.w,
               child: Text(
-                isNonAlbum ? nonAlbumTitle : album.name!,
+                widget.isNonAlbum ? widget.nonAlbumTitle : widget.album.name!,
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.fade,
                 style:
-                    TextStyle(fontSize: album.name!.length <= 12 ? 12.sp : 10.sp, color: Colors.white.withOpacity(0.86), fontWeight: FontWeight.w500),
+                    TextStyle(fontSize: widget.album.name!.length <= 12 ? 12.sp : 10.sp, color: Colors.white.withOpacity(0.86), fontWeight: FontWeight.w500),
               ),
             ),
           ],

@@ -30,8 +30,8 @@ class ArtistRepositoryImpl extends ArtistRepository {
   }
 
   @override
-  Future<Either> getFollowedArtists() async {
-    return await sl<ArtistSupabaseService>().getFollowedArtists();
+  Future<Either> getFollowedArtists(String userId) async {
+    return await sl<ArtistSupabaseService>().getFollowedArtists(userId);
   }
 
 }
