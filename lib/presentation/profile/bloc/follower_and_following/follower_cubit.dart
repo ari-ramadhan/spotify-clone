@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/usecases/user/get_followerAndFollowing.dart';
 import 'package:spotify_clone/presentation/profile/bloc/follower_and_following/follower_state.dart';
 import 'package:spotify_clone/service_locator.dart';
@@ -19,5 +20,29 @@ class FollowerCubit extends Cubit<FollowerState> {
         }
       },
     );
+  }
+
+  void decrementFollowerCount() {
+    if (state is FollowerLoaded) {
+      final currentState = state as FollowerLoaded;
+      final updatedFollowers = currentState.followEntity.follower!.count - 1;
+
+      var follow = FollowerAndFollowing(
+          following: currentState.followEntity.following, follower: currentState.followEntity.follower!.copyWith(count: updatedFollowers));
+
+      emit(FollowerLoaded(followEntity: follow));
+    }
+  }
+
+  void incrementFollowerCount() {
+    if (state is FollowerLoaded) {
+      final currentState = state as FollowerLoaded;
+      final updatedFollowers = currentState.followEntity.follower!.count + 1;
+
+      var follow = FollowerAndFollowing(
+          following: currentState.followEntity.following, follower: currentState.followEntity.follower!.copyWith(count: updatedFollowers));
+
+      emit(FollowerLoaded(followEntity: follow));
+    }
   }
 }

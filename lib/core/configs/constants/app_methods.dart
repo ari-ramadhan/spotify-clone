@@ -310,7 +310,7 @@ Future<Object?> blurryDialog(
                       padding: EdgeInsets.symmetric(horizontal: 21.w),
                       child: Text(
                         dialogTitle,
-                        style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
                       ),
                     ),
                     SizedBox(
