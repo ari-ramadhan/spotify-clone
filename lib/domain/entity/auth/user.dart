@@ -2,11 +2,13 @@ class UserEntity {
   String? userId;
   String? fullName;
   String? email;
+  String? avatarUrl;
 
   UserEntity({
     this.userId,
     this.fullName,
     this.email,
+    this.avatarUrl,
   });
 }
 

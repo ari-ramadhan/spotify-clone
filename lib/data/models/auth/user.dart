@@ -4,12 +4,14 @@ class UserModel {
   String? userId;
   String? fullName;
   String? email;
+  String? avatarUrl;
   // String? imageUrl;
 
   UserModel({
     this.email,
     this.userId,
     this.fullName,
+    this.avatarUrl,
     // this.imageUrl,
   });
 
@@ -26,6 +28,7 @@ extension UserModelX on UserModel {
       userId: userId,
       email: email,
       fullName: fullName,
+      avatarUrl: avatarUrl,
       // imageUrl: imageUrl,
     );
   }

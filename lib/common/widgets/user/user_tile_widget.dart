@@ -29,12 +29,12 @@ class UserTileWidget extends StatelessWidget {
           Container(
             height: 40.h,
             width: 44.w,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
               image: DecorationImage(
                 fit: BoxFit.cover,
-                image: AssetImage(
-                  AppImages.defaultProfile,
+                image: NetworkImage(
+                  userEntity.userEntity.avatarUrl!,
                 ),
               ),
             ),

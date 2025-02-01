@@ -5,6 +5,8 @@ import 'package:spotify_clone/presentation/home/bloc/all_song/allSong_cubit.dart
 import 'package:spotify_clone/presentation/home/bloc/news_song/news_songs_cubit.dart';
 import 'package:spotify_clone/presentation/home/pages/home_navigation.dart';
 import 'package:spotify_clone/presentation/playlist/bloc/playlist_songs_cubit.dart';
+import 'package:spotify_clone/presentation/profile/bloc/profile_image_upload/profile_image_cubit.dart';
+import 'package:spotify_clone/presentation/profile/bloc/profile_image_upload/profile_image_state.dart';
 import 'package:spotify_clone/presentation/song_player/bloc/song_player_cubit.dart';
 
 Future<void> main() async {
@@ -64,13 +66,10 @@ class _MyAppState extends State<MyApp> {
           providers: [
             BlocProvider(create: (_) => ThemeCubit()),
             BlocProvider(create: (_) => SongPlayerCubit()),
-            // BlocProvider(create: (_) => ProfileInfoCubit()..getUser()),
             BlocProvider(create: (_) => NewsSongsCubit()..getNewsSongs()),
             BlocProvider(create: (_) => AllSongCubit()..getAllSong()),
             BlocProvider(create: (_) => PlaylistSongsCubit()),
-            // BlocProvider(
-            //   create: (_) => PlaylistCubit()..getCurrentuserPlaylist(),
-            // ),
+            BlocProvider(create: (_) => AvatarCubit(supabase)),
           ],
           child: BlocBuilder<ThemeCubit, ThemeMode>(
             builder: (context, mode) => MaterialApp(
@@ -78,9 +77,7 @@ class _MyAppState extends State<MyApp> {
               darkTheme: AppTheme.darkTheme,
               themeMode: mode,
               debugShowCheckedModeBanner: false,
-              // home: Debug(),
               home: _isLoggedIn ? const HomeNavigation() : const SplashPage(),
-              // home: ArtistPage(),
             ),
           ),
         );
@@ -88,77 +85,3 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-// lib/main.dart
-
-// void main() {
-//   runApp(MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       title: 'Flutter BLoC Example',
-//       home: BlocProvider(
-//         create: (context) => ItemCubit(),
-//         child: ItemListScreen(),
-//       ),
-//     );
-//   }
-// }
-
-// class ItemListScreen extends StatelessWidget {
-//   final TextEditingController _controller = TextEditingController();
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Item List'),
-//       ),
-//       body: Column(
-//         children: [
-//           Expanded(
-//             child: BlocBuilder<ItemCubit, ItemState>(
-//               builder: (context, state) {
-//                 if (state is ItemLoaded) {
-//                   return ListView.builder(
-//                     itemCount: state.items.length,
-//                     itemBuilder: (context, index) {
-//                       return ListTile(
-//                         title: Text(state.items[index]),
-//                       );
-//                     },
-//                   );
-//                 }
-//                 return Center(child: Text('No items yet.'));
-//               },
-//             ),
-//           ),
-//           Padding(
-//             padding: const EdgeInsets.all(8.0),
-//             child: Row(
-//               children: [
-//                 Expanded(
-//                   child: TextField(
-//                     controller: _controller,
-//                     decoration: InputDecoration(labelText: 'Add Item'),
-//                   ),
-//                 ),
-//                 IconButton(
-//                   icon: Icon(Icons.add),
-//                   onPressed: () {
-//                     if (_controller.text.isNotEmpty) {
-//                       context.read<ItemCubit>().addItem(_controller.text);
-//                       _controller.clear();
-//                     }
-//                   },
-//                 ),
-//               ],
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/data/models/auth/user.dart';
@@ -8,6 +10,7 @@ abstract class UserSupabaseService {
   Future<Either> getFollowerAndFollowing(String userId);
   // Future<Either> getFollowing(String userId);
   Future<bool> isFollowed(String userId);
+  Future<Either> uploadImageStorage(File imageFile);
 }
 
 class UserSupabaseServiceImpl implements UserSupabaseService {
@@ -110,9 +113,38 @@ class UserSupabaseServiceImpl implements UserSupabaseService {
     try {
       var follower = await getFollower(userId);
       var following = await getFollowing(userId);
-      return Right(FollowerAndFollowing(follower: follower, following: following)) ;
+      return Right(FollowerAndFollowing(follower: follower, following: following));
     } catch (e) {
       return Left('error while getting follower and following list');
+    }
+  }
+
+  @override
+  Future<Either> uploadImageStorage(File imageFile) async {
+    try {
+      var uid = supabase.auth.currentUser!.id;
+      final fileExt = imageFile.path.split('.').last;
+      var fileName = '$uid.$fileExt';
+
+      await supabase.storage.from('songs').uploadBinary(
+            "userProfile/$fileName",
+            await imageFile.readAsBytes(),
+            fileOptions: const FileOptions(upsert: true),
+          );
+
+      // Dapatkan URL avatar yang baru
+      final publicUrl = supabase.storage.from('songs').getPublicUrl('userProfile/$fileName');
+
+      // // Simpan URL ke database user
+      var count = await supabase.from('avatar').select().contains('avatarUrl', publicUrl).count();
+
+      // if (count == 0) {
+        await supabase.from('avatar').insert({'avatarUrl': publicUrl});
+      // }
+
+      return Right(publicUrl);
+    } catch (e) {
+      return Left('error occured on your code');
     }
   }
 }

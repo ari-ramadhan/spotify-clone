@@ -17,6 +17,8 @@ import 'package:spotify_clone/presentation/profile/bloc/follower_and_following/f
 import 'package:spotify_clone/presentation/profile/bloc/follower_and_following/follower_state.dart';
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_state.dart';
+import 'package:spotify_clone/presentation/profile/bloc/profile_image_upload/profile_image_cubit.dart';
+import 'package:spotify_clone/presentation/profile/bloc/profile_image_upload/profile_image_state.dart';
 import 'package:spotify_clone/presentation/profile/pages/my_favorite.dart';
 import 'package:spotify_clone/presentation/profile/widgets/FollowUserButton.dart';
 
@@ -686,17 +688,220 @@ class _ProfilePageState extends State<ProfilePage> {
                           SizedBox(
                             height: 10.h,
                           ),
-                          Container(
-                            height: 80.w,
-                            width: 80.w,
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image: AssetImage(AppImages.defaultProfile),
-                              ),
-                            ),
-                          ),
+                          isCurrentUser
+                              ? BlocBuilder<AvatarCubit, AvatarState>(
+                                  builder: (context, state) {
+                                    return Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        // Avatar Image Display
+                                        CircleAvatar(
+                                          radius: 60,
+                                          backgroundImage: state is AvatarUploaded
+                                              ? NetworkImage(state.imageUrl) // Ini sekarang akan selalu update
+                                              : state is AvatarPicked
+                                                  ? FileImage(state.imageFile) as ImageProvider
+                                                  : const NetworkImage(
+                                                      'https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg?semt=ais_hybrid',
+                                                    ),
+                                        ),
+
+                                        // Center(
+                                        //   child: CircleAvatar(
+                                        //     radius: 60,
+                                        //     backgroundImage: state is AvatarUploaded
+                                        //         ? NetworkImage(state.imageUrl)
+                                        //         : state is AvatarPicked
+                                        //             ? FileImage(state.imageFile) as ImageProvider
+                                        //             : const NetworkImage(
+                                        //                 'https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg?semt=ais_hybrid',
+                                        //               ),
+                                        //   ),
+                                        // ),
+                                        const SizedBox(height: 20),
+
+                                        // Pick Image Button
+                                        ElevatedButton.icon(
+                                          onPressed: () => context.read<AvatarCubit>().pickImage(),
+                                          icon: const Icon(Icons.image),
+                                          label: const Text("Pick Image"),
+                                        ),
+
+                                        // Upload Confirmation and Loading Indicator
+                                        if (state is AvatarPicked) ...[
+                                          const SizedBox(height: 10),
+                                          ElevatedButton.icon(
+                                            onPressed: () {
+                                              context.read<AvatarCubit>().uploadAvatar(state.imageFile, userId);
+                                            },
+                                            icon: const Icon(Icons.upload),
+                                            label: const Text("Upload"),
+                                            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                                          ),
+                                        ],
+
+                                        if (state is AvatarUploading)
+                                          const Padding(
+                                            padding: EdgeInsets.all(20.0),
+                                            child: CircularProgressIndicator(),
+                                          ),
+
+                                        // Error Message Display
+                                        if (state is AvatarError)
+                                          Padding(
+                                            padding: const EdgeInsets.all(10),
+                                            child: Text(state.message, style: const TextStyle(color: Colors.red)),
+                                          ),
+                                      ],
+                                    );
+                                  },
+                                )
+                              : const CircleAvatar(
+                                  radius: 60,
+                                  backgroundImage: NetworkImage(
+                                      'https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg?semt=ais_hybrid') // Ini sekarang akan selalu update
+
+                                  ),
+
+                          // BlocBuilder<AvatarCubit, AvatarState>(
+                          //   builder: (context, state) {
+                          //     return Column(
+                          //       mainAxisAlignment: MainAxisAlignment.center,
+                          //       children: [
+                          //         // Avatar Image Display
+
+                          //         ((){
+                          //         context.read<AvatarCubit>().getUserAvatar();
+
+                          //         return Center(
+                          //           child: CircleAvatar(
+                          //             radius: 60,
+                          //             backgroundImage: state is AvatarUploaded
+                          //                 ? NetworkImage(state.imageUrl)
+                          //                 : state is AvatarPicked
+                          //                     ? FileImage(state.imageFile) as ImageProvider
+                          //                     : state is AvatarInitial ? NetworkImage(state.) : NetworkImage('https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg?semt=ais_hybrid'),
+                          //           ),
+                          //         );
+
+                          //         }()),
+                          //         const SizedBox(height: 20),
+
+                          //         // Pick Image Button
+                          //         ElevatedButton.icon(
+                          //           onPressed: () => context.read<AvatarCubit>().pickImage(),
+                          //           icon: const Icon(Icons.image),
+                          //           label: const Text("Pick Image"),
+                          //         ),
+
+                          //         // Upload Confirmation and Loading Indicator
+                          //         if (state is AvatarPicked) ...[
+                          //           const SizedBox(height: 10),
+                          //           ElevatedButton.icon(
+                          //             onPressed: () {
+                          //               context.read<AvatarCubit>().uploadAvatar(state.imageFile, userId);
+                          //             },
+                          //             icon: const Icon(Icons.upload),
+                          //             label: const Text("Upload"),
+                          //             style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                          //           ),
+                          //         ],
+
+                          //         if (state is AvatarUploading)
+                          //           const Padding(
+                          //             padding: EdgeInsets.all(20.0),
+                          //             child: CircularProgressIndicator(),
+                          //           ),
+
+                          //         // Error Message Display
+                          //         if (state is AvatarError)
+                          //           Padding(
+                          //             padding: const EdgeInsets.all(10),
+                          //             child: Text(state.message, style: const TextStyle(color: Colors.red)),
+                          //           ),
+                          //       ],
+                          //     );
+                          //   },
+                          // ),
+
+                          // BlocConsumer<ProfileImageCubit, ProfileImageState>(
+                          //   builder: (context, state) {
+                          //     if (state is ProfileImageUploading) {
+                          //       return const CircularProgressIndicator();
+                          //     }
+
+                          //     if (state is ProfileImageUploadSuccess) {
+                          //       return Stack(
+                          //         alignment: Alignment.bottomRight,
+                          //         children: [
+                          //           Container(
+                          //             height: 80.w,
+                          //             width: 80.w,
+                          //             decoration: BoxDecoration(
+                          //               shape: BoxShape.circle,
+                          //               image: DecorationImage(
+                          //                 fit: BoxFit.cover,
+                          //                 image: NetworkImage(state.imageUrl),
+                          //               ),
+                          //             ),
+                          //           ),
+                          //           InkWell(
+                          //             onTap: () {
+                          //               context.read<ProfileImageCubit>().pickAndUploadImage();
+                          //               print('clicked');
+                          //             },
+                          //             child: CircleAvatar(
+                          //               radius: 10.sp,
+                          //               child: Icon(
+                          //                 Icons.edit,
+                          //                 size: 14.sp,
+                          //               ),
+                          //             ),
+                          //           ),
+                          //         ],
+                          //       );
+                          //     }
+
+                          //     // Initial state or error state
+                          //     return Stack(
+                          //       alignment: Alignment.bottomRight,
+                          //       children: [
+                          //         Container(
+                          //           height: 80.w,
+                          //           width: 80.w,
+                          //           decoration: const BoxDecoration(
+                          //             shape: BoxShape.circle,
+                          //             image: DecorationImage(
+                          //               fit: BoxFit.cover,
+                          //               image: AssetImage(AppImages.defaultProfile),
+                          //             ),
+                          //           ),
+                          //         ),
+                          //         InkWell(
+                          //           onTap: () {
+                          //             context.read<ProfileImageCubit>().pickAndUploadImage();
+                          //             print('clicked');
+                          //           },
+                          //           child: CircleAvatar(
+                          //             radius: 10.sp,
+                          //             child: Icon(
+                          //               Icons.edit,
+                          //               size: 14.sp,
+                          //             ),
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     );
+                          //   },
+                          //   listener: (context, state) {
+                          //     if (state is ProfileImageError) {
+                          //       ScaffoldMessenger.of(context).showSnackBar(
+                          //         SnackBar(content: Text(state.message)),
+                          //       );
+                          //     }
+                          //   },
+                          // ),
+
                           SizedBox(
                             height: isCurrentUser ? 10.h : 0,
                           ),

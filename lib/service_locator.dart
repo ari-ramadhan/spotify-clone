@@ -49,6 +49,7 @@ import 'package:spotify_clone/domain/usecases/song/user_favorite_songs.dart';
 import 'package:spotify_clone/domain/usecases/user/check_following_status.dart';
 import 'package:spotify_clone/domain/usecases/user/follow_user.dart';
 import 'package:spotify_clone/domain/usecases/user/get_followerAndFollowing.dart';
+import 'package:spotify_clone/domain/usecases/user/upload_profile_picture.dart';
 import 'data/repository/user/user_repository_impl.dart';
 import 'data/sources/user/user_supabase_service.dart';
 
@@ -205,6 +206,9 @@ Future<void> initializeDependencies () async {
   );
   sl.registerSingleton<CheckFollowingStatusUseCase>(
     CheckFollowingStatusUseCase()
+  );
+  sl.registerSingleton<UploadProfilePictureUseCase>(
+    UploadProfilePictureUseCase()
   );
 
 

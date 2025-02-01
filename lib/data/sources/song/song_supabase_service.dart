@@ -274,7 +274,14 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
               'following': item['user_id'],
             });
 
-            return UserWithStatus(userEntity: UserModel.fromJson(item).toEntity(), isFollowed: isFollowed.isNotEmpty);
+            var avatarQuery = await supabase.from('avatar').select().eq('user_id', item['user_id']).maybeSingle();
+            var avatarUrl = avatarQuery != null && avatarQuery['avatarUrl'] != null
+                ? avatarQuery['avatarUrl']
+                : 'https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg?semt=ais_hybrid';
+
+            var userModel = UserModel.fromJson(item);
+            userModel.avatarUrl = avatarUrl;
+            return UserWithStatus(userEntity: userModel.toEntity(), isFollowed: isFollowed.isNotEmpty);
           },
         ),
       );
@@ -297,7 +304,8 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
     List<SongWithFavorite> songs = [];
 
     try {
-      var result = await supabase.from('recently_played').select().eq('user_id', supabase.auth.currentUser!.id).order('played_at', ascending: false).limit(5);
+      var result =
+          await supabase.from('recently_played').select().eq('user_id', supabase.auth.currentUser!.id).order('played_at', ascending: false).limit(5);
 
       if (result.isEmpty) {
         return Right(songs);
