@@ -20,48 +20,51 @@ class AllSongPage extends StatefulWidget {
 class _AllSongPageState extends State<AllSongPage> {
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<AllSongCubit, AllSongState>(
-      builder: (context, state) {
-        if (state is AllSongLoading) {
-          return Container(padding: const EdgeInsets.only(top: 30), alignment: Alignment.center, child: const CircularProgressIndicator());
-        }
+    return BlocProvider(
+      create: (context) => AllSongCubit()..getAllSong(),
+      child: BlocBuilder<AllSongCubit, AllSongState>(
+        builder: (context, state) {
+          if (state is AllSongLoading) {
+            return Container(padding: const EdgeInsets.only(top: 30), alignment: Alignment.center, child: const CircularProgressIndicator());
+          }
 
-        if (state is AllSongLoaded) {
-          return Container(
-            // padding: EdgeInsets.symmetric(vertical: 35.h, horizontal: 22.w)
-            //     .copyWith(right: 15.w, top: 20.h),
-            child: Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 22.w),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Playlist',
-                        style: TextStyle(
-                          fontSize: 16.2.sp,
-                          fontWeight: FontWeight.w500,
+          if (state is AllSongLoaded) {
+            return Container(
+              // padding: EdgeInsets.symmetric(vertical: 35.h, horizontal: 22.w)
+              //     .copyWith(right: 15.w, top: 20.h),
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 22.w),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Playlist',
+                          style: TextStyle(
+                            fontSize: 16.2.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
-                      Text(
-                        'See more',
-                        style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w400),
-                      ),
-                    ],
+                        Text(
+                          'See more',
+                          style: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w400),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(
-                  height: 5.h,
-                ),
-                _songs(state.songs)
-              ],
-            ),
-          );
-        }
+                  SizedBox(
+                    height: 5.h,
+                  ),
+                  _songs(state.songs)
+                ],
+              ),
+            );
+          }
 
-        return Container();
-      },
+          return Container();
+        },
+      ),
     );
   }
 

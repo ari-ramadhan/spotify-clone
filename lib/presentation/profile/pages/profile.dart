@@ -1,26 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
-import 'package:spotify_clone/common/widgets/artist/artist_tile_widget.dart';
-import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
-import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget_selectable.dart';
-import 'package:spotify_clone/core/configs/constants/app_methods.dart';
-import 'package:spotify_clone/data/repository/auth/auth_service.dart';
-import 'package:spotify_clone/domain/entity/auth/user.dart';
-import 'package:spotify_clone/domain/entity/playlist/playlist.dart';
-import 'package:spotify_clone/domain/entity/song/song.dart';
-import 'package:spotify_clone/presentation/intro/pages/get_started.dart';
-import 'package:spotify_clone/presentation/playlist/pages/playlist.dart';
-import 'package:spotify_clone/presentation/profile/bloc/favorite_song/favorite_song_cubit.dart';
-import 'package:spotify_clone/presentation/profile/bloc/favorite_song/favorite_song_state.dart';
-import 'package:spotify_clone/presentation/profile/bloc/followed_artists.dart/followed_song_cubit.dart';
-import 'package:spotify_clone/presentation/profile/bloc/followed_artists.dart/followed_song_state.dart';
-import 'package:spotify_clone/presentation/profile/bloc/follower_and_following/follower_cubit.dart';
-import 'package:spotify_clone/presentation/profile/bloc/follower_and_following/follower_state.dart';
-import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.dart';
-import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_state.dart';
-import 'package:spotify_clone/presentation/profile/bloc/profile_image_upload/profile_image_cubit.dart';
-import 'package:spotify_clone/presentation/profile/bloc/profile_image_upload/profile_image_state.dart';
-import 'package:spotify_clone/presentation/profile/pages/my_favorite.dart';
-import 'package:spotify_clone/presentation/profile/widgets/FollowUserButton.dart';
+import 'package:spotify_clone/data/models/auth/user.dart';
+import 'package:spotify_clone/domain/usecases/user/update_username.dart';
+import 'package:spotify_clone/presentation/home/bloc/all_song/allSong_cubit.dart';
+
+import 'export.dart';
 
 class ProfilePage extends StatefulWidget {
   final UserWithStatus userEntity;
@@ -38,6 +22,9 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   bool isLoading = false;
   TextEditingController playlistController = TextEditingController();
+  TextEditingController usernameController = TextEditingController();
+
+  GlobalKey<FormState> _editProfileKey = GlobalKey();
 
   List<SongWithFavorite> selectedSongs = [];
 
@@ -54,6 +41,7 @@ class _ProfilePageState extends State<ProfilePage> {
         email = userInfo[1];
         fullName = userInfo[2];
         isCurrentUser = userInfo[0] == widget.userEntity.userEntity.userId;
+        usernameController.text = userInfo[2];
       });
     }
   }
@@ -62,6 +50,14 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     getUserInfo();
+    context.read<AvatarCubit>().getUserAvatar();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    playlistController.dispose();
+    usernameController.dispose();
   }
 
   @override
@@ -136,6 +132,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                                 // showAddPlaylistModal(context, '');
                                                 blurryDialog(
                                                     context: context,
+                                                    onClosed: () {
+                                                      Navigator.pop(context);
+                                                    },
                                                     horizontalPadding: 10,
                                                     dialogTitle: 'Create a playlist',
                                                     content: Column(
@@ -511,7 +510,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 isLoading = true;
               });
               AuthService authService = AuthService();
-              await supabase.auth.signOut();
+              await supabase.auth.signOut(scope: SignOutScope.global);
               await authService.logout();
 
               Future.delayed(
@@ -626,6 +625,247 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
+  void _profileEditDialog() {
+    void close() {
+      Navigator.pop(context);
+    }
+
+    blurryDialog(
+        context: context,
+        onClosed: () async {
+          close();
+          await context.read<AvatarCubit>().getUserAvatar();
+        },
+        dialogTitle: 'Edit your profile',
+        content: BlocBuilder<AvatarCubit, AvatarState>(
+          builder: (context1, state) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Profile Image Preview BEFORE
+                    Stack(
+                      alignment: Alignment.bottomRight,
+                      children: [
+                        Builder(
+                          builder: (context) {
+                            final state = context.watch<AvatarCubit>().state;
+
+                            if (state is AvatarLoaded) {
+                              return CircleAvatar(
+                                radius: 46.sp,
+                                backgroundImage: NetworkImage(state.imageUrl),
+                              );
+                            } else if (state is AvatarPicked) {
+                              return ClipOval(child: state.imageUrl);
+                            } else {
+                              return CircleAvatar(
+                                radius: 46.sp,
+                                backgroundColor: Colors.grey.shade700,
+                                child: Icon(
+                                  Icons.person,
+                                  color: Colors.grey,
+                                  size: 70.sp,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                        state is AvatarPicked
+                            ? const SizedBox.shrink()
+                            : SizedBox(
+                                height: 23.sp,
+                                width: 23.sp,
+                                child: MaterialButton(
+                                  padding: EdgeInsets.zero,
+                                  onPressed: () {
+                                    showMenuAvatar(context);
+                                    // context.read<AvatarCubit>().pickImage();
+                                  },
+                                  color: Colors.blue,
+                                  shape: const CircleBorder(),
+                                  child: Icon(
+                                    state is AvatarLoaded || state is AvatarInitial ? Icons.more_vert : Icons.edit,
+                                    size: 15.sp,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              )
+                      ],
+                    ),
+                    SizedBox(
+                      width: 15.w,
+                    ),
+                    // Profile Image Preview AFTER
+                    state is AvatarPicked
+                        ? Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.arrow_right_alt_outlined,
+                                size: 30.sp,
+                              ),
+                              SizedBox(
+                                width: 15.w,
+                              ),
+                              Stack(
+                                alignment: Alignment.bottomRight,
+                                children: [
+                                  Stack(
+                                    children: [
+                                      CircleAvatar(
+                                        radius: 46.sp,
+                                        backgroundImage: FileImage(state.imageFile),
+                                      ),
+                                      state is AvatarUploading
+                                          ? CircleAvatar(
+                                              radius: 46.sp,
+                                              child: const Center(
+                                                child: CircularProgressIndicator(
+                                                  color: AppColors.primary,
+                                                ),
+                                              ),
+                                            )
+                                          : const SizedBox.shrink()
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 23.sp,
+                                    width: 23.sp,
+                                    child: MaterialButton(
+                                      padding: EdgeInsets.zero,
+                                      onPressed: () {
+                                        context.read<AvatarCubit>().uploadAvatar(state.imageFile, userId);
+                                        Navigator.pop(context);
+                                      },
+                                      color: AppColors.primary,
+                                      shape: const CircleBorder(),
+                                      child: Icon(
+                                        Icons.done_rounded,
+                                        size: 17.sp,
+                                        weight: 2,
+                                        fill: 1,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ],
+                          )
+                        : const SizedBox.shrink(),
+                  ],
+                ),
+
+                // if (state is AvatarUploading)
+                //   const Padding(
+                //     padding: EdgeInsets.all(20.0),
+                //     child: CircularProgressIndicator(),
+                //   ),
+
+                // Error Message Display
+                if (state is AvatarError)
+                  Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Text(state.message, style: const TextStyle(color: Colors.red)),
+                  ),
+
+                SizedBox(
+                  height: 10.h,
+                ),
+                // Edit Profile textfield
+                Form(
+                  key: _editProfileKey,
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'username must be filled';
+                          }
+                          return null;
+                        },
+                        controller: usernameController,
+                        style: TextStyle(fontSize: 18.sp),
+                        decoration: InputDecoration(
+                          hintText: 'fill with desired username',
+                          labelText: 'Username',
+                          labelStyle: TextStyle(
+                            fontSize: 16.sp,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.primary,
+                          ),
+                          contentPadding: EdgeInsets.only(bottom: 5.h),
+                          border: const UnderlineInputBorder(),
+                          errorBorder: const UnderlineInputBorder(),
+                          focusedBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(color: AppColors.primary),
+                          ),
+                          enabledBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(color: Colors.grey),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 30.h,
+                ),
+                MaterialButton(
+                  onPressed: () async {
+                    if (_editProfileKey.currentState!.validate()) {
+                      if (state is AvatarPicked) {
+                        context.read<AvatarCubit>().uploadAvatar(state.imageFile, userId);
+                      }
+                      var result = await sl<UpdateUsernameUseCase>().call(params: usernameController.text);
+                      result.fold(
+                        (l) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              behavior: SnackBarBehavior.floating,
+                              content: Text(l, style: TextStyle(color: Colors.white)),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        },
+                        (r) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              behavior: SnackBarBehavior.floating,
+                              content: Text(
+                                'Profile information updated',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              backgroundColor: AppColors.primary,
+                            ),
+                          );
+                          AuthService().saveUserLoggedInInfo(UserModel(userId: userId, email: email, fullName: usernameController.text));
+                          getUserInfo();
+                          close();
+                        },
+                      );
+                    }
+                  },
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.sp)),
+                  color: AppColors.primary,
+                  minWidth: double.infinity,
+                  padding: EdgeInsets.symmetric(vertical: 8.h),
+                  child: Text(
+                    'Confirm changes',
+                    style: TextStyle(fontSize: 16.sp, color: Colors.white),
+                  ),
+                )
+              ],
+            );
+          },
+        ),
+        horizontalPadding: 16.w);
+  }
+
   Widget _profileInfo(BuildContext context) {
     return MultiBlocProvider(
       providers: [
@@ -663,7 +903,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     bottomRight: Radius.circular(60.w),
                   ),
                 ),
-                // height: ScreenUtil().screenHeight / 3.4,
                 width: double.infinity,
                 child: Stack(
                   children: [
@@ -689,230 +928,33 @@ class _ProfilePageState extends State<ProfilePage> {
                             height: 10.h,
                           ),
                           isCurrentUser
-                              ? BlocBuilder<AvatarCubit, AvatarState>(
-                                  builder: (context, state) {
-                                    return Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        // Avatar Image Display
-                                        CircleAvatar(
-                                          radius: 60,
-                                          backgroundImage: state is AvatarUploaded
-                                              ? NetworkImage(state.imageUrl) // Ini sekarang akan selalu update
-                                              : state is AvatarPicked
-                                                  ? FileImage(state.imageFile) as ImageProvider
-                                                  : const NetworkImage(
-                                                      'https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg?semt=ais_hybrid',
-                                                    ),
-                                        ),
-
-                                        // Center(
-                                        //   child: CircleAvatar(
-                                        //     radius: 60,
-                                        //     backgroundImage: state is AvatarUploaded
-                                        //         ? NetworkImage(state.imageUrl)
-                                        //         : state is AvatarPicked
-                                        //             ? FileImage(state.imageFile) as ImageProvider
-                                        //             : const NetworkImage(
-                                        //                 'https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg?semt=ais_hybrid',
-                                        //               ),
-                                        //   ),
-                                        // ),
-                                        const SizedBox(height: 20),
-
-                                        // Pick Image Button
-                                        ElevatedButton.icon(
-                                          onPressed: () => context.read<AvatarCubit>().pickImage(),
-                                          icon: const Icon(Icons.image),
-                                          label: const Text("Pick Image"),
-                                        ),
-
-                                        // Upload Confirmation and Loading Indicator
-                                        if (state is AvatarPicked) ...[
-                                          const SizedBox(height: 10),
-                                          ElevatedButton.icon(
-                                            onPressed: () {
-                                              context.read<AvatarCubit>().uploadAvatar(state.imageFile, userId);
-                                            },
-                                            icon: const Icon(Icons.upload),
-                                            label: const Text("Upload"),
-                                            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+                              ? currentUserProfileImage()
+                              : SizedBox(
+                                  height: 92.sp,
+                                  width: 92.sp,
+                                  child: ClipOval(
+                                    child: widget.userEntity.userEntity.avatarUrl != ''
+                                        ? CachedNetworkImage(
+                                            imageUrl: widget.userEntity.userEntity.avatarUrl!,
+                                            fit: BoxFit.cover,
+                                          )
+                                        : Container(
+                                            color: Colors.grey.shade700,
+                                            child: Icon(
+                                              Icons.person,
+                                              color: Colors.grey,
+                                              size: 70.sp,
+                                            ),
                                           ),
-                                        ],
-
-                                        if (state is AvatarUploading)
-                                          const Padding(
-                                            padding: EdgeInsets.all(20.0),
-                                            child: CircularProgressIndicator(),
-                                          ),
-
-                                        // Error Message Display
-                                        if (state is AvatarError)
-                                          Padding(
-                                            padding: const EdgeInsets.all(10),
-                                            child: Text(state.message, style: const TextStyle(color: Colors.red)),
-                                          ),
-                                      ],
-                                    );
-                                  },
-                                )
-                              : const CircleAvatar(
-                                  radius: 60,
-                                  backgroundImage: NetworkImage(
-                                      'https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg?semt=ais_hybrid') // Ini sekarang akan selalu update
-
                                   ),
-
-                          // BlocBuilder<AvatarCubit, AvatarState>(
-                          //   builder: (context, state) {
-                          //     return Column(
-                          //       mainAxisAlignment: MainAxisAlignment.center,
-                          //       children: [
-                          //         // Avatar Image Display
-
-                          //         ((){
-                          //         context.read<AvatarCubit>().getUserAvatar();
-
-                          //         return Center(
-                          //           child: CircleAvatar(
-                          //             radius: 60,
-                          //             backgroundImage: state is AvatarUploaded
-                          //                 ? NetworkImage(state.imageUrl)
-                          //                 : state is AvatarPicked
-                          //                     ? FileImage(state.imageFile) as ImageProvider
-                          //                     : state is AvatarInitial ? NetworkImage(state.) : NetworkImage('https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg?semt=ais_hybrid'),
-                          //           ),
-                          //         );
-
-                          //         }()),
-                          //         const SizedBox(height: 20),
-
-                          //         // Pick Image Button
-                          //         ElevatedButton.icon(
-                          //           onPressed: () => context.read<AvatarCubit>().pickImage(),
-                          //           icon: const Icon(Icons.image),
-                          //           label: const Text("Pick Image"),
-                          //         ),
-
-                          //         // Upload Confirmation and Loading Indicator
-                          //         if (state is AvatarPicked) ...[
-                          //           const SizedBox(height: 10),
-                          //           ElevatedButton.icon(
-                          //             onPressed: () {
-                          //               context.read<AvatarCubit>().uploadAvatar(state.imageFile, userId);
-                          //             },
-                          //             icon: const Icon(Icons.upload),
-                          //             label: const Text("Upload"),
-                          //             style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                          //           ),
-                          //         ],
-
-                          //         if (state is AvatarUploading)
-                          //           const Padding(
-                          //             padding: EdgeInsets.all(20.0),
-                          //             child: CircularProgressIndicator(),
-                          //           ),
-
-                          //         // Error Message Display
-                          //         if (state is AvatarError)
-                          //           Padding(
-                          //             padding: const EdgeInsets.all(10),
-                          //             child: Text(state.message, style: const TextStyle(color: Colors.red)),
-                          //           ),
-                          //       ],
-                          //     );
-                          //   },
-                          // ),
-
-                          // BlocConsumer<ProfileImageCubit, ProfileImageState>(
-                          //   builder: (context, state) {
-                          //     if (state is ProfileImageUploading) {
-                          //       return const CircularProgressIndicator();
-                          //     }
-
-                          //     if (state is ProfileImageUploadSuccess) {
-                          //       return Stack(
-                          //         alignment: Alignment.bottomRight,
-                          //         children: [
-                          //           Container(
-                          //             height: 80.w,
-                          //             width: 80.w,
-                          //             decoration: BoxDecoration(
-                          //               shape: BoxShape.circle,
-                          //               image: DecorationImage(
-                          //                 fit: BoxFit.cover,
-                          //                 image: NetworkImage(state.imageUrl),
-                          //               ),
-                          //             ),
-                          //           ),
-                          //           InkWell(
-                          //             onTap: () {
-                          //               context.read<ProfileImageCubit>().pickAndUploadImage();
-                          //               print('clicked');
-                          //             },
-                          //             child: CircleAvatar(
-                          //               radius: 10.sp,
-                          //               child: Icon(
-                          //                 Icons.edit,
-                          //                 size: 14.sp,
-                          //               ),
-                          //             ),
-                          //           ),
-                          //         ],
-                          //       );
-                          //     }
-
-                          //     // Initial state or error state
-                          //     return Stack(
-                          //       alignment: Alignment.bottomRight,
-                          //       children: [
-                          //         Container(
-                          //           height: 80.w,
-                          //           width: 80.w,
-                          //           decoration: const BoxDecoration(
-                          //             shape: BoxShape.circle,
-                          //             image: DecorationImage(
-                          //               fit: BoxFit.cover,
-                          //               image: AssetImage(AppImages.defaultProfile),
-                          //             ),
-                          //           ),
-                          //         ),
-                          //         InkWell(
-                          //           onTap: () {
-                          //             context.read<ProfileImageCubit>().pickAndUploadImage();
-                          //             print('clicked');
-                          //           },
-                          //           child: CircleAvatar(
-                          //             radius: 10.sp,
-                          //             child: Icon(
-                          //               Icons.edit,
-                          //               size: 14.sp,
-                          //             ),
-                          //           ),
-                          //         ),
-                          //       ],
-                          //     );
-                          //   },
-                          //   listener: (context, state) {
-                          //     if (state is ProfileImageError) {
-                          //       ScaffoldMessenger.of(context).showSnackBar(
-                          //         SnackBar(content: Text(state.message)),
-                          //       );
-                          //     }
-                          //   },
-                          // ),
-
+                                ),
                           SizedBox(
                             height: isCurrentUser ? 10.h : 0,
                           ),
                           isCurrentUser
                               ? Text(
                                   email,
-                                  style: TextStyle(
-                                      fontSize: 13.sp,
-                                      // color: const Color.fromARGB(255, 204, 204, 204),
-                                      fontWeight: FontWeight.w300,
-                                      letterSpacing: 0.3),
+                                  style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w300, letterSpacing: 0.3),
                                 )
                               : const SizedBox.shrink(),
                           SizedBox(
@@ -957,206 +999,115 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Widget _favoriteSongs(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24.w),
-      child: BlocProvider(
-        lazy: false,
-        create: (context) => FavoriteSongCubit()..getFavoriteSongs(isCurrentUser ? '' : widget.userEntity.userEntity.userId!),
-        child: BlocBuilder<FavoriteSongCubit, FavoriteSongState>(
-          builder: (context, state) {
-            if (state is FavoriteSongLoading) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
-
-            if (state is FavoriteSongFailure) {
-              return const Center(
-                child: Text('Please try again'),
-              );
-            }
-
-            if (state is FavoriteSongLoaded) {
-              return state.songs.length < 1
-                  ? Container(
-                      height: ScreenUtil().screenHeight / 4,
-                      alignment: Alignment.center,
-                      child: const Text(
-                        'You have no songs added to favorite list',
-                        style: TextStyle(
-                          fontSize: 16,
-                        ),
-                      ),
-                    )
-                  : ListView.separated(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) {
-                        return SongTileWidget(
-                          songList: state.songs,
-                          index: index,
-                          onSelectionChanged: (isSelected) => setState(() => isSelected = isSelected),
-                        );
-                      },
-                      separatorBuilder: (context, index) {
-                        return SizedBox(
-                          height: 10.h,
-                        );
-                      },
-                      itemCount: state.songs.length);
-            }
-
-            return Container();
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class FollowCount extends StatelessWidget {
-  final String title;
-  final int count;
-  const FollowCount({super.key, required this.title, required this.count});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Text(
-          count.toString(),
-          style: TextStyle(
-            fontSize: 18.3.sp,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        Text(
-          title,
-          style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w300),
-        )
-      ],
-    );
-  }
-}
-
-class ElementTitleWidget extends StatelessWidget {
-  final String elementTitle;
-  final List<dynamic> list;
-  final double limit;
-  final VoidCallback onTap;
-  const ElementTitleWidget({
-    required this.elementTitle,
-    required this.list,
-    required this.limit,
-    required this.onTap,
-    super.key,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialButton(
-      onPressed: onTap,
-      padding: EdgeInsets.symmetric(horizontal: 13.w).copyWith(right: 6.w),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Text(
-                elementTitle,
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontWeight: FontWeight.w500,
+  BlocBuilder<AvatarCubit, AvatarState> currentUserProfileImage() {
+    return BlocBuilder<AvatarCubit, AvatarState>(
+      builder: (context, state) {
+        return Stack(
+          alignment: Alignment.bottomRight,
+          children: [
+            Container(
+              width: 92.sp,
+              height: 92.sp,
+              decoration: BoxDecoration(color: Colors.grey.shade700, shape: BoxShape.circle),
+              child: Center(
+                child: Icon(
+                  Icons.person,
+                  color: Colors.grey,
+                  size: 65.sp,
                 ),
               ),
-              const Icon(
-                Icons.arrow_drop_down_rounded,
-                color: AppColors.primary,
+            ),
+            state is AvatarLoaded || state is AvatarInitial
+                ? Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      state is AvatarLoaded
+                          ? CircleAvatar(radius: 46.sp, backgroundImage: NetworkImage(state.imageUrl) // Ini sekarang akan selalu update,
+                              )
+                          : const SizedBox(),
+                      SizedBox(
+                        height: 23.sp,
+                        width: 23.sp,
+                        child: MaterialButton(
+                          padding: EdgeInsets.zero,
+                          onPressed: () {
+                            _profileEditDialog();
+                          },
+                          color: Colors.white,
+                          shape: const CircleBorder(),
+                          // height: 20.sp,
+                          child: Icon(
+                            Icons.edit,
+                            size: 15.sp,
+                            color: Colors.black,
+                          ),
+                        ),
+                      )
+                    ],
+                  )
+                : state is AvatarPicked
+                    ? ClipOval(
+                        child: state.imageUrl,
+                      )
+                    : const SizedBox.shrink()
+          ],
+        );
+      },
+    );
+  }
+
+  showMenuAvatar(BuildContext context) {
+    showMenu(
+      context: context,
+      menuPadding: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
+      position: RelativeRect.fromLTRB(50.w, context.size!.height * 0.76, 40.w, -100.h),
+      items: [
+        PopupMenuItem(
+          height: 28.h,
+          onTap: () {
+            context.read<AvatarCubit>().pickImage();
+          },
+          child: Row(
+            children: [
+              Icon(
+                Icons.upload_rounded,
+                color: Colors.blue,
+                size: 17.sp,
+              ),
+              SizedBox(
+                width: 10.w,
+              ),
+              Text(
+                'Upload profile picture',
+                style: TextStyle(color: Colors.blue, fontSize: 12.sp, fontWeight: FontWeight.w500),
               )
             ],
           ),
-          list.length >= limit
-              ? Icon(
-                  Icons.arrow_forward_ios_rounded,
-                  size: 16.sp,
-                )
-              : const SizedBox.shrink()
-        ],
-      ),
-    );
-  }
-}
-
-class PlaylistTileWidget extends StatelessWidget {
-  final VoidCallback onTap;
-  const PlaylistTileWidget({
-    super.key,
-    required this.playlist,
-    required this.onTap,
-  });
-
-  final PlaylistEntity playlist;
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialButton(
-      splashColor: Colors.transparent,
-      padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 14.w),
-      onPressed: onTap,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
+        ),
+        PopupMenuItem(
+          height: 28.h,
+          onTap: () {
+            context.read<AvatarCubit>().deleteAvatarImage();
+          },
+          child: Row(
             children: [
-              Container(
-                height: 40.h,
-                width: 44.w,
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Color(0xff091e3a),
-                      Color(0xff2d6cbe),
-                      Color(0xff64a9dd),
-                    ],
-                    stops: [0, 0.5, 0.75],
-                    begin: Alignment.bottomRight,
-                    end: Alignment.topLeft,
-                  ),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.all(8.sp),
-                  child: SvgPicture.asset(
-                    AppVectors.playlist,
-                    color: Colors.white,
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              Icon(
+                Icons.delete_outline_rounded,
+                color: Colors.red,
+                size: 17.sp,
               ),
               SizedBox(
-                width: 12.w,
+                width: 10.w,
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    playlist.name!,
-                    style: TextStyle(fontSize: 14.sp),
-                  ),
-                  SizedBox(
-                    height: 3.h,
-                  ),
-                  Text(
-                    playlist.songCount == 0 ? 'Playlist | empty song' : 'Playlist | ${playlist.songCount} songs',
-                    style: TextStyle(fontSize: 10.sp, color: Colors.white70),
-                  ),
-                ],
-              ),
+              Text(
+                'Remove profile picture',
+                style: TextStyle(color: Colors.red, fontSize: 12.sp, fontWeight: FontWeight.w500),
+              )
             ],
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

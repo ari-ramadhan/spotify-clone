@@ -11,6 +11,7 @@ abstract class UserSupabaseService {
   // Future<Either> getFollowing(String userId);
   Future<bool> isFollowed(String userId);
   Future<Either> uploadImageStorage(File imageFile);
+  Future<Either> updateUsername(String username);
 }
 
 class UserSupabaseServiceImpl implements UserSupabaseService {
@@ -147,4 +148,19 @@ class UserSupabaseServiceImpl implements UserSupabaseService {
       return Left('error occured on your code');
     }
   }
+
+  @override
+  Future<Either> updateUsername(String username) async {
+    try {
+      await supabase.from('users').update({
+        'name' : username
+      }).eq('user_id', supabase.auth.currentUser!.id);
+
+      return const Right('Username updated');
+    } catch (e) {
+      return const Left('Something wrong :(');
+    }
+  }
+
+
 }

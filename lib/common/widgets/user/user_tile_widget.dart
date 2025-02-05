@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/domain/entity/auth/user.dart';
 
@@ -8,7 +9,6 @@ class UserTileWidget extends StatelessWidget {
     super.key,
     required this.userEntity,
     this.isOnSearch = false,
-
   });
 
   @override
@@ -18,7 +18,9 @@ class UserTileWidget extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => ProfilePage(userEntity: userEntity,),
+            builder: (context) => ProfilePage(
+              userEntity: userEntity,
+            ),
           ),
         );
       },
@@ -26,18 +28,23 @@ class UserTileWidget extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 5.h).copyWith(right: 6.5.w),
       child: Row(
         children: [
-          Container(
+          SizedBox(
             height: 40.h,
             width: 44.w,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              image: DecorationImage(
-                fit: BoxFit.cover,
-                image: NetworkImage(
-                  userEntity.userEntity.avatarUrl!,
-                ),
-              ),
-            ),
+            child: userEntity.userEntity.avatarUrl != ''
+                ? ClipOval(
+                    child: CachedNetworkImage(imageUrl: userEntity.userEntity.avatarUrl!, fit: BoxFit.cover,),
+                  )
+                : ClipOval(
+                    child: Container(
+                      color: Colors.grey.shade700,
+                      child: Icon(
+                        Icons.person,
+                        size: 30.sp,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
           ),
           SizedBox(
             width: 14.w,
@@ -60,17 +67,19 @@ class UserTileWidget extends StatelessWidget {
               ],
             ),
           ),
-          isOnSearch ? Row(
-            children: [
-              Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 16.sp,
-              ),
-              SizedBox(
-                width: 10.w,
-              )
-            ],
-          ) : const SizedBox.shrink()
+          isOnSearch
+              ? Row(
+                  children: [
+                    Icon(
+                      Icons.arrow_forward_ios_rounded,
+                      size: 16.sp,
+                    ),
+                    SizedBox(
+                      width: 10.w,
+                    )
+                  ],
+                )
+              : const SizedBox.shrink()
         ],
       ),
     );

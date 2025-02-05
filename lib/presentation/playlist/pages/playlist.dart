@@ -206,6 +206,9 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                             blurryDialog(
                                                 context: context,
                                                 horizontalPadding: 21,
+                                                onClosed: (){
+                                                  Navigator.pop(context);
+                                                },
                                                 content: Column(
                                                   mainAxisSize: MainAxisSize.min,
                                                   crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -272,6 +275,9 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                           child: const Text('Delete playlist'),
                                           onTap: () {
                                             blurryDialog(
+                                              onClosed: (){
+                                                Navigator.pop(context);
+                                              },
                                               context: context,
                                               dialogTitle: 'Delete this playlist',
                                               horizontalPadding: 21,
@@ -447,6 +453,9 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                               context: context,
                                               horizontalPadding: 21,
                                               dialogTitle: 'Add songs',
+                                              onClosed: (){
+                                                Navigator.pop(context);
+                                              },
                                               content: Container(
                                                 width: double.maxFinite,
                                                 child: Column(

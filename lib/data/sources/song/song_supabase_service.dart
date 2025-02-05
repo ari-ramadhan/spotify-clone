@@ -277,7 +277,7 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
             var avatarQuery = await supabase.from('avatar').select().eq('user_id', item['user_id']).maybeSingle();
             var avatarUrl = avatarQuery != null && avatarQuery['avatarUrl'] != null
                 ? avatarQuery['avatarUrl']
-                : 'https://img.freepik.com/free-psd/contact-icon-illustration-isolated_23-2151903337.jpg?semt=ais_hybrid';
+                : '';
 
             var userModel = UserModel.fromJson(item);
             userModel.avatarUrl = avatarUrl;

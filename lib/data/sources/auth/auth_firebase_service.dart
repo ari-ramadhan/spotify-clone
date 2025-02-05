@@ -33,7 +33,10 @@ class AuthSupabaseServiceImpl extends AuthSupabaseService {
         authService.saveUserLoggedInInfo(UserModel(email: signInUserReq.email, fullName: result['name'], userId : result['user_id']));
       }
 
+      print(supabase.auth.currentSession!.user.id);
+
       return const Right('Sign In was succesfull');
+
     } on AuthApiException catch (e) {
       String message = '';
       if (e.code!.contains("email")) {

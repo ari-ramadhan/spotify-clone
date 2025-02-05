@@ -10,6 +10,7 @@ import 'package:spotify_clone/domain/usecases/playlist/batch_add_to_playlist.dar
 import 'package:spotify_clone/presentation/playlist/pages/playlist.dart';
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_state.dart';
+import 'package:spotify_clone/presentation/profile/widgets/PlaylistTileWidget.dart';
 
 Future<Object?> blurryDialogForPlaylist({
   required String backgroundImage,
@@ -283,7 +284,7 @@ Future<Object?> blurryDialogForPlaylist({
 }
 
 Future<Object?> blurryDialog(
-    {required BuildContext context, required String dialogTitle, required Widget content, required double horizontalPadding}) {
+    {required BuildContext context, required String dialogTitle, required Widget content, required double horizontalPadding, required VoidCallback onClosed}) {
   return showGeneralDialog(
     barrierDismissible: true,
     barrierLabel: '',
@@ -317,9 +318,7 @@ Future<Object?> blurryDialog(
                       height: 30.h,
                       width: 30.h,
                       child: IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
+                        onPressed: onClosed,
                         icon: const Icon(Icons.close_rounded),
                         splashRadius: 22.sp,
                       ),

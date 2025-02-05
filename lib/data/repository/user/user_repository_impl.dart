@@ -24,4 +24,9 @@ class UserRepositoryImpl extends UserRepository{
   Future<Either> uploadImageStorage(File imageFile) async {
     return await sl<UserSupabaseService>().uploadImageStorage(imageFile);
   }
+
+  @override
+  Future<Either> updateUsername(String username) async {
+    return await sl<UserSupabaseService>().updateUsername(username);
+  }
 }
