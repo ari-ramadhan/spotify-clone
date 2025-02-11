@@ -1,10 +1,13 @@
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/data/repository/auth/auth_service.dart';
+import 'package:spotify_clone/presentation/genre_picks/pages/genre_picks.dart';
 import 'package:spotify_clone/presentation/home/bloc/all_song/allSong_cubit.dart';
 import 'package:spotify_clone/presentation/home/bloc/news_song/news_songs_cubit.dart';
 import 'package:spotify_clone/presentation/home/pages/home_navigation.dart';
 import 'package:spotify_clone/presentation/playlist/bloc/playlist_songs_cubit.dart';
+import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/profile_image_upload/profile_image_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/profile_image_upload/profile_image_state.dart';
 import 'package:spotify_clone/presentation/song_player/bloc/song_player_cubit.dart';
@@ -41,8 +44,14 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   bool _isLoggedIn = false;
+  bool _onBoarded = false;
   String username = '';
   String email = '';
+
+  Future<void> _checkOnBoardStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _onBoarded = prefs.getBool('onboarding_complete') ?? false;
+  }
 
   Future<void> _checkLoginStatus() async {
     bool isLoggedIn = await _authService.checkLoginStatus();
@@ -55,6 +64,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     _checkLoginStatus();
+    _checkOnBoardStatus();
     super.initState();
   }
 
@@ -67,7 +77,8 @@ class _MyAppState extends State<MyApp> {
             BlocProvider(create: (_) => ThemeCubit()),
             BlocProvider(create: (_) => SongPlayerCubit()),
             BlocProvider(create: (_) => NewsSongsCubit()..getNewsSongs()),
-            // BlocProvider(create: (_) => AllSongCubit()..getAllSong()),
+            BlocProvider(create: (_) => AllSongCubit()..getAllSong()),
+            BlocProvider(create: (_) => PlaylistCubit()),
             BlocProvider(create: (_) => PlaylistSongsCubit()),
             BlocProvider(create: (_) => AvatarCubit(supabase)),
           ],
@@ -77,7 +88,8 @@ class _MyAppState extends State<MyApp> {
               darkTheme: AppTheme.darkTheme,
               themeMode: mode,
               debugShowCheckedModeBanner: false,
-              home: _isLoggedIn ? const HomeNavigation() : const SplashPage(),
+              home: _isLoggedIn ? _onBoarded ? const HomeNavigation() : GenrePicks() : const SplashPage(),
+              // home: GenrePicks(),
             ),
           ),
         );

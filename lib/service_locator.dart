@@ -49,6 +49,7 @@ import 'package:spotify_clone/domain/usecases/song/user_favorite_songs.dart';
 import 'package:spotify_clone/domain/usecases/user/check_following_status.dart';
 import 'package:spotify_clone/domain/usecases/user/follow_user.dart';
 import 'package:spotify_clone/domain/usecases/user/get_followerAndFollowing.dart';
+import 'package:spotify_clone/domain/usecases/user/update_favorite_genres.dart';
 import 'package:spotify_clone/domain/usecases/user/update_username.dart';
 import 'package:spotify_clone/domain/usecases/user/upload_profile_picture.dart';
 import 'data/repository/user/user_repository_impl.dart';
@@ -213,6 +214,9 @@ Future<void> initializeDependencies () async {
   );
   sl.registerSingleton<UpdateUsernameUseCase>(
     UpdateUsernameUseCase()
+  );
+  sl.registerSingleton<UpdateFavoriteGenresUseCase>(
+    UpdateFavoriteGenresUseCase()
   );
 
 

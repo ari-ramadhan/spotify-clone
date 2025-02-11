@@ -1,13 +1,18 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/helpers/is_dark_mode.dart';
 import 'package:spotify_clone/common/widgets/favorite_button/favorite_button.dart';
+import 'package:spotify_clone/core/configs/constants/app_methods.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/core/configs/theme/app_colors.dart';
 // ignore: unused_import
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
+import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.dart';
+import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_state.dart';
+import 'package:spotify_clone/presentation/profile/pages/export.dart';
 import 'package:spotify_clone/presentation/song_player/pages/song_player.dart';
 
 class SongTileWidget extends StatefulWidget {
@@ -52,7 +57,6 @@ class _SongTileWidgetState extends State<SongTileWidget> {
     SongWithFavorite songEntity = widget.songList[widget.index];
     Color textColor = Colors.white;
     String songDuration = songEntity.song.duration.toString().replaceAll('.', ':');
-
 
     return InkWell(
       splashColor: Colors.transparent,
@@ -145,7 +149,7 @@ class _SongTileWidgetState extends State<SongTileWidget> {
                     : Row(
                         children: [
                           Text(
-                        songDuration.length == 3 ? '${songDuration}0' : songDuration,
+                            songDuration.length == 3 ? '${songDuration}0' : songDuration,
                             style: TextStyle(
                               color: textColor,
                             ),
@@ -158,7 +162,9 @@ class _SongTileWidgetState extends State<SongTileWidget> {
                                   height: 21.sp,
                                   width: 21.sp,
                                   child: IconButton(
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      blurryDialogForSongTile(context: context, song: songEntity);
+                                    },
                                     splashRadius: 21.sp,
                                     padding: const EdgeInsets.all(0),
                                     icon: Icon(

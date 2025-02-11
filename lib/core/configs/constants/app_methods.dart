@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
@@ -11,6 +12,274 @@ import 'package:spotify_clone/presentation/playlist/pages/playlist.dart';
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_state.dart';
 import 'package:spotify_clone/presentation/profile/widgets/PlaylistTileWidget.dart';
+
+Future<Object?> blurryDialogForSongTile({required BuildContext context, required SongWithFavorite song}) {
+  return showGeneralDialog(
+    barrierDismissible: true,
+    barrierLabel: '',
+    barrierColor: Colors.black38,
+    transitionDuration: const Duration(milliseconds: 500),
+    pageBuilder: (ctx, anim1, anim2) => Padding(
+      padding: EdgeInsets.all(10.sp),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.sp), color: AppColors.medDarkBackground),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topRight: Radius.circular(15.sp),
+                      topLeft: Radius.circular(
+                        15.sp,
+                      ),
+                    ),
+                    gradient: LinearGradient(colors: [
+                      Colors.blue.shade900,
+                      Colors.black
+                    ])
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 15.w),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Add to playlist',
+                              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(Icons.close_rounded),
+                              splashRadius: 22.sp,
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 4.h,),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 12.w, bottom: 15.h),
+                          child: Row(
+                            children: [
+                              Container(
+                                height: 40.w,
+                                width: 40.w,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: CachedNetworkImageProvider(
+                                        '${AppURLs.supabaseCoverStorage}${song.song.artist} - ${song.song.title}.jpg',
+                                      )),
+                                ),
+                              ),
+                              SizedBox(
+                                width: 9.w,
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    // padding: EdgeInsets.symmetric(horizontal: 4.w),
+                                    child: Text(
+                                      '${song.song.artist}\'s',
+                                      style: TextStyle(fontWeight: FontWeight.w500, color: Colors.white70, fontSize: 11.2.sp),
+                                    ),
+                                  ),
+                                  Container(
+                                    // padding: EdgeInsets.symmetric(horizontal: 4.w),
+                                    child: Text(
+                                      '${song.song.title}',
+                                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.sp, letterSpacing: 0.4),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 6.h,
+                ),
+                Column(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 15.w).copyWith(top: 5.h),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.format_list_bulleted_add,
+                            size: 14.sp,
+                          ),
+                          SizedBox(
+                            width: 5.w,
+                          ),
+                          Text(
+                            'Select a playlist',
+                            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                    BlocProvider(
+                      create: (context) => PlaylistCubit()..getCurrentuserPlaylist(''),
+                      child: BlocBuilder<PlaylistCubit, PlaylistState>(
+                        builder: (context, state) {
+                          if (state is PlaylistLoading) {
+                            return Container(
+                              alignment: Alignment.center,
+                              height: 100.h,
+                              child: const CircularProgressIndicator(
+                                color: AppColors.primary,
+                              ),
+                            );
+                          }
+                          if (state is PlaylistLoaded) {
+                            return state.playlistModel.isNotEmpty ? ListView.builder(
+                              padding: EdgeInsets.only(top: 5.h),
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemBuilder: (context, index) {
+                                var playlist = state.playlistModel[index];
+
+                                return PlaylistTileWidget(
+                                  playlist: playlist,
+                                  onTap: () async {
+                                    // var result = await sl<BatchAddToPlaylistUseCase>()
+                                    //     .call(params: BatchAddToPlaylistParams(playlistId: playlist.id!, songList: songList));
+                                    Navigator.pop(context);
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Row(
+                                          children: [
+                                            SizedBox(
+                                              height: 20.sp,
+                                              width: 20.sp,
+                                              child: const CircularProgressIndicator(
+                                                color: AppColors.primary,
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 10.w,
+                                            ),
+                                            const Text(
+                                              'Adding the songs',
+                                              style: TextStyle(color: Colors.white),
+                                            ),
+                                          ],
+                                        ),
+                                        backgroundColor: AppColors.darkBackground,
+                                        behavior: SnackBarBehavior.floating,
+                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
+                                      ),
+                                    );
+
+                                    // result.fold(
+                                    //   (l) {
+                                    //     var errorSnackbar = SnackBar(
+                                    //       content: Text(
+                                    //         l,
+                                    //         style: const TextStyle(color: Colors.white),
+                                    //       ),
+                                    //       backgroundColor: Colors.red,
+                                    //       behavior: SnackBarBehavior.floating,
+                                    //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
+                                    //     );
+                                    //     ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
+                                    //   },
+                                    //   (r) {
+                                    //     var successSnackbar = SnackBar(
+                                    //       content: Row(
+                                    //         children: [
+                                    //           Text(
+                                    //             r,
+                                    //             style: const TextStyle(color: Colors.white),
+                                    //           ),
+                                    //           GestureDetector(
+                                    //             onTap: () {
+                                    //               Navigator.push(
+                                    //                 ctx,
+                                    //                 MaterialPageRoute(
+                                    //                   builder: (ctx) => PlaylistPage(
+                                    //                     playlistEntity: playlist,
+                                    //                     userEntity: UserEntity(),
+                                    //                     onPlaylistDeleted: () {
+
+                                    //                     },
+                                    //                   ),
+                                    //                 ),
+                                    //               );
+                                    //             },
+                                    //             child: const Text(
+                                    //               'Playlist',
+                                    //               selectionColor: Colors.blue,
+                                    //               style: TextStyle(decoration: TextDecoration.underline),
+                                    //             ),
+                                    //           )
+                                    //         ],
+                                    //       ),
+                                    //       backgroundColor: AppColors.primary,
+                                    //       behavior: SnackBarBehavior.floating,
+                                    //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
+                                    //     );
+                                    //     ScaffoldMessenger.of(context).showSnackBar(successSnackbar);
+                                    //   },
+                                    // );
+                                  },
+                                );
+                              },
+                              itemCount: state.playlistModel.take(4).length,
+                            ) : Container(
+                              height: 100.h,
+                              margin: EdgeInsets.symmetric(horizontal: 15.w).copyWith(top: 10.h),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.sp),
+                                color: const Color.fromARGB(235, 27, 27, 27)
+                              ),
+                              child: Center(child: Text('You have no playlist')),
+                            );
+                          }
+
+                          return Container();
+                        },
+                      ),
+                    )
+                  ],
+                ),
+                SizedBox(
+                  height: 15.h,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+    transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
+      child: FadeTransition(
+        opacity: anim1,
+        child: child,
+      ),
+    ),
+    context: context,
+  );
+}
 
 Future<Object?> blurryDialogForPlaylist({
   required String backgroundImage,
@@ -30,14 +299,11 @@ Future<Object?> blurryDialogForPlaylist({
         body: Align(
           alignment: Alignment.bottomCenter,
           child: Container(
-            // alignment: Alignment.topLeft,
-            // padding: EdgeInsets.symmetric(horizontal: horizontalPadding.w, vertical: 15.h),
             decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.sp), color: AppColors.medDarkBackground),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Stack(
-                  // alignment: Alignment.topRight,
                   children: [
                     Container(
                       height: 120.h,
@@ -231,6 +497,7 @@ Future<Object?> blurryDialogForPlaylist({
                                                       builder: (ctx) => PlaylistPage(
                                                         playlistEntity: playlist,
                                                         userEntity: UserEntity(),
+                                                        onPlaylistDeleted: () {},
                                                       ),
                                                     ),
                                                   );
@@ -284,7 +551,11 @@ Future<Object?> blurryDialogForPlaylist({
 }
 
 Future<Object?> blurryDialog(
-    {required BuildContext context, required String dialogTitle, required Widget content, required double horizontalPadding, required VoidCallback onClosed}) {
+    {required BuildContext context,
+    required String dialogTitle,
+    required Widget content,
+    required double horizontalPadding,
+    required VoidCallback onClosed}) {
   return showGeneralDialog(
     barrierDismissible: true,
     barrierLabel: '',

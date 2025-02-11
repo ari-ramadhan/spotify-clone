@@ -231,7 +231,7 @@ class _MyFavoriteState extends State<MyFavorite> {
                               Container(
                                 // margin: EdgeInsets.only(right: 10.w),
                                 padding: EdgeInsets.all(5.h),
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   color: AppColors.primary,
                                   shape: BoxShape.circle,
                                 ),

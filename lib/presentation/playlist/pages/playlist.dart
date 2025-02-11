@@ -15,6 +15,7 @@ import 'package:spotify_clone/presentation/playlist/bloc/playlist_songs_cubit.da
 import 'package:spotify_clone/presentation/playlist/bloc/playlist_songs_state.dart';
 import 'package:spotify_clone/presentation/playlist/bloc/recommended_artist_state.dart';
 import 'package:spotify_clone/presentation/playlist/bloc/recommended_artists_cubit.dart';
+import 'package:spotify_clone/presentation/playlist/widgets/EditInfoField.dart';
 import 'package:spotify_clone/presentation/profile/bloc/favorite_song/favorite_song_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/favorite_song/favorite_song_state.dart';
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.dart';
@@ -23,11 +24,13 @@ import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_state.
 class PlaylistPage extends StatefulWidget {
   final PlaylistEntity playlistEntity;
   final UserEntity userEntity;
-  PlaylistPage({
-    Key? key,
+  final VoidCallback onPlaylistDeleted;
+  const PlaylistPage({
+    super.key,
     required this.userEntity,
     required this.playlistEntity,
-  }) : super(key: key);
+    required this.onPlaylistDeleted,
+  });
 
   @override
   State<PlaylistPage> createState() => _PlaylistPageState();
@@ -72,8 +75,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
     playlistDesc = widget.playlistEntity.description!;
   }
 
-  final TextEditingController _controller = TextEditingController();
-
   bool isShowSelectedSongError = false;
   @override
   Widget build(BuildContext context) {
@@ -92,7 +93,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
             ),
             BlocProvider(
               create: (context) => FavoriteSongCubit()..getFavoriteSongs(''),
-            )
+            ),
           ],
           child: SafeArea(
             child: Column(
@@ -206,7 +207,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                             blurryDialog(
                                                 context: context,
                                                 horizontalPadding: 21,
-                                                onClosed: (){
+                                                onClosed: () {
                                                   Navigator.pop(context);
                                                 },
                                                 content: Column(
@@ -275,7 +276,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                           child: const Text('Delete playlist'),
                                           onTap: () {
                                             blurryDialog(
-                                              onClosed: (){
+                                              onClosed: () {
                                                 Navigator.pop(context);
                                               },
                                               context: context,
@@ -314,17 +315,23 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                                         height: 15.h,
                                                         color: Colors.white,
                                                       ),
-                                                      Expanded(
-                                                        child: MaterialButton(
-                                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.sp)),
-                                                          onPressed: () {
-                                                            deletePlaylist(context);
-                                                          },
-                                                          child: Padding(
-                                                            padding: EdgeInsets.symmetric(vertical: 4.h),
-                                                            child: Text(
-                                                              'Confirm',
-                                                              style: TextStyle(fontSize: 16.sp, color: Colors.red),
+                                                      BlocProvider(
+                                                        create: (contextPlaylist) => PlaylistCubit(),
+                                                        lazy: true,
+                                                        child: BlocBuilder<PlaylistCubit, PlaylistState>(
+                                                          builder: (contextPlaylist, state) => Expanded(
+                                                            child: MaterialButton(
+                                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.sp)),
+                                                              onPressed: () {
+                                                                deletePlaylist(context: context, playlistContext: contextPlaylist);
+                                                              },
+                                                              child: Padding(
+                                                                padding: EdgeInsets.symmetric(vertical: 4.h),
+                                                                child: Text(
+                                                                  'Confirm',
+                                                                  style: TextStyle(fontSize: 16.sp, color: Colors.red),
+                                                                ),
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
@@ -453,7 +460,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                               context: context,
                                               horizontalPadding: 21,
                                               dialogTitle: 'Add songs',
-                                              onClosed: (){
+                                              onClosed: () {
                                                 Navigator.pop(context);
                                               },
                                               content: Container(
@@ -702,7 +709,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                             physics: const NeverScrollableScrollPhysics(),
                                             shrinkWrap: true,
                                             itemBuilder: (context, index) {
-
                                               return PlaylistSongTileWidget(
                                                 index: index,
                                                 songList: state.songs,
@@ -928,14 +934,14 @@ class _PlaylistPageState extends State<PlaylistPage> {
             playlistDesc = _playlistDescController.text;
           });
           ScaffoldMessenger.of(context).showSnackBar(successSnackbar);
-          context.read<PlaylistCubit>().getCurrentuserPlaylist(supabase.auth.currentUser!.id);
+          // context.read<PlaylistCubit>().getCurrentuserPlaylist(supabase.auth.currentUser!.id);
           Navigator.pop(context, true);
         },
       );
     } else {}
   }
 
-  Future<void> deletePlaylist(BuildContext context) async {
+  Future<void> deletePlaylist({required BuildContext context, required BuildContext playlistContext}) async {
     showDialog(
       context: context,
       barrierDismissible: false, // Tidak bisa ditutup tanpa selesai
@@ -962,7 +968,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
 
     // Melakukan query
     var result = await sl<DeletePlaylistUseCase>().call(params: widget.playlistEntity.id!);
-
+    playlistContext.read<PlaylistCubit>().deletePlaylist(widget.playlistEntity.id!);
     // Menghapus Dialog Loading
     Navigator.of(context, rootNavigator: true).pop();
 
@@ -996,105 +1002,5 @@ class _PlaylistPageState extends State<PlaylistPage> {
         Navigator.pop(context);
       },
     );
-  }
-}
-
-class EditInfoField extends StatefulWidget {
-  final TextEditingController controller;
-  final String label;
-  final String value;
-  final FormFieldValidator<String>? validator;
-
-  final bool isExpanded;
-  const EditInfoField({
-    super.key,
-    required this.controller,
-    required this.label,
-    required this.validator,
-    required this.value,
-    this.isExpanded = false,
-  });
-
-  @override
-  State<EditInfoField> createState() => _EditInfoFieldState();
-}
-
-class _EditInfoFieldState extends State<EditInfoField> {
-  @override
-  void dispose() {
-    super.dispose();
-    widget.controller.clear();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    widget.controller.text = widget.value;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.isExpanded
-        ? TextFormField(
-            expands: true,
-            minLines: null,
-            validator: widget.validator,
-            maxLines: null,
-            keyboardType: TextInputType.multiline,
-            controller: widget.controller,
-            decoration: InputDecoration(
-              fillColor: AppColors.darkBackground,
-              labelText: widget.label,
-              labelStyle: const TextStyle(
-                color: Colors.white70,
-                fontWeight: FontWeight.w500,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.sp),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.blue),
-                borderRadius: BorderRadius.circular(10.sp),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.sp),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: AppColors.primary),
-                borderRadius: BorderRadius.circular(10.sp),
-              ),
-              contentPadding: EdgeInsets.symmetric(horizontal: 10.w),
-            ),
-          )
-        : TextFormField(
-            minLines: 1,
-            maxLines: 1,
-            validator: widget.validator,
-            keyboardType: TextInputType.text,
-            controller: widget.controller,
-            decoration: InputDecoration(
-              fillColor: AppColors.darkBackground,
-              labelText: widget.label,
-              labelStyle: const TextStyle(
-                color: Colors.white70,
-                fontWeight: FontWeight.w500,
-              ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.sp),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.blue),
-                borderRadius: BorderRadius.circular(10.sp),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.sp),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: AppColors.primary),
-                borderRadius: BorderRadius.circular(10.sp),
-              ),
-              contentPadding: EdgeInsets.symmetric(horizontal: 10.w),
-            ),
-          );
   }
 }

@@ -10,15 +10,10 @@ class SongTileWidgetSelectable extends StatefulWidget {
   final bool isSelected;
   final Function(SongWithFavorite?) onSelectionChanged;
 
-  const SongTileWidgetSelectable(
-      {super.key,
-      required this.songEntity,
-      this.isSelected = false,
-      required this.onSelectionChanged});
+  const SongTileWidgetSelectable({super.key, required this.songEntity, this.isSelected = false, required this.onSelectionChanged});
 
   @override
-  State<SongTileWidgetSelectable> createState() =>
-      _SongTileWidgetSelectableState();
+  State<SongTileWidgetSelectable> createState() => _SongTileWidgetSelectableState();
 }
 
 class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
@@ -30,12 +25,11 @@ class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
   }
 
   void toggleSelected() {
-  setState(() {
-    isSelected = !isSelected;
-    widget.onSelectionChanged(isSelected ? widget.songEntity : null);
-  });
-}
-
+    setState(() {
+      isSelected = !isSelected;
+      widget.onSelectionChanged(isSelected ? widget.songEntity : null);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +45,6 @@ class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
       child: InkWell(
         onTap: () {
           toggleSelected();
-
         },
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -82,10 +75,7 @@ class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
                       child: Text(
                         widget.songEntity.song.title,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            color: textColor,
-                            fontSize: 12.sp),
+                        style: TextStyle(fontWeight: FontWeight.w500, color: textColor, fontSize: 12.sp),
                       ),
                     ),
                     SizedBox(
@@ -93,10 +83,7 @@ class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
                     ),
                     Text(
                       widget.songEntity.song.artist,
-                      style: TextStyle(
-                          fontWeight: FontWeight.w400,
-                          color: textColor,
-                          fontSize: 9.sp),
+                      style: TextStyle(fontWeight: FontWeight.w400, color: textColor, fontSize: 9.sp),
                     ),
                   ],
                 )
@@ -106,20 +93,14 @@ class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
               children: [
                 Text(
                   widget.songEntity.song.duration.toString(),
-                  style: TextStyle(
-                    color: textColor,
-                    fontSize: 11.sp
-                  ),
+                  style: TextStyle(color: textColor, fontSize: 11.sp),
                 ),
                 SizedBox(
                   width: 10.w,
                 ),
                 Container(
                   padding: EdgeInsets.all(2.sp),
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppColors.darkBackground
-                  ),
+                  decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.darkBackground),
                   child: Icon(
                     isSelected ? Icons.check : Icons.playlist_add,
                     color: Colors.white,

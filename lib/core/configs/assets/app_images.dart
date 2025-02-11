@@ -12,5 +12,6 @@ class AppImages {
   static const String artistPage = '${basePath}artist_page.jpg';
   static const String album1 = '${basePath}album.jpg';
   static const String album2 = '${basePath}Billie Eilish - WILDFLOWER.jpg';
+  static const String genrePicks = '${basePath}genre_picks.jpg';
 
 }

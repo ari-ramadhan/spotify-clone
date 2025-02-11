@@ -30,7 +30,7 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
     try {
       List<SongWithFavorite> songs = [];
 
-      var item = await supabase.from('songs').select('*').order('release_date', ascending: false).limit(5);
+      var item = await supabase.from('songs').select('*').order('release_date', ascending: true).limit(5);
 
       final List<SongModel> data = item.map((item) {
         return SongModel.fromJson(item);

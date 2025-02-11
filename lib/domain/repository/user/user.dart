@@ -8,4 +8,5 @@ abstract class UserRepository {
   Future<bool> isFollowed(String userId);
   Future<Either> uploadImageStorage(File imageFile);
   Future<Either> updateUsername(String username);
+  Future<Either> updateFavoriteGenres(List selectedGenres);
 }

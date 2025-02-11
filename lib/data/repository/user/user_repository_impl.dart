@@ -29,4 +29,9 @@ class UserRepositoryImpl extends UserRepository{
   Future<Either> updateUsername(String username) async {
     return await sl<UserSupabaseService>().updateUsername(username);
   }
+
+  @override
+  Future<Either> updateFavoriteGenres(List selectedGenres) async {
+    return await sl<UserSupabaseService>().updateFavoriteGenres(selectedGenres);
+  }
 }

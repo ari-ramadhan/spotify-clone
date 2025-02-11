@@ -12,6 +12,7 @@ abstract class UserSupabaseService {
   Future<bool> isFollowed(String userId);
   Future<Either> uploadImageStorage(File imageFile);
   Future<Either> updateUsername(String username);
+  Future<Either> updateFavoriteGenres(List selectedGenres);
 }
 
 class UserSupabaseServiceImpl implements UserSupabaseService {
@@ -140,7 +141,7 @@ class UserSupabaseServiceImpl implements UserSupabaseService {
       var count = await supabase.from('avatar').select().contains('avatarUrl', publicUrl).count();
 
       // if (count == 0) {
-        await supabase.from('avatar').insert({'avatarUrl': publicUrl});
+      await supabase.from('avatar').insert({'avatarUrl': publicUrl});
       // }
 
       return Right(publicUrl);
@@ -152,9 +153,7 @@ class UserSupabaseServiceImpl implements UserSupabaseService {
   @override
   Future<Either> updateUsername(String username) async {
     try {
-      await supabase.from('users').update({
-        'name' : username
-      }).eq('user_id', supabase.auth.currentUser!.id);
+      await supabase.from('users').update({'name': username}).eq('user_id', supabase.auth.currentUser!.id);
 
       return const Right('Username updated');
     } catch (e) {
@@ -162,5 +161,20 @@ class UserSupabaseServiceImpl implements UserSupabaseService {
     }
   }
 
+  @override
+  Future<Either> updateFavoriteGenres(List selectedGenres) async {
+    try {
+      await supabase.from('user_genres').delete().eq('user_id', supabase.auth.currentSession!.user.id);
 
+      if (selectedGenres.isNotEmpty) {
+        for (var genre in selectedGenres) {
+          await supabase.from('user_genres').insert({'user_id': supabase.auth.currentSession!.user.id, 'genre': genre});
+        }
+      }
+
+      return Right('Done picking favorite genre\'s');
+    } catch (e) {
+      return Left('Something wrong..');
+    }
+  }
 }
