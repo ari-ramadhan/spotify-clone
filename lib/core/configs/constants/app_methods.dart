@@ -13,7 +13,52 @@ import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_state.dart';
 import 'package:spotify_clone/presentation/profile/widgets/PlaylistTileWidget.dart';
 
-Future<Object?> blurryDialogForSongTile({required BuildContext context, required SongWithFavorite song}) {
+void customLoadingSnackBar({required String loadingText, required BuildContext context}) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Row(
+        children: [
+          SizedBox(
+            height: 20.sp,
+            width: 20.sp,
+            child: const CircularProgressIndicator(
+              color: AppColors.primary,
+            ),
+          ),
+          SizedBox(
+            width: 10.w,
+          ),
+          Text(
+            loadingText,
+            style: const TextStyle(color: Colors.white),
+          ),
+        ],
+      ),
+      backgroundColor: AppColors.darkBackground,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
+    ),
+  );
+}
+
+void customSnackBar({required bool isSuccess, required String text, required BuildContext context}) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        text,
+        style: const TextStyle(color: Colors.white),
+      ),
+      backgroundColor: isSuccess ? AppColors.primary : Colors.red,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
+    ),
+  );
+}
+
+Future<Object?> blurryDialogForSongTile({
+  required BuildContext context,
+  required SongWithFavorite song,
+}) {
   return showGeneralDialog(
     barrierDismissible: true,
     barrierLabel: '',
@@ -32,17 +77,13 @@ Future<Object?> blurryDialogForSongTile({required BuildContext context, required
               children: [
                 Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      topRight: Radius.circular(15.sp),
-                      topLeft: Radius.circular(
-                        15.sp,
+                      borderRadius: BorderRadius.only(
+                        topRight: Radius.circular(15.sp),
+                        topLeft: Radius.circular(
+                          15.sp,
+                        ),
                       ),
-                    ),
-                    gradient: LinearGradient(colors: [
-                      Colors.blue.shade900,
-                      Colors.black
-                    ])
-                  ),
+                      gradient: LinearGradient(colors: [Colors.blue.shade900, Colors.black])),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -65,7 +106,9 @@ Future<Object?> blurryDialogForSongTile({required BuildContext context, required
                           ],
                         ),
                       ),
-                      SizedBox(height: 4.h,),
+                      SizedBox(
+                        height: 4.h,
+                      ),
                       Positioned(
                         bottom: 0,
                         left: 0,
@@ -150,109 +193,44 @@ Future<Object?> blurryDialogForSongTile({required BuildContext context, required
                             );
                           }
                           if (state is PlaylistLoaded) {
-                            return state.playlistModel.isNotEmpty ? ListView.builder(
-                              padding: EdgeInsets.only(top: 5.h),
-                              physics: const NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemBuilder: (context, index) {
-                                var playlist = state.playlistModel[index];
+                            return state.playlistModel.isNotEmpty
+                                ? ListView.builder(
+                                    padding: EdgeInsets.only(top: 5.h),
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    shrinkWrap: true,
+                                    itemBuilder: (context, index) {
+                                      var playlist = state.playlistModel[index];
 
-                                return PlaylistTileWidget(
-                                  playlist: playlist,
-                                  onTap: () async {
-                                    // var result = await sl<BatchAddToPlaylistUseCase>()
-                                    //     .call(params: BatchAddToPlaylistParams(playlistId: playlist.id!, songList: songList));
-                                    Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Row(
-                                          children: [
-                                            SizedBox(
-                                              height: 20.sp,
-                                              width: 20.sp,
-                                              child: const CircularProgressIndicator(
-                                                color: AppColors.primary,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 10.w,
-                                            ),
-                                            const Text(
-                                              'Adding the songs',
-                                              style: TextStyle(color: Colors.white),
-                                            ),
-                                          ],
-                                        ),
-                                        backgroundColor: AppColors.darkBackground,
-                                        behavior: SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
-                                      ),
-                                    );
+                                      return PlaylistTileWidget(
+                                        playlist: playlist,
+                                        onTap: () async {
+                                          var result = await sl<BatchAddToPlaylistUseCase>()
+                                              .call(params: BatchAddToPlaylistParams(playlistId: playlist.id!, songList: [song]));
 
-                                    // result.fold(
-                                    //   (l) {
-                                    //     var errorSnackbar = SnackBar(
-                                    //       content: Text(
-                                    //         l,
-                                    //         style: const TextStyle(color: Colors.white),
-                                    //       ),
-                                    //       backgroundColor: Colors.red,
-                                    //       behavior: SnackBarBehavior.floating,
-                                    //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
-                                    //     );
-                                    //     ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
-                                    //   },
-                                    //   (r) {
-                                    //     var successSnackbar = SnackBar(
-                                    //       content: Row(
-                                    //         children: [
-                                    //           Text(
-                                    //             r,
-                                    //             style: const TextStyle(color: Colors.white),
-                                    //           ),
-                                    //           GestureDetector(
-                                    //             onTap: () {
-                                    //               Navigator.push(
-                                    //                 ctx,
-                                    //                 MaterialPageRoute(
-                                    //                   builder: (ctx) => PlaylistPage(
-                                    //                     playlistEntity: playlist,
-                                    //                     userEntity: UserEntity(),
-                                    //                     onPlaylistDeleted: () {
+                                          Navigator.pop(context);
 
-                                    //                     },
-                                    //                   ),
-                                    //                 ),
-                                    //               );
-                                    //             },
-                                    //             child: const Text(
-                                    //               'Playlist',
-                                    //               selectionColor: Colors.blue,
-                                    //               style: TextStyle(decoration: TextDecoration.underline),
-                                    //             ),
-                                    //           )
-                                    //         ],
-                                    //       ),
-                                    //       backgroundColor: AppColors.primary,
-                                    //       behavior: SnackBarBehavior.floating,
-                                    //       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
-                                    //     );
-                                    //     ScaffoldMessenger.of(context).showSnackBar(successSnackbar);
-                                    //   },
-                                    // );
-                                  },
-                                );
-                              },
-                              itemCount: state.playlistModel.take(4).length,
-                            ) : Container(
-                              height: 100.h,
-                              margin: EdgeInsets.symmetric(horizontal: 15.w).copyWith(top: 10.h),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.sp),
-                                color: const Color.fromARGB(235, 27, 27, 27)
-                              ),
-                              child: Center(child: Text('You have no playlist')),
-                            );
+                                          customLoadingSnackBar(loadingText: 'Adding the songs', context: context);
+
+                                          result.fold(
+                                            (l) {
+                                              customSnackBar(isSuccess: false, text: l, context: context);
+                                            },
+                                            (r) {
+                                              customSnackBar(isSuccess: true, text: r, context: context);
+                                            },
+                                          );
+                                        },
+                                      );
+                                    },
+                                    itemCount: state.playlistModel.take(4).length,
+                                  )
+                                : Container(
+                                    height: 100.h,
+                                    margin: EdgeInsets.symmetric(horizontal: 15.w).copyWith(top: 10.h),
+                                    decoration:
+                                        BoxDecoration(borderRadius: BorderRadius.circular(10.sp), color: const Color.fromARGB(235, 27, 27, 27)),
+                                    child: const Center(child: Text('You have no playlist')),
+                                  );
                           }
 
                           return Container();
@@ -442,79 +420,14 @@ Future<Object?> blurryDialogForPlaylist({
                                     var result = await sl<BatchAddToPlaylistUseCase>()
                                         .call(params: BatchAddToPlaylistParams(playlistId: playlist.id!, songList: songList));
                                     Navigator.pop(context);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Row(
-                                          children: [
-                                            SizedBox(
-                                              height: 20.sp,
-                                              width: 20.sp,
-                                              child: const CircularProgressIndicator(
-                                                color: AppColors.primary,
-                                              ),
-                                            ),
-                                            SizedBox(
-                                              width: 10.w,
-                                            ),
-                                            const Text(
-                                              'Adding the songs',
-                                              style: TextStyle(color: Colors.white),
-                                            ),
-                                          ],
-                                        ),
-                                        backgroundColor: AppColors.darkBackground,
-                                        behavior: SnackBarBehavior.floating,
-                                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
-                                      ),
-                                    );
+                                    customLoadingSnackBar(loadingText: 'Adding the songs', context: context);
 
                                     result.fold(
                                       (l) {
-                                        var errorSnackbar = SnackBar(
-                                          content: Text(
-                                            l,
-                                            style: const TextStyle(color: Colors.white),
-                                          ),
-                                          backgroundColor: Colors.red,
-                                          behavior: SnackBarBehavior.floating,
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
-                                        );
-                                        ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
+                                        customSnackBar(isSuccess: false, text: l, context: context);
                                       },
                                       (r) {
-                                        var successSnackbar = SnackBar(
-                                          content: Row(
-                                            children: [
-                                              Text(
-                                                r,
-                                                style: const TextStyle(color: Colors.white),
-                                              ),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                    ctx,
-                                                    MaterialPageRoute(
-                                                      builder: (ctx) => PlaylistPage(
-                                                        playlistEntity: playlist,
-                                                        userEntity: UserEntity(),
-                                                        onPlaylistDeleted: () {},
-                                                      ),
-                                                    ),
-                                                  );
-                                                },
-                                                child: const Text(
-                                                  'Playlist',
-                                                  selectionColor: Colors.blue,
-                                                  style: TextStyle(decoration: TextDecoration.underline),
-                                                ),
-                                              )
-                                            ],
-                                          ),
-                                          backgroundColor: AppColors.primary,
-                                          behavior: SnackBarBehavior.floating,
-                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
-                                        );
-                                        ScaffoldMessenger.of(context).showSnackBar(successSnackbar);
+                                        customSnackBar(isSuccess: true, text: r, context: context);
                                       },
                                     );
                                   },

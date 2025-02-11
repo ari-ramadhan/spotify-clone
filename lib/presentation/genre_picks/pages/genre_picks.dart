@@ -8,6 +8,8 @@ import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/domain/usecases/user/update_favorite_genres.dart';
 import 'package:spotify_clone/presentation/home/pages/home_navigation.dart';
 
+import '../../../core/configs/constants/app_methods.dart';
+
 class GenrePicks extends StatefulWidget {
   GenrePicks({Key? key}) : super(key: key);
 
@@ -168,13 +170,7 @@ class _GenrePicksState extends State<GenrePicks> {
                         (r) async {
                           SharedPreferences prefs = await SharedPreferences.getInstance();
                           prefs.setBool('onboarding_complete', true);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(r),
-                              backgroundColor: AppColors.primary,
-                              behavior: SnackBarBehavior.floating,
-                            ),
-                          );
+                          customSnackBar(isSuccess: true, text: r, context: context);
                         },
                       );
                     }

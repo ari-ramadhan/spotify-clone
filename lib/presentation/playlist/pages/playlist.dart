@@ -909,32 +909,15 @@ class _PlaylistPageState extends State<PlaylistPage> {
 
       result.fold(
         (l) {
-          var errorSnackbar = SnackBar(
-            content: Text(
-              l,
-              style: const TextStyle(color: Colors.black),
-            ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-          );
-          ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
+          customSnackBar(isSuccess: false, text: l, context: context);
           Navigator.pop(context, true);
         },
         (r) {
-          var successSnackbar = SnackBar(
-            content: Text(
-              r,
-              style: const TextStyle(color: Colors.black),
-            ),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-          );
           setState(() {
             playlistName = _playlistNameController.text;
             playlistDesc = _playlistDescController.text;
           });
-          ScaffoldMessenger.of(context).showSnackBar(successSnackbar);
-          // context.read<PlaylistCubit>().getCurrentuserPlaylist(supabase.auth.currentUser!.id);
+          customSnackBar(isSuccess: true, text: r, context: context);
           Navigator.pop(context, true);
         },
       );
@@ -975,29 +958,13 @@ class _PlaylistPageState extends State<PlaylistPage> {
     // Menampilkan hasil
     result.fold(
       (l) {
-        var errorSnackbar = SnackBar(
-          content: Text(
-            l,
-            style: const TextStyle(color: Colors.black),
-          ),
-          backgroundColor: Colors.red,
-          behavior: SnackBarBehavior.floating,
-        );
-        ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
+        customSnackBar(isSuccess: false, text: l, context: context);
 
         Navigator.pop(context);
       },
       (r) {
         context.read<PlaylistSongsCubit>().getPlaylistSongs(widget.playlistEntity.id!);
-        var successSnackbar = SnackBar(
-          content: Text(
-            r,
-            style: const TextStyle(color: Colors.black),
-          ),
-          backgroundColor: Colors.green,
-          behavior: SnackBarBehavior.floating,
-        );
-        ScaffoldMessenger.of(context).showSnackBar(successSnackbar);
+        customSnackBar(isSuccess: true, text: r, context: context);
         Navigator.pop(context);
         Navigator.pop(context);
       },

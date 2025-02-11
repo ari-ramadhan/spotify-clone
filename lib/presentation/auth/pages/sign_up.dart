@@ -10,6 +10,8 @@ import 'package:spotify_clone/presentation/home/pages/home.dart';
 import 'package:spotify_clone/presentation/home/pages/home_navigation.dart';
 import 'package:spotify_clone/service_locator.dart';
 
+import '../../../core/configs/constants/app_methods.dart';
+
 class SignUpPage extends StatefulWidget {
   SignUpPage({super.key});
 
@@ -72,13 +74,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
                 result.fold(
                   (l) {
-                    var snackbar = SnackBar(
-                        content: Text(
-                          l,
-                          style: const TextStyle(color: Colors.black),
-                        ),
-                        behavior: SnackBarBehavior.floating);
-                    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                    customSnackBar(isSuccess: false, text: l, context: context);
                   },
                   (r) {
                     Navigator.pushAndRemoveUntil(

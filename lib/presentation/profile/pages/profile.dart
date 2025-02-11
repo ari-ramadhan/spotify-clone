@@ -589,31 +589,13 @@ class _ProfilePageState extends State<ProfilePage> {
       // Menampilkan hasil
       result2.fold(
         (l) {
-          var errorSnackbar = SnackBar(
-            content: Text(
-              l,
-              style: const TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Colors.red,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
-          );
-          ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
+          customSnackBar(isSuccess: false, text: l, context: context);
           playlistController.clear();
           selectedSongs.clear();
           Navigator.pop(context);
         },
         (r) {
-          var successSnackbar = SnackBar(
-            content: Text(
-              r,
-              style: const TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Colors.green,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
-            behavior: SnackBarBehavior.floating,
-          );
-          ScaffoldMessenger.of(context).showSnackBar(successSnackbar);
+          customSnackBar(isSuccess: true, text: r, context: context);
           playlistController.clear();
           selectedSongs.clear();
           Navigator.pop(context);
@@ -850,25 +832,10 @@ class _ProfilePageState extends State<ProfilePage> {
                       var result = await sl<UpdateUsernameUseCase>().call(params: usernameController.text);
                       result.fold(
                         (l) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              behavior: SnackBarBehavior.floating,
-                              content: Text(l, style: TextStyle(color: Colors.white)),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
+                          customSnackBar(isSuccess: false, text: l, context: context);
                         },
                         (r) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              behavior: SnackBarBehavior.floating,
-                              content: Text(
-                                'Profile information updated',
-                                style: TextStyle(color: Colors.white),
-                              ),
-                              backgroundColor: AppColors.primary,
-                            ),
-                          );
+                          customSnackBar(isSuccess: false, text: r, context: context);
                           AuthService().saveUserLoggedInInfo(UserModel(userId: userId, email: email, fullName: usernameController.text));
                           getUserInfo();
                           close();

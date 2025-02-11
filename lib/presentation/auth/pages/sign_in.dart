@@ -13,6 +13,8 @@ import 'package:spotify_clone/presentation/home/pages/home.dart';
 import 'package:spotify_clone/presentation/home/pages/home_navigation.dart';
 import 'package:spotify_clone/service_locator.dart';
 
+import '../../../core/configs/constants/app_methods.dart';
+
 class SignInPage extends StatefulWidget {
   SignInPage({super.key});
 
@@ -66,14 +68,7 @@ class _SignInPageState extends State<SignInPage> {
 
                 result.fold(
                   (l) {
-                    var snackbar = SnackBar(
-                      content: Text(
-                        l,
-                      ),
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.red,
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                    customSnackBar(isSuccess: false, text: l, context: context);
                   },
                   (r) async {
                     SharedPreferences prefs = await SharedPreferences.getInstance();

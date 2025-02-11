@@ -6,10 +6,11 @@ import 'package:spotify_clone/domain/entity/artist/artist.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/follow_button/follow_button_cubit.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/follow_button/follow_button_state.dart';
 
+import '../../../core/configs/constants/app_methods.dart';
+
 class FollowArtistButton extends StatefulWidget {
   final ArtistWithFollowing artistEntity;
-  const FollowArtistButton({Key? key, required this.artistEntity})
-      : super(key: key);
+  const FollowArtistButton({Key? key, required this.artistEntity}) : super(key: key);
 
   @override
   _FollowArtistButtonState createState() => _FollowArtistButtonState();
@@ -25,50 +26,13 @@ class _FollowArtistButtonState extends State<FollowArtistButton> {
           if (state is FollowButtonInitial) {
             return InkWell(
               onTap: () async {
-                context
-                    .read<FollowButtonCubit>()
-                    .followButtonUpdated(widget.artistEntity.artist.id!);
-                // if (followStatus) {
-                // var result = await sl<FollowUnfollowArtistUseCase>()
-                //     .call(params: artist.artist.id);
-
-                // result.fold(
-                //   (l) {
-                //     var errorSnackbar = SnackBar(
-                //       content: Text(
-                //         l,
-                //         style: const TextStyle(color: Colors.black),
-                //       ),
-                //       backgroundColor: Colors.red,
-                //       behavior: SnackBarBehavior.floating,
-                //     );
-                //     ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
-                //   },
-                //   (r) {
-                //     var successSnackbar = SnackBar(
-                //       content: Text(
-                //         'Done following ${artist.artist.name}',
-                //         style: const TextStyle(color: Colors.black),
-                //       ),
-                //       backgroundColor: Colors.green,
-                //       behavior: SnackBarBehavior.floating,
-                //     );
-                //     setState(() {
-                //       followStatus = r;
-                //     });
-                //     ScaffoldMessenger.of(context).showSnackBar(successSnackbar);
-                //   },
-                // );
-                // }
+                context.read<FollowButtonCubit>().followButtonUpdated(widget.artistEntity.artist.id!);
               },
               child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 3.h)
-                    .copyWith(left: 0),
+                margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 3.h).copyWith(left: 0),
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
                 decoration: BoxDecoration(
-                    color: widget.artistEntity.isFollowed
-                        ? AppColors.primary
-                        : Colors.transparent,
+                    color: widget.artistEntity.isFollowed ? AppColors.primary : Colors.transparent,
                     border: Border.all(
                       color: AppColors.primary,
                     ),
@@ -76,19 +40,11 @@ class _FollowArtistButtonState extends State<FollowArtistButton> {
                 child: widget.artistEntity.isFollowed
                     ? Text(
                         'Followed',
-                        style: TextStyle(
-                            letterSpacing: 0.7,
-                            fontSize: 13.sp,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold),
+                        style: TextStyle(letterSpacing: 0.7, fontSize: 13.sp, color: Colors.white, fontWeight: FontWeight.bold),
                       )
                     : Text(
                         'Follow',
-                        style: TextStyle(
-                            letterSpacing: 0.7,
-                            fontSize: 13.sp,
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold),
+                        style: TextStyle(letterSpacing: 0.7, fontSize: 13.sp, color: AppColors.primary, fontWeight: FontWeight.bold),
                       ),
               ),
             );
@@ -96,70 +52,18 @@ class _FollowArtistButtonState extends State<FollowArtistButton> {
           if (state is FollowButtonUpdated) {
             return InkWell(
               onTap: () async {
-                context
-                    .read<FollowButtonCubit>()
-                    .followButtonUpdated(widget.artistEntity.artist.id!);
+                context.read<FollowButtonCubit>().followButtonUpdated(widget.artistEntity.artist.id!);
 
-                var unfollowSnackbar = SnackBar(
-                  content: Text(
-                    'Done unfollowing ${widget.artistEntity.artist.name}',
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  backgroundColor: Colors.blue,
-                  behavior: SnackBarBehavior.floating,
-                );
-
-                var followSnackbar = SnackBar(
-                  content: Text(
-                    'Done following ${widget.artistEntity.artist.name}',
-                    style: const TextStyle(color: Colors.white),
-                  ),
-                  backgroundColor: AppColors.primary,
-                  behavior: SnackBarBehavior.floating,
-                );
-
-                ScaffoldMessenger.of(context).showSnackBar(state.isFollowed ? unfollowSnackbar : followSnackbar);
-                // if (followStatus) {
-                // var result = await sl<FollowUnfollowArtistUseCase>()
-                //     .call(params: artist.artist.id);
-
-                // result.fold(
-                //   (l) {
-                //     var errorSnackbar = SnackBar(
-                //       content: Text(
-                //         l,
-                //         style: const TextStyle(color: Colors.black),
-                //       ),
-                //       backgroundColor: Colors.red,
-                //       behavior: SnackBarBehavior.floating,
-                //     );
-                //     ScaffoldMessenger.of(context).showSnackBar(errorSnackbar);
-                //   },
-                //   (r) {
-                //     var successSnackbar = SnackBar(
-                //       content: Text(
-                //         'Done following ${artist.artist.name}',
-                //         style: const TextStyle(color: Colors.black),
-                //       ),
-                //       backgroundColor: Colors.green,
-                //       behavior: SnackBarBehavior.floating,
-                //     );
-                //     setState(() {
-                //       followStatus = r;
-                //     });
-                //     ScaffoldMessenger.of(context).showSnackBar(successSnackbar);
-                //   },
-                // );
-                // }
+                customSnackBar(
+                    isSuccess: false,
+                    text: (state.isFollowed ? 'Done unfollowing' : 'Done following') + widget.artistEntity.artist.name!,
+                    context: context);
               },
               child: Container(
-                margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 3.h)
-                    .copyWith(left: 0),
+                margin: EdgeInsets.symmetric(horizontal: 10.w, vertical: 3.h).copyWith(left: 0),
                 padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 2.h),
                 decoration: BoxDecoration(
-                    color: state.isFollowed
-                        ? AppColors.primary
-                        : Colors.transparent,
+                    color: state.isFollowed ? AppColors.primary : Colors.transparent,
                     border: Border.all(
                       color: AppColors.primary,
                     ),
@@ -167,19 +71,11 @@ class _FollowArtistButtonState extends State<FollowArtistButton> {
                 child: state.isFollowed
                     ? Text(
                         'Unfollow',
-                        style: TextStyle(
-                            letterSpacing: 0.7,
-                            fontSize: 13.sp,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold),
+                        style: TextStyle(letterSpacing: 0.7, fontSize: 13.sp, color: Colors.white, fontWeight: FontWeight.bold),
                       )
                     : Text(
                         'Follow',
-                        style: TextStyle(
-                            letterSpacing: 0.7,
-                            fontSize: 13.sp,
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold),
+                        style: TextStyle(letterSpacing: 0.7, fontSize: 13.sp, color: AppColors.primary, fontWeight: FontWeight.bold),
                       ),
               ),
             );

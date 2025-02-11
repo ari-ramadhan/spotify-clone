@@ -9,6 +9,7 @@ import 'package:spotify_clone/domain/usecases/song/add_or_remove_favorite_song.d
 import 'package:spotify_clone/presentation/playlist/bloc/playlist_songs_cubit.dart';
 import 'package:spotify_clone/presentation/song_player/pages/song_player.dart';
 
+import '../../../core/configs/constants/app_methods.dart';
 import '../../../service_locator.dart';
 
 class PlaylistSongTileWidget extends StatefulWidget {
@@ -122,28 +123,10 @@ class _PlaylistSongTileWidgetState extends State<PlaylistSongTileWidget> {
                                 await context.read<PlaylistSongsCubit>().removeSongFromPlaylist(widget.playlistId, widget.songList[widget.index]);
                             result.fold(
                               (l) {
-                                var snackBar = SnackBar(
-                                  content: Text(
-                                    l,
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
-                                  backgroundColor: Colors.redAccent,
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
-                                );
-                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                customSnackBar(isSuccess: false, text: l, context: context);
                               },
                               (r) {
-                                var snackBar = SnackBar(
-                                  content: Text(
-                                    r,
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
-                                  backgroundColor: AppColors.primary,
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
-                                );
-                                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                                customSnackBar(isSuccess: true, text: r, context: context);
                               },
                             );
                           },
@@ -175,19 +158,7 @@ class _PlaylistSongTileWidgetState extends State<PlaylistSongTileWidget> {
                               final snackBarMessage = newIsFavorite ? 'Added to favorites' : 'Removed from favorites';
 
                               // Tampilkan SnackBar
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    snackBarMessage,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
-                                  backgroundColor: newIsFavorite ? AppColors.primary : Colors.blue,
-                                  behavior: SnackBarBehavior.floating,
-                                ),
-                              );
+                              customSnackBar(isSuccess: true, text: snackBarMessage, context: context);
                             }
                           },
                           textStyle: TextStyle(fontSize: 12.sp),
