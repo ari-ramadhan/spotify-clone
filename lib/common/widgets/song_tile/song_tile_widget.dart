@@ -1,17 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
-import 'package:spotify_clone/common/helpers/is_dark_mode.dart';
 import 'package:spotify_clone/common/widgets/favorite_button/favorite_button.dart';
-import 'package:spotify_clone/core/configs/constants/app_methods.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
-import 'package:spotify_clone/core/configs/theme/app_colors.dart';
-// ignore: unused_import
-import 'package:spotify_clone/domain/entity/artist/artist.dart';
-import 'package:spotify_clone/domain/entity/song/song.dart';
-import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.dart';
-import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_state.dart';
 import 'package:spotify_clone/presentation/profile/pages/export.dart';
 import 'package:spotify_clone/presentation/song_player/pages/song_player.dart';
 

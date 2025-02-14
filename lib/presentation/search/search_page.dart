@@ -22,6 +22,8 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
   bool _isNotEmpty = false;
+  late FocusNode _focusNode;
+  bool _isFocused = false;
 
   final SearchCubit searchCubit = SearchCubit();
 
@@ -33,11 +35,25 @@ class _SearchPageState extends State<SearchPage> {
         _isNotEmpty = _searchController.text.isNotEmpty;
       });
     });
+    _focusNode = FocusNode();
+
+    // Listen for focus changes
+    _focusNode.addListener(() {
+      setState(() {
+        _isFocused = _focusNode.hasFocus;
+      });
+      if (_isFocused) {
+        print('TextField is focused');
+      } else {
+        print('TextField is not focused');
+      }
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
+    _focusNode.dispose();
     _searchController.dispose();
   }
 
@@ -72,24 +88,42 @@ class _SearchPageState extends State<SearchPage> {
                             SizedBox(
                               width: 8.w,
                             ),
+                            Container(
+                              margin: EdgeInsets.all(4.sp),
+                              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5.sp),
+                                color: Colors.grey,
+                              ),
+                              child: Text('Favorite artist\'s popular songs'),
+                            ),
                             Expanded(
                               child: TextField(
+                                focusNode: _focusNode,
                                 controller: _searchController,
                                 onChanged: (value) {
                                   if (value.length >= 4) {
                                     searchCubit.search(value);
                                   }
                                 },
-                                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, letterSpacing: 0.4),
+                                style: TextStyle(
+                                    fontSize: 14.sp,
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 0.4),
                                 decoration: InputDecoration(
                                   isDense: true,
-                                  contentPadding: EdgeInsets.symmetric(vertical: 5.6.h),
+                                  contentPadding:
+                                      EdgeInsets.symmetric(vertical: 5.6.h),
                                   hintText: 'Find all about it..',
                                   hintStyle: TextStyle(fontSize: 14.sp),
-                                  border: const OutlineInputBorder(borderSide: BorderSide.none),
-                                  focusedBorder: const OutlineInputBorder(borderSide: BorderSide.none),
-                                  errorBorder: const OutlineInputBorder(borderSide: BorderSide.none),
-                                  enabledBorder: const OutlineInputBorder(borderSide: BorderSide.none),
+                                  border: const OutlineInputBorder(
+                                      borderSide: BorderSide.none),
+                                  focusedBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide.none),
+                                  errorBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide.none),
+                                  enabledBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide.none),
                                 ),
                               ),
                             ),
@@ -127,109 +161,118 @@ class _SearchPageState extends State<SearchPage> {
               SizedBox(
                 height: 15.h,
               ),
-              BlocBuilder<SearchCubit, SearchState>(
-                bloc: searchCubit,
-                builder: (context, state) {
-                  if (state is SearchInitial) {
-                    return SizedBox(
-                      height: 100.h,
-                      child: const Center(
-                        child: Text('Type something to search'),
-                      ),
-                    );
-                  }
-                  if (state is SearchLoading) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
-                  if (state is SearchLoaded) {
-                    final results = state.results;
-                    final songs = results['songs'] as List<SongWithFavorite>;
-                    final artists = results['artists'] as List<ArtistEntity>;
-                    final albums = results['albums'] as List<AlbumWithArtist>;
-                    final users = results['users'] as List<UserWithStatus>;
+              _isFocused && _searchController.value.text.isEmpty
+                  ? Container(
+                      child: Text('data'),
+                    )
+                  : BlocBuilder<SearchCubit, SearchState>(
+                      bloc: searchCubit,
+                      builder: (context, state) {
+                        if (state is SearchInitial) {
+                          return SizedBox(
+                            height: 100.h,
+                            child: const Center(
+                              child: Text('Type something to search'),
+                            ),
+                          );
+                        }
+                        if (state is SearchLoading) {
+                          return const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                        }
+                        if (state is SearchLoaded) {
+                          final results = state.results;
+                          final songs =
+                              results['songs'] as List<SongWithFavorite>;
+                          final artists =
+                              results['artists'] as List<ArtistEntity>;
+                          final albums =
+                              results['albums'] as List<AlbumWithArtist>;
+                          final users =
+                              results['users'] as List<UserWithStatus>;
 
-                    return ListView(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: [
-                        if (songs.isNotEmpty) ...[
-                          const EntityTitleSearch(
-                            title: 'Songs',
-                            icons: Icons.music_note,
-                          ),
-                          ...songs.map((song) => SongTileWidget(
-                                index: songs.indexOf(song),
-                                songList: songs,
-                                onSelectionChanged: (p0) {},
-                                isOnSearch: true,
-                                isShowArtist: true,
-                              )),
-                          SizedBox(
-                            height: 10.h,
-                          ),
-                        ],
-                        if (artists.isNotEmpty) ...[
-                          const EntityTitleSearch(
-                            title: 'Artists',
-                            icons: Icons.star_border_purple500_outlined,
-                          ),
-                          ...artists.map((artist) => ArtistTileWidget(
-                                artist: artist,
-                                isOnSearch: true,
-                              )),
-                          SizedBox(
-                            height: 10.h,
-                          ),
-                        ],
-                        if (albums.isNotEmpty) ...[
-                          const EntityTitleSearch(
-                            title: 'Albums',
-                            icons: Icons.album,
-                          ),
-                          ...albums.map((album) {
-                            // return ListTile(title: Text(album.name!));
-                            return AlbumListWidget(album: album.albumEntity, artist: album.artistEntity);
-                          }),
-                          SizedBox(
-                            height: 10.h,
-                          ),
-                        ],
-                        if (users.isNotEmpty) ...[
-                          const EntityTitleSearch(
-                            title: 'Users',
-                            icons: Icons.person_2_rounded,
-                          ),
-                          ...users.map(
-                            (user) => UserTileWidget(userEntity: user)
-                          ),
-                          SizedBox(
-                            height: 10.h,
-                          ),
-                        ],
-                      ],
-                    );
+                          return ListView(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            children: [
+                              if (songs.isNotEmpty) ...[
+                                const EntityTitleSearch(
+                                  title: 'Songs',
+                                  icons: Icons.music_note,
+                                ),
+                                ...songs.map((song) => SongTileWidget(
+                                      index: songs.indexOf(song),
+                                      songList: songs,
+                                      onSelectionChanged: (p0) {},
+                                      isOnSearch: true,
+                                      isShowArtist: true,
+                                    )),
+                                SizedBox(
+                                  height: 10.h,
+                                ),
+                              ],
+                              if (artists.isNotEmpty) ...[
+                                const EntityTitleSearch(
+                                  title: 'Artists',
+                                  icons: Icons.star_border_purple500_outlined,
+                                ),
+                                ...artists.map((artist) => ArtistTileWidget(
+                                      artist: artist,
+                                      isOnSearch: true,
+                                    )),
+                                SizedBox(
+                                  height: 10.h,
+                                ),
+                              ],
+                              if (albums.isNotEmpty) ...[
+                                const EntityTitleSearch(
+                                  title: 'Albums',
+                                  icons: Icons.album,
+                                ),
+                                ...albums.map((album) {
+                                  // return ListTile(title: Text(album.name!));
+                                  return AlbumListWidget(
+                                      album: album.albumEntity,
+                                      artist: album.artistEntity);
+                                }),
+                                SizedBox(
+                                  height: 10.h,
+                                ),
+                              ],
+                              if (users.isNotEmpty) ...[
+                                const EntityTitleSearch(
+                                  title: 'Users',
+                                  icons: Icons.person_2_rounded,
+                                ),
+                                ...users.map(
+                                    (user) => UserTileWidget(userEntity: user)),
+                                SizedBox(
+                                  height: 10.h,
+                                ),
+                              ],
+                            ],
+                          );
 
-                    // return ListView.builder(
-                    //   shrinkWrap: true,
-                    //   itemCount: _isNotEmpty ? state.songs.length : 0,
-                    //   itemBuilder: (context, index) {
-                    //     var song = state.songs[index].song;
+                          // return ListView.builder(
+                          //   shrinkWrap: true,
+                          //   itemCount: _isNotEmpty ? state.songs.length : 0,
+                          //   itemBuilder: (context, index) {
+                          //     var song = state.songs[index].song;
 
-                    //     return SongTileWidget(
-                    //       index: index,
-                    //       songList: state.songs,
-                    //       isShowArtist: true,
-                    //       isOnSearch: true,
-                    //       onSelectionChanged: (p0) {},
-                    //     );
-                    //   },
-                    // );
-                  }
-                  return Container();
-                },
-              )
+                          //     return SongTileWidget(
+                          //       index: index,
+                          //       songList: state.songs,
+                          //       isShowArtist: true,
+                          //       isOnSearch: true,
+                          //       onSelectionChanged: (p0) {},
+                          //     );
+                          //   },
+                          // );
+                        }
+                        return Container();
+                      },
+                    )
             ],
           ),
         ),
@@ -262,7 +305,8 @@ class AlbumListWidget extends StatelessWidget {
         );
       },
       splashColor: Colors.transparent,
-      padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 5.h).copyWith(right: 6.5.w),
+      padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 5.h)
+          .copyWith(right: 6.5.w),
       child: Row(
         children: [
           Container(
@@ -357,7 +401,11 @@ class EntityTitleSearch extends StatelessWidget {
           SizedBox(
             width: 5.w,
           ),
-          Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15.sp, color: Colors.white70)),
+          Text(title,
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 15.sp,
+                  color: Colors.white70)),
         ],
       ),
     );

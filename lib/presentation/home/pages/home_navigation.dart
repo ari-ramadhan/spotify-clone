@@ -77,7 +77,12 @@ class _HomeNavigationState extends State<HomeNavigation> {
         ,
         ProfilePage(
           hideBackButton: true,
-          userEntity: UserWithStatus(userEntity: UserEntity(userId: supabase.auth.currentUser!.id, fullName: fullName, email: email), isFollowed: false) ,
+          userEntity: UserWithStatus(
+              userEntity: UserEntity(
+                  userId: supabase.auth.currentUser!.id,
+                  fullName: fullName,
+                  email: email),
+              isFollowed: false),
         ),
         Scaffold(
           body: Center(

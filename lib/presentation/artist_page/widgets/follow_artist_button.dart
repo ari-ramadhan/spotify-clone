@@ -55,8 +55,8 @@ class _FollowArtistButtonState extends State<FollowArtistButton> {
                 context.read<FollowButtonCubit>().followButtonUpdated(widget.artistEntity.artist.id!);
 
                 customSnackBar(
-                    isSuccess: false,
-                    text: (state.isFollowed ? 'Done unfollowing' : 'Done following') + widget.artistEntity.artist.name!,
+                    isSuccess: true,
+                    text: (state.isFollowed ? 'Done unfollowing ' : 'Done following ') + widget.artistEntity.artist.name!,
                     context: context);
               },
               child: Container(

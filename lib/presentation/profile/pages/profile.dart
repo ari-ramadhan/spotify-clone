@@ -415,6 +415,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               playlistEntity: playlist, // Pass the playlist object
                               userEntity: isCurrentUser ? UserEntity(email: email, fullName: fullName, userId: userId) : widget.userEntity.userEntity,
                               onPlaylistDeleted: () {
+
                                 // Refresh PlaylistView
                                 context.read<PlaylistCubit>().getCurrentuserPlaylist('');
                                 Navigator.pop(context); // Pop back to PlaylistView

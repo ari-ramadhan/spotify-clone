@@ -29,7 +29,7 @@ class ArtistAlbum extends StatelessWidget {
     Map<String, Color> gradientAcak = AppColors.gradientList.first;
 
     return Scaffold(
-      backgroundColor: AppColors.medDarkBackground,
+      backgroundColor: AppColors.darkBackground,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
