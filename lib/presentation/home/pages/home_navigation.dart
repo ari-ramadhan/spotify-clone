@@ -5,7 +5,7 @@ import 'package:spotify_clone/presentation/home/pages/home.dart';
 import 'package:spotify_clone/presentation/search/search_page.dart';
 
 class HomeNavigation extends StatefulWidget {
-  const HomeNavigation({Key? key}) : super(key: key);
+  const HomeNavigation({super.key});
 
   @override
   _HomeNavigationState createState() => _HomeNavigationState();
@@ -65,7 +65,7 @@ class _HomeNavigationState extends State<HomeNavigation> {
     return Scaffold(
       body: [
         const HomePage(),
-        SearchPage()
+        const SearchPage()
         // Scaffold(),
         // Scaffold(
         //   body: Center(

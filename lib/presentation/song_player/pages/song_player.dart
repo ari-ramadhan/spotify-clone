@@ -7,13 +7,8 @@ import 'package:spotify_clone/common/widgets/appbar/app_bar.dart';
 import 'package:spotify_clone/common/widgets/favorite_button/favorite_button.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/core/configs/theme/app_colors.dart';
-import 'package:spotify_clone/data/models/artist/artist.dart';
-import 'package:spotify_clone/data/repository/auth/auth_service.dart';
-import 'package:spotify_clone/domain/entity/artist/artist.dart';
-import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/domain/usecases/song/add_recent_song.dart';
-import 'package:spotify_clone/main.dart';
 import 'package:spotify_clone/presentation/artist_page/pages/artist_page.dart';
 import 'package:spotify_clone/presentation/song_player/bloc/song_player_cubit.dart';
 import 'package:spotify_clone/presentation/song_player/bloc/song_player_state.dart';
@@ -24,10 +19,10 @@ class SongPlayerPage extends StatefulWidget {
   final int startIndex;
 
   const SongPlayerPage({
-    Key? key,
+    super.key,
     required this.songs,
     required this.startIndex,
-  }) : super(key: key);
+  });
 
   @override
   _SongPlayerPageState createState() => _SongPlayerPageState();

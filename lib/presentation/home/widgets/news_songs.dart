@@ -5,7 +5,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:spotify_clone/common/helpers/is_dark_mode.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/core/configs/theme/app_colors.dart';
-import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/presentation/home/bloc/news_song/news_songs_cubit.dart';
 import 'package:spotify_clone/presentation/home/bloc/news_song/news_songs_state.dart';
@@ -19,7 +18,7 @@ class NewsSongs extends StatelessWidget {
     return BlocBuilder<NewsSongsCubit, NewsSongsState>(
       builder: (context, state) {
         if (state is NewsSongsLoading) {
-          return Center(child: const CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         if (state is NewsSongsLoaded) {
@@ -72,14 +71,14 @@ class NewsSongs extends StatelessWidget {
         right: index == (totalSongs - 1) ? 10.w : 0,
       ),
       child: SizedBox(
-        width: 126.w,
+        width: 111.w,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(25.sp),
+                  borderRadius: BorderRadius.circular(20.sp),
                   image: DecorationImage(
                     fit: BoxFit.cover,
                     image: CachedNetworkImageProvider('${AppURLs.supabaseCoverStorage}${song.song.artist} - ${song.song.title}.jpg'),

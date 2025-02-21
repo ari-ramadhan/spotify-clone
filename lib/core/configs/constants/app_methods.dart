@@ -1,14 +1,11 @@
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
-import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/domain/usecases/playlist/batch_add_to_playlist.dart';
-import 'package:spotify_clone/presentation/playlist/pages/playlist.dart';
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_state.dart';
 import 'package:spotify_clone/presentation/profile/widgets/PlaylistTileWidget.dart';
@@ -109,48 +106,44 @@ Future<Object?> blurryDialogForSongTile({
                       SizedBox(
                         height: 4.h,
                       ),
-                      Positioned(
-                        bottom: 0,
-                        left: 0,
-                        child: Padding(
-                          padding: EdgeInsets.only(left: 12.w, bottom: 15.h),
-                          child: Row(
-                            children: [
-                              Container(
-                                height: 40.w,
-                                width: 40.w,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: CachedNetworkImageProvider(
-                                        '${AppURLs.supabaseCoverStorage}${song.song.artist} - ${song.song.title}.jpg',
-                                      )),
+                      Padding(
+                        padding: EdgeInsets.only(left: 12.w, bottom: 15.h),
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 40.w,
+                              width: 40.w,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: CachedNetworkImageProvider(
+                                      '${AppURLs.supabaseCoverStorage}${song.song.artist} - ${song.song.title}.jpg',
+                                    )),
+                              ),
+                            ),
+                            SizedBox(
+                              width: 9.w,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  // padding: EdgeInsets.symmetric(horizontal: 4.w),
+                                  child: Text(
+                                    '${song.song.artist}\'s',
+                                    style: TextStyle(fontWeight: FontWeight.w500, color: Colors.white70, fontSize: 11.2.sp),
+                                  ),
                                 ),
-                              ),
-                              SizedBox(
-                                width: 9.w,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    // padding: EdgeInsets.symmetric(horizontal: 4.w),
-                                    child: Text(
-                                      '${song.song.artist}\'s',
-                                      style: TextStyle(fontWeight: FontWeight.w500, color: Colors.white70, fontSize: 11.2.sp),
-                                    ),
+                                Container(
+                                  // padding: EdgeInsets.symmetric(horizontal: 4.w),
+                                  child: Text(
+                                    song.song.title,
+                                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.sp, letterSpacing: 0.4),
                                   ),
-                                  Container(
-                                    // padding: EdgeInsets.symmetric(horizontal: 4.w),
-                                    child: Text(
-                                      '${song.song.title}',
-                                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.sp, letterSpacing: 0.4),
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
-                          ),
+                                ),
+                              ],
+                            )
+                          ],
                         ),
                       ),
                     ],

@@ -20,4 +20,11 @@ class AlbumRepositoryImpl extends AlbumRepository {
     return await sl<SongSupabaseService>().getArtistSingleSongs(artistId);
   }
 
+  @override
+  Future<Either> getTopAlbums() async  {
+    return await sl<AlbumSupabaseService>().getTopAlbums();
+  }
+
+
+
 }

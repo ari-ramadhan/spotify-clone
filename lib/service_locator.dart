@@ -17,11 +17,13 @@ import 'package:spotify_clone/domain/repository/song/song.dart';
 import 'package:spotify_clone/domain/repository/user/user.dart';
 import 'package:spotify_clone/domain/usecases/album/get_all_songs.dart';
 import 'package:spotify_clone/domain/usecases/album/get_artist_album.dart';
+import 'package:spotify_clone/domain/usecases/album/get_top_albums.dart';
 import 'package:spotify_clone/domain/usecases/artist/follow_unfollow_artist.dart';
 import 'package:spotify_clone/domain/usecases/artist/get_all_artist.dart';
 import 'package:spotify_clone/domain/usecases/artist/get_artist_info.dart';
 import 'package:spotify_clone/domain/usecases/artist/get_followed_artists.dart';
 import 'package:spotify_clone/domain/usecases/artist/get_recommended_artist_based_on_playlist.dart';
+import 'package:spotify_clone/domain/usecases/artist/hot_artists.dart';
 import 'package:spotify_clone/domain/usecases/artist/is_following_artist.dart';
 import 'package:spotify_clone/domain/usecases/auth/get_user.dart';
 import 'package:spotify_clone/domain/usecases/auth/signin.dart';
@@ -44,6 +46,8 @@ import 'package:spotify_clone/domain/usecases/song/get_playlist_songs.dart';
 import 'package:spotify_clone/domain/usecases/song/get_recent_songs.dart';
 import 'package:spotify_clone/domain/usecases/song/is_favorite_song.dart';
 import 'package:spotify_clone/domain/usecases/song/news_songs.dart';
+import 'package:spotify_clone/domain/usecases/song/popular_songs_from_fav_artist.dart';
+import 'package:spotify_clone/domain/usecases/song/search_song.dart';
 import 'package:spotify_clone/domain/usecases/song/search_song_by_keyword.dart';
 import 'package:spotify_clone/domain/usecases/song/user_favorite_songs.dart';
 import 'package:spotify_clone/domain/usecases/user/check_following_status.dart';
@@ -119,6 +123,12 @@ Future<void> initializeDependencies () async {
   sl.registerSingleton<AddRecentSongUseCase>(
     AddRecentSongUseCase()
   );
+  sl.registerSingleton<SearchSongUseCase>(
+    SearchSongUseCase()
+  );
+  sl.registerSingleton<PopularSongsFromFavArtistUseCase>(
+    PopularSongsFromFavArtistUseCase()
+  );
 
 
   // artist
@@ -149,6 +159,9 @@ Future<void> initializeDependencies () async {
   sl.registerSingleton<GetArtistSingleSongs>(
     GetArtistSingleSongs()
   );
+  sl.registerSingleton<HotArtistsUseCase>(
+    HotArtistsUseCase()
+  );
 
   // album
   sl.registerSingleton<AlbumRepository>(
@@ -159,6 +172,9 @@ Future<void> initializeDependencies () async {
   );
   sl.registerSingleton<GetArtistAlbumUseCase>(
     GetArtistAlbumUseCase()
+  );
+  sl.registerSingleton<GetTopAlbumsUseCase>(
+    GetTopAlbumsUseCase()
   );
 
   // playlist

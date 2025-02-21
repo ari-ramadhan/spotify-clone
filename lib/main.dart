@@ -4,12 +4,13 @@ import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/data/repository/auth/auth_service.dart';
 import 'package:spotify_clone/presentation/genre_picks/pages/genre_picks.dart';
 import 'package:spotify_clone/presentation/home/bloc/all_song/allSong_cubit.dart';
+import 'package:spotify_clone/presentation/home/bloc/hot_artists/hot_artists_cubit.dart';
 import 'package:spotify_clone/presentation/home/bloc/news_song/news_songs_cubit.dart';
+import 'package:spotify_clone/presentation/home/bloc/top_album/top_album_cubit.dart';
 import 'package:spotify_clone/presentation/home/pages/home_navigation.dart';
 import 'package:spotify_clone/presentation/playlist/bloc/playlist_songs_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/profile_image_upload/profile_image_cubit.dart';
-import 'package:spotify_clone/presentation/profile/bloc/profile_image_upload/profile_image_state.dart';
 import 'package:spotify_clone/presentation/song_player/bloc/song_player_cubit.dart';
 
 Future<void> main() async {
@@ -77,6 +78,8 @@ class _MyAppState extends State<MyApp> {
             BlocProvider(create: (_) => ThemeCubit()),
             BlocProvider(create: (_) => SongPlayerCubit()),
             BlocProvider(create: (_) => NewsSongsCubit()..getNewsSongs()),
+            BlocProvider(create: (_) => HotArtistsCubit()..getHotArtists()),
+            BlocProvider(create: (_) => TopAlbumsCubit()..getTopAlbums()),
             BlocProvider(create: (_) => AllSongCubit()..getAllSong()),
             BlocProvider(create: (_) => PlaylistCubit()),
             BlocProvider(create: (_) => PlaylistSongsCubit()),
@@ -88,7 +91,7 @@ class _MyAppState extends State<MyApp> {
               darkTheme: AppTheme.darkTheme,
               themeMode: mode,
               debugShowCheckedModeBanner: false,
-              home: _isLoggedIn ? _onBoarded ? const HomeNavigation() : GenrePicks() : const SplashPage(),
+              home: _isLoggedIn ? _onBoarded ? const HomeNavigation() : const GenrePicks() : const SplashPage(),
               // home: GenrePicks(),
             ),
           ),

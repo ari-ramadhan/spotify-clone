@@ -1,6 +1,4 @@
-import 'package:spotify_clone/domain/entity/album/album.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
-import 'package:spotify_clone/domain/entity/song/song.dart';
 
 abstract class SimilarArtistState {}
 

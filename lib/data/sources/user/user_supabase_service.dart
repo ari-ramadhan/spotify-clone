@@ -117,7 +117,7 @@ class UserSupabaseServiceImpl implements UserSupabaseService {
       var following = await getFollowing(userId);
       return Right(FollowerAndFollowing(follower: follower, following: following));
     } catch (e) {
-      return Left('error while getting follower and following list');
+      return const Left('error while getting follower and following list');
     }
   }
 
@@ -146,7 +146,7 @@ class UserSupabaseServiceImpl implements UserSupabaseService {
 
       return Right(publicUrl);
     } catch (e) {
-      return Left('error occured on your code');
+      return const Left('error occured on your code');
     }
   }
 
@@ -172,9 +172,9 @@ class UserSupabaseServiceImpl implements UserSupabaseService {
         }
       }
 
-      return Right('Done picking favorite genre\'s');
+      return const Right('Done picking favorite genre\'s');
     } catch (e) {
-      return Left('Something wrong..');
+      return const Left('Something wrong..');
     }
   }
 }

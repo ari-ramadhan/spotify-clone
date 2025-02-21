@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:spotify_clone/common/helpers/is_dark_mode.dart';
-import 'package:spotify_clone/common/widgets/favorite_button/favorite_button.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
-import 'package:spotify_clone/core/configs/theme/app_colors.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/presentation/home/bloc/all_song/allSong_cubit.dart';
 import 'package:spotify_clone/presentation/home/bloc/all_song/allSong_state.dart';
-import 'package:spotify_clone/presentation/song_player/pages/song_player.dart';
 
 class AllSongPage extends StatefulWidget {
   const AllSongPage({super.key});

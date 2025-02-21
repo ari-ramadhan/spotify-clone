@@ -1,8 +1,5 @@
 import 'dart:math';
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/domain/usecases/user/update_favorite_genres.dart';
@@ -11,7 +8,7 @@ import 'package:spotify_clone/presentation/home/pages/home_navigation.dart';
 import '../../../core/configs/constants/app_methods.dart';
 
 class GenrePicks extends StatefulWidget {
-  GenrePicks({Key? key}) : super(key: key);
+  const GenrePicks({super.key});
 
   @override
   State<GenrePicks> createState() => _GenrePicksState();
@@ -176,7 +173,7 @@ class _GenrePicksState extends State<GenrePicks> {
                     }
                     Navigator.of(context).push(
                       MaterialPageRoute(
-                        builder: (context) => HomeNavigation(),
+                        builder: (context) => const HomeNavigation(),
                       ),
                     );
                   },
@@ -210,7 +207,7 @@ class GenreChip extends StatefulWidget {
   final bool isSelected;
   final bool enabled;
   final Function(String?) onSelectionChanged;
-  const GenreChip({Key? key, required this.genre, this.enabled = true, this.isSelected = false, required this.onSelectionChanged}) : super(key: key);
+  const GenreChip({super.key, required this.genre, this.enabled = true, this.isSelected = false, required this.onSelectionChanged});
 
   @override
   State<GenreChip> createState() => _GenreChipState();

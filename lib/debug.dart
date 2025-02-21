@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Debug extends StatelessWidget {
-  const Debug({Key? key}) : super(key: key);
+  const Debug({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +28,7 @@ class Debug extends StatelessWidget {
                 child: Container(
                   width: 100,
                   height: 100,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     color: Colors.red,
                     shape: BoxShape.circle,
                   ),

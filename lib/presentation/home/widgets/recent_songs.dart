@@ -1,16 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:spotify_clone/common/helpers/is_dark_mode.dart';
-import 'package:spotify_clone/common/widgets/favorite_button/favorite_button.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
-import 'package:spotify_clone/core/configs/theme/app_colors.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
-import 'package:spotify_clone/presentation/home/bloc/all_song/allSong_cubit.dart';
-import 'package:spotify_clone/presentation/home/bloc/all_song/allSong_state.dart';
 import 'package:spotify_clone/presentation/home/bloc/recent_songs/recent_songs_cubit.dart';
 import 'package:spotify_clone/presentation/home/bloc/recent_songs/recent_songs_state.dart';
-import 'package:spotify_clone/presentation/song_player/pages/song_player.dart';
 
 class RecentSongs extends StatefulWidget {
   const RecentSongs({super.key});
@@ -53,7 +47,7 @@ class _RecentSongsState extends State<RecentSongs> {
                             Text(
                               'Recently Played',
                               style: TextStyle(
-                                fontSize: 16.2.sp,
+                                fontSize: 17.sp,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),

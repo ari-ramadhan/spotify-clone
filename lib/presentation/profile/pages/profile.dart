@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/data/models/auth/user.dart';
 import 'package:spotify_clone/domain/usecases/user/update_username.dart';
-import 'package:spotify_clone/presentation/home/bloc/all_song/allSong_cubit.dart';
 
 import 'export.dart';
 
@@ -112,7 +111,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                           ],
                           child: BlocBuilder<PlaylistCubit, PlaylistState>(
-                            key: ValueKey(PlaylistState),
+                            key: const ValueKey(PlaylistState),
                             builder: (context, state) => Column(
                               children: [
                                 Padding(

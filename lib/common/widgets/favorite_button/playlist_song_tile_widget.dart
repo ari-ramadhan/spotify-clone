@@ -167,7 +167,7 @@ class _PlaylistSongTileWidgetState extends State<PlaylistSongTileWidget> {
                               Icon(
                                 songList.isFavorite ? Icons.favorite_rounded : Icons.favorite_outline_rounded,
                                 size: 17.sp,
-                                color: songList.isFavorite ? AppColors.primary : IconThemeData().color,
+                                color: songList.isFavorite ? AppColors.primary : const IconThemeData().color,
                               ),
                               SizedBox(
                                 width: 10.w,

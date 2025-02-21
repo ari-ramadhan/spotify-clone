@@ -1,4 +1,3 @@
-import 'package:spotify_clone/domain/entity/song/song.dart';
 
 abstract class SearchState {}
 

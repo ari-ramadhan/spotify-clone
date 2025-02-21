@@ -1,18 +1,12 @@
-import 'dart:ui';
-
-import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:spotify_clone/common/helpers/is_dark_mode.dart';
-import 'package:spotify_clone/common/widgets/appbar/app_bar.dart';
-import 'package:spotify_clone/core/configs/assets/app_images.dart';
-import 'package:spotify_clone/core/configs/assets/app_vectors.dart';
-import 'package:spotify_clone/core/configs/theme/app_colors.dart';
+import 'package:spotify_clone/common/helpers/export.dart';
+import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/data/repository/auth/auth_service.dart';
-import 'package:spotify_clone/presentation/home/widgets/news_songs.dart';
-import 'package:spotify_clone/presentation/home/widgets/all_song.dart';
+import 'package:spotify_clone/presentation/album/page/artist_album.dart';
+import 'package:spotify_clone/presentation/home/bloc/top_album/top_album_state.dart';
+import 'package:spotify_clone/presentation/home/widgets/hot_artists.dart';
 import 'package:spotify_clone/presentation/home/widgets/recent_songs.dart';
+
+import '../bloc/top_album/top_album_cubit.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,7 +15,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   String fullName = '';
@@ -43,7 +38,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController =
+        TabController(length: 2, vsync: this); // Updated length to 2
   }
 
   @override
@@ -81,37 +77,31 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         ),
       ),
       body: SingleChildScrollView(
+        physics: PageScrollPhysics(),
+
+
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // SizedBox(
+            //   height: 20.h,
+            // ),
             carousel(),
             _tabs(),
             SizedBox(
-              height: 190.h,
+              height: 170.h,
               child: TabBarView(
                 controller: _tabController,
-                children: [
-                  const NewsSongs(),
-                  Container(
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Comming soon..',
-                      style: TextStyle(fontSize: 20.sp, color: Colors.grey),
-                    ),
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Comming soon..',
-                      style: TextStyle(fontSize: 20.sp, color: Colors.grey),
-                    ),
-                  ),
-                  Container(
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Comming soon..',
-                      style: TextStyle(fontSize: 20.sp, color: Colors.grey),
-                    ),
-                  ),
+                children: const [
+                  NewsSongs(),
+                  HotArtists(),
+                  // Container(
+                  //   alignment: Alignment.center,
+                  //   child: Text(
+                  //     'Comming soon..',
+                  //     style: TextStyle(fontSize: 20.sp, color: Colors.grey),
+                  //   ),
+                  // ),
                 ],
               ),
             ),
@@ -120,9 +110,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             ),
             const RecentSongs(),
             SizedBox(
-              height: 10.h,
+              height: 27.h,
             ),
-            const AllSongPage(),
+
+            TopAlbum(),
+            SizedBox(
+              height: 30.h,
+            )
           ],
         ),
       ),
@@ -157,11 +151,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 Align(
                   alignment: Alignment.topRight,
                   child: Container(
-                    padding: EdgeInsets.only(top: e['artist'] == AppImages.homeArtist3 ? 10.h : 0),
+                    padding: EdgeInsets.only(
+                        top: e['artist'] == AppImages.homeArtist3 ? 10.h : 0),
                     child: Padding(
                       padding: EdgeInsets.only(right: 10.w),
                       child: SizedBox(
-                        height: e['artist'] == AppImages.homeArtist3 ? 121.h : 131.h,
+                        height: e['artist'] == AppImages.homeArtist3
+                            ? 121.h
+                            : 131.h,
                         child: Image.asset(
                           e['artist'],
                         ),
@@ -187,51 +184,209 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Widget _tabs() {
-    return TabBar(
-      controller: _tabController,
-      isScrollable: true,
-      indicatorColor: AppColors.primary,
-      indicatorPadding: EdgeInsets.symmetric(horizontal: 30.w),
-      labelColor: context.isDarkMode ? Colors.white : Colors.black,
-      padding: EdgeInsets.symmetric(vertical: 14.h, horizontal: _tabController.index == 0 ? 10.sp : 16.sp).copyWith(bottom: 17.h),
-      tabs: [
-        Padding(
+    return SizedBox(
+      width: double.infinity,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 14.w),
+        child: TabBar(
+          controller: _tabController,
+          isScrollable: true,
+          tabAlignment: TabAlignment.start,
+          indicatorSize: TabBarIndicatorSize.label,
+
+          indicatorColor: Colors.transparent,
+          // indicatorPadding: EdgeInsets.symmetric(horizontal: 30.w),
+          labelColor: context.isDarkMode ? Colors.white : Colors.black,
           padding: EdgeInsets.symmetric(
-            horizontal: 10.w,
-          ).copyWith(left: 0),
-          child: Text(
-            'News',
-            style: TextStyle(fontSize: 16.2.sp, fontWeight: FontWeight.w500),
-          ),
+                  vertical: 8.h,
+                  horizontal: _tabController.index == 0 ? 10.sp : 16.sp)
+              .copyWith(bottom: 10.h),
+          tabs: [
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 0.w,
+              ),
+              child: Text(
+                'News',
+                style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 0.w,
+              ),
+              child: Text(
+                'Hot Artists',
+                style: TextStyle(fontSize: 17.sp, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 10.w,
-          ),
-          child: Text(
-            'Videos',
-            style: TextStyle(fontSize: 16.2.sp, fontWeight: FontWeight.w500),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 6.w,
-          ),
-          child: Text(
-            'Artist',
-            style: TextStyle(fontSize: 16.2.sp, fontWeight: FontWeight.w500),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(
-            horizontal: 10.w,
-          ),
-          child: Text(
-            'Podcast',
-            style: TextStyle(fontSize: 16.2.sp, fontWeight: FontWeight.w500),
-          ),
-        ),
-      ],
+      ),
+    );
+  }
+}
+
+class TopAlbum extends StatelessWidget {
+  const TopAlbum({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<TopAlbumsCubit, TopAlbumsState>(
+      builder: (context, state) {
+        if (state is TopAlbumsLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (state is TopAlbumsLoaded) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.only(
+                  left: 20.w,
+                ),
+                child: Text(
+                  'Most Popular Album',
+                  style: TextStyle(
+                    fontSize: 21.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 16.h,
+              ),
+              GridView.builder(
+                itemCount: state.albums.take(6).length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 22.w,
+                ),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 18.w,
+                  crossAxisSpacing: 18.w,
+                  childAspectRatio: 0.75, // Adjust the aspect ratio as needed
+                ),
+                itemBuilder: (context, index) {
+                  var album = state.albums[index].albumEnitity;
+                  var artist = state.albums[index].artistEntity;
+
+                  // print('${AppURLs.supabaseAlbumStorage}${artistName} - ${album.name}.jpg');
+
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ArtistAlbum(
+                            artist: artist,
+                            album: album,
+                          ),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      height: 100.h,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(18.sp),
+                        image: DecorationImage(
+                          fit: BoxFit.fitHeight,
+                          image: NetworkImage(
+                              '${AppURLs.supabaseAlbumStorage}${artist.name} - ${album.name}.jpg'),
+                        ),
+                      ),
+                      child: Stack(
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(15.sp),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(18.sp),
+                              gradient: LinearGradient(
+                                begin: Alignment.center,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  AppColors.darkBackground.withOpacity(0),
+                                  // AppColors.darkBackground.withOpacity(0.6),
+                                  AppColors.darkBackground.withOpacity(1),
+                                ],
+                              ),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Icon(
+                                  Icons.library_music,
+                                  color: AppColors.primary,
+                                  size: 20.sp,
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      album.name.toString(),
+                                      style: TextStyle(
+                                          fontSize: album.name!.length > 13
+                                              ? 12.sp
+                                              : 14.sp,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(
+                                      height: 7.h,
+                                    ),
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          height: 16.sp,
+                                          width: 16.sp,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            image: DecorationImage(
+                                              fit: BoxFit.cover,
+                                              image: NetworkImage(
+                                                '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 10.w,
+                                        ),
+                                        Expanded(
+                                            child: Text(
+                                          artist.name!,
+                                          style: TextStyle(
+                                              fontSize: 11.sp,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.white),
+                                        ))
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          );
+        }
+
+        return const Center(
+          child: Text('No albums available.'),
+        );
+      },
     );
   }
 }

@@ -6,11 +6,8 @@ import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/album_song_tile/album_tile_widget.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
-import 'package:spotify_clone/data/repository/auth/auth_service.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
-import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
-import 'package:spotify_clone/domain/usecases/artist/follow_unfollow_artist.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_cubit.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_state.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/artist_page_cubit.dart';
@@ -23,7 +20,7 @@ import 'package:spotify_clone/presentation/artist_page/widgets/follow_artist_but
 
 class ArtistPage extends StatefulWidget {
   final int artistId;
-  const ArtistPage({Key? key, required this.artistId,}) : super(key: key);
+  const ArtistPage({super.key, required this.artistId,});
 
   @override
   _ArtistPageState createState() => _ArtistPageState();
@@ -345,7 +342,6 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
       ),
     );
 
-    ;
   }
 
   Padding artistInfo(ArtistWithFollowing artist) {

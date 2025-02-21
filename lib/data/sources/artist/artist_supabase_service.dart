@@ -12,6 +12,7 @@ abstract class ArtistSupabaseService {
   Future<bool> isFollowed(int artistId);
   Future<Either> followUnfollowArtist(int artistId);
   Future<Either> getRecommendedArtistBasedOnPlaylist(List<String> artistsName);
+  Future<Either> getHotArtists();
 }
 
 class ArtistSupabaseServiceImpl extends ArtistSupabaseService {
@@ -46,10 +47,10 @@ class ArtistSupabaseServiceImpl extends ArtistSupabaseService {
       }).toList();
 
       for (final artistModel in data) {
-
         bool followStatus = await isFollowed(artistModel.id!);
 
-        artistList.add(ArtistWithFollowing(artistModel.toEntity(), followStatus));
+        artistList
+            .add(ArtistWithFollowing(artistModel.toEntity(), followStatus));
       }
 
       return Right(artistList);
@@ -61,17 +62,25 @@ class ArtistSupabaseServiceImpl extends ArtistSupabaseService {
   @override
   Future<Either> getFollowedArtists(String userId) async {
     try {
-        print('aa');
+      print('aa');
       List<ArtistWithFollowing> artistList = [];
 
-      var artistIdResult = await supabase.from('artist_follower').select().match({
-        'user_id' : userId == '' ? supabase.auth.currentUser!.id : userId
+      var artistIdResult = await supabase
+          .from('artist_follower')
+          .select()
+          .match({
+        'user_id': userId == '' ? supabase.auth.currentUser!.id : userId
       });
 
-      for (var artistId in artistIdResult){
-        var artist = await supabase.from('artist').select().eq('id', artistId['artist_id']).single();
+      for (var artistId in artistIdResult) {
+        var artist = await supabase
+            .from('artist')
+            .select()
+            .eq('id', artistId['artist_id'])
+            .single();
         print(artistId.toString());
-        artistList.add(ArtistWithFollowing(ArtistModel.fromJson(artist).toEntity(), true));
+        artistList.add(
+            ArtistWithFollowing(ArtistModel.fromJson(artist).toEntity(), true));
       }
 
       return Right(artistList);
@@ -115,29 +124,53 @@ class ArtistSupabaseServiceImpl extends ArtistSupabaseService {
 
       return Right(followStatus);
     } catch (e) {
-      return Left('An error occured when following an artist');
+      return const Left('An error occured when following an artist');
     }
   }
 
   @override
-  Future<Either> getRecommendedArtistBasedOnPlaylist(List<String> artistsName) async {
+  Future<Either> getRecommendedArtistBasedOnPlaylist(
+      List<String> artistsName) async {
     try {
-
-      if (artistsName.isEmpty){
+      if (artistsName.isEmpty) {
         return const Left('no artists founded according this playlist');
       } else {
         List<ArtistEntity> artistMap = [];
 
-        for (var artist in artistsName){
-          var result = await supabase.from('artist').select().eq('name', artist).single();
+        for (var artist in artistsName) {
+          var result = await supabase
+              .from('artist')
+              .select()
+              .eq('name', artist)
+              .single();
           artistMap.add(ArtistModel.fromJson(result).toEntity());
         }
 
         return Right(artistMap);
       }
     } catch (e) {
-        return const Left('error occured when getting recommended artist');
+      return const Left('error occured when getting recommended artist');
+    }
+  }
 
+  @override
+  Future<Either> getHotArtists() async {
+    try {
+      final result = await supabase
+          .from('artist')
+          .select()
+          .order('name', ascending: false)
+          .limit(6);
+
+      List<ArtistEntity> artists = (result as List).map(
+        (e) {
+          return ArtistModel.fromJson(e).toEntity();
+        },
+      ).toList();
+
+      return Right(artists);
+    } catch (e) {
+      return const Left('Error while fetching artist');
     }
   }
 }

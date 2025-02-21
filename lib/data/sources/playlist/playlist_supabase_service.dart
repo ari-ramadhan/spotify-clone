@@ -107,7 +107,7 @@ class PlaylistSupabaseServiceImpl extends PlaylistSupabaseService {
       await supabase.from('playlists').update({'name': title, 'description': desc}).eq('id', playlistId);
       return const Right('Berhasil memperbarui informasi playlist');
     } on Exception catch (e) {
-      return Left('Terjadi kesalahan: ${e}');
+      return Left('Terjadi kesalahan: $e');
     }
   }
 
@@ -160,11 +160,11 @@ class PlaylistSupabaseServiceImpl extends PlaylistSupabaseService {
         return Right(songEntity);
       } else {
         print('song not found');
-        return Left('Try another keyword');
+        return const Left('Try another keyword');
       }
     } catch (e) {
       print('error');
-      return Left('Error occured while searching for song');
+      return const Left('Error occured while searching for song');
     }
   }
 
@@ -173,9 +173,9 @@ class PlaylistSupabaseServiceImpl extends PlaylistSupabaseService {
     try {
       await supabase.from('playlist_songs').delete().eq('playlist_id', playlistId).eq('song_id', songId);
 
-      return Right('Successfull deleting song from this playlist');
+      return const Right('Successfull deleting song from this playlist');
     } catch (e) {
-      return Left('error occured while deleting this song');
+      return const Left('error occured while deleting this song');
     }
   }
 

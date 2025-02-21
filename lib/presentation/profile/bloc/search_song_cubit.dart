@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:spotify_clone/domain/usecases/song/search_song_by_keyword.dart';
-import 'package:spotify_clone/presentation/search/bloc/search_state.dart';
+import 'package:spotify_clone/domain/usecases/song/search_song.dart';
 import 'package:spotify_clone/service_locator.dart';
+import 'search_song_state.dart';
 
-class SearchCubit extends Cubit<SearchState> {
-  SearchCubit() : super(SearchInitial());
+class SearchSongCubit extends Cubit<SearchSongState> {
+  SearchSongCubit() : super(SearchSongInitial());
 
   Timer? _debounce;
 
@@ -15,23 +15,23 @@ class SearchCubit extends Cubit<SearchState> {
 
     _debounce = Timer(const Duration(milliseconds: 1000), () async {
       if (keyword.isEmpty) {
-        emit(SearchInitial());
+        emit(SearchSongInitial());
         return;
       }
 
       if (!isClosed) {
-        emit(SearchLoading());
+        emit(SearchSongLoading());
       }
 
       // Simulasi pencarian (ganti dengan API call atau logika pencarian Anda)
-      final results = await sl<SearchSongByKeywordUseCase>().call(params: keyword);
+      final results = await sl<SearchSongUseCase>().call(params: keyword);
 
       results.fold(
         (l) {
-          emit(SearchError(l));
+          emit(SearchSongFailure(error: l));
         },
         (r) {
-          emit(SearchLoaded(r));
+          emit(SearchSongLoaded(songs: r));
         },
       );
     });

@@ -12,4 +12,6 @@ abstract class SongRepository {
   Future<Either> searchSongBasedOnKeyword(String playlistId);
   Future<Either> getRecentSongs();
   Future<Either> addRecentSongs(int songId);
+  Future<Either> searchSongs(String keyword);
+  Future<Either> popularSongsFromFavoriteArtists();
 }

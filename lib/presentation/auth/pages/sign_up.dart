@@ -6,14 +6,13 @@ import 'package:spotify_clone/common/widgets/button/basic_app_button.dart';
 import 'package:spotify_clone/core/configs/assets/app_vectors.dart';
 import 'package:spotify_clone/data/models/auth/create_user_request.dart';
 import 'package:spotify_clone/domain/usecases/auth/signup.dart';
-import 'package:spotify_clone/presentation/home/pages/home.dart';
 import 'package:spotify_clone/presentation/home/pages/home_navigation.dart';
 import 'package:spotify_clone/service_locator.dart';
 
 import '../../../core/configs/constants/app_methods.dart';
 
 class SignUpPage extends StatefulWidget {
-  SignUpPage({super.key});
+  const SignUpPage({super.key});
 
   @override
   State<SignUpPage> createState() => _SignUpPageState();

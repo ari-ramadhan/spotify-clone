@@ -3,7 +3,6 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:spotify_clone/common/widgets/album_song_tile/album_tile_widget.dart';
 import 'package:spotify_clone/presentation/profile/bloc/profile_image_upload/profile_image_state.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 

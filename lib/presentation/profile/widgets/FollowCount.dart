@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 
 class FollowCount extends StatelessWidget {

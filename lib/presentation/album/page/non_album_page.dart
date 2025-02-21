@@ -4,9 +4,7 @@ import 'package:spotify_clone/common/widgets/album_song_tile/album_tile_widget.d
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
 import 'package:spotify_clone/core/configs/constants/app_methods.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
-import 'package:spotify_clone/data/repository/auth/auth_service.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
-import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/presentation/album/bloc/all_songs/all_songs_cubit.dart';
 import 'package:spotify_clone/presentation/album/bloc/all_songs/all_songs_state.dart';
@@ -18,7 +16,7 @@ import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_sta
 class NonAlbumPage extends StatefulWidget {
   final ArtistEntity artist;
   final String nonAlbumPageTitle;
-  NonAlbumPage({
+  const NonAlbumPage({
     super.key,
     required this.artist,
     required this.nonAlbumPageTitle,

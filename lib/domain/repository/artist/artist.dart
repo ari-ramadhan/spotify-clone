@@ -8,5 +8,6 @@ abstract class ArtistRepository {
   Future<Either> getRecommendedArtistBasedOnPlaylist(List<String> artistsName);
   Future<Either> getAllArtist ();
   Future<Either> getFollowedArtists (String params);
+  Future<Either> getHotArtists();
 
 }

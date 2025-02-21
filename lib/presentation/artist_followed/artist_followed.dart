@@ -1,16 +1,15 @@
-import 'package:flutter/material.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/presentation/profile/bloc/followed_artists.dart/followed_song_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/followed_artists.dart/followed_song_state.dart';
 
 class ArtistFollowed extends StatelessWidget {
-  const ArtistFollowed({Key? key}) : super(key: key);
+  const ArtistFollowed({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: BasicAppbar(
+      appBar: const BasicAppbar(
         title: Text('Artists Followed'),
       ),
       body: Column(
@@ -23,7 +22,7 @@ class ArtistFollowed extends StatelessWidget {
                   return Container(
                     height: 200.h,
                     alignment: Alignment.center,
-                    child: CircularProgressIndicator(
+                    child: const CircularProgressIndicator(
                       color: AppColors.primary,
                     ),
                   );

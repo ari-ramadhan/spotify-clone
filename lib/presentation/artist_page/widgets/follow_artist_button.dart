@@ -10,7 +10,7 @@ import '../../../core/configs/constants/app_methods.dart';
 
 class FollowArtistButton extends StatefulWidget {
   final ArtistWithFollowing artistEntity;
-  const FollowArtistButton({Key? key, required this.artistEntity}) : super(key: key);
+  const FollowArtistButton({super.key, required this.artistEntity});
 
   @override
   _FollowArtistButtonState createState() => _FollowArtistButtonState();

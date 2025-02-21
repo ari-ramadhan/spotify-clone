@@ -6,7 +6,6 @@ import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/domain/entity/album/album.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
-import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/presentation/album/bloc/artist_album/artist_album_cubit.dart';
 import 'package:spotify_clone/presentation/album/bloc/artist_album/artist_album_state.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_cubit.dart';

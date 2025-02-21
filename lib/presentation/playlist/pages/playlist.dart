@@ -3,12 +3,10 @@ import 'package:spotify_clone/common/widgets/favorite_button/playlist_song_tile_
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget_selectable.dart';
 import 'package:spotify_clone/core/configs/constants/app_methods.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
-import 'package:spotify_clone/data/repository/auth/auth_service.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
 import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/entity/playlist/playlist.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
-import 'package:spotify_clone/domain/usecases/playlist/delete_playlist.dart';
 import 'package:spotify_clone/domain/usecases/playlist/update_playlist_info.dart';
 import 'package:spotify_clone/presentation/artist_page/pages/artist_page.dart';
 import 'package:spotify_clone/presentation/playlist/bloc/playlist_songs_cubit.dart';
@@ -52,23 +50,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
 
   List<SongWithFavorite> exceptionalSongs = [];
   List<SongWithFavorite> selectedSongs = [];
-
-  // String fullName = '';
-  // String email = '';
-  // String userId = '';
-  // bool isCurrentUser = false;
-
-  // Future getUserInfo() async {
-  //   List<String>? userInfo = await AuthService().getUserLoggedInInfo();
-  //   if (userInfo != null) {
-  //     setState(() {
-  //       userId = userInfo[0];
-  //       email = userInfo[1];
-  //       fullName = userInfo[2];
-  //       isCurrentUser = userInfo[0] == widget.userEntity.userId;
-  //     });
-  //   }
-  // }
 
   @override
   void initState() {
@@ -232,6 +213,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                                                   .isEmpty) {
                                                                 return 'You must add some title';
                                                               }
+                                                              return null;
                                                             },
                                                             value: playlistName,
                                                             controller:
@@ -248,7 +230,9 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                                             child:
                                                                 EditInfoField(
                                                               validator:
-                                                                  (value) {},
+                                                                  (value) {
+                                                                    return null;
+                                                                  },
                                                               value:
                                                                   playlistDesc,
                                                               isExpanded: true,
@@ -437,10 +421,10 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                 height: 10.h,
                               ),
                               Text(
-                                playlistName!,
+                                playlistName,
                                 style: TextStyle(
                                   fontSize:
-                                      playlistName!.length < 17 ? 21.sp : 17.sp,
+                                      playlistName.length < 17 ? 21.sp : 17.sp,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 0.4,
                                 ),
@@ -451,7 +435,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                               playlistDesc.isEmpty
                                   ? const SizedBox.shrink()
                                   : Text(
-                                      "~ ${playlistDesc}",
+                                      "~ $playlistDesc",
                                       style: TextStyle(
                                         fontSize: 12.sp,
                                         fontWeight: FontWeight.w500,
@@ -460,7 +444,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                       ),
                                     ),
                               playlistDesc.isEmpty
-                                  ? SizedBox.shrink()
+                                  ? const SizedBox.shrink()
                                   : SizedBox(
                                       height: 10.h,
                                     ),
@@ -536,7 +520,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                               onClosed: () {
                                                 Navigator.pop(context);
                                               },
-                                              content: Container(
+                                              content: SizedBox(
                                                 width: double.maxFinite,
                                                 child: Column(
                                                   crossAxisAlignment:
@@ -636,10 +620,10 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                                                         selectedSongs.removeWhere((song) =>
                                                                             song.song.id ==
                                                                             realList[index].song.id);
-                                                                          setState(
-                                                                              () {
-                                                                            selectedSongCount--;
-                                                                          });
+                                                                        setState(
+                                                                            () {
+                                                                          selectedSongCount--;
+                                                                        });
                                                                         print(
                                                                             'Removed: ${realList[index].song.title}');
                                                                       }
@@ -679,7 +663,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                                               .end,
                                                       children: [
                                                         Text(
-                                                          '${selectedSongCount} song selected',
+                                                          '$selectedSongCount song selected',
                                                           style: TextStyle(
                                                               fontSize: 16.sp,
                                                               color:
@@ -1163,7 +1147,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
           content: Center(
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: const [
+              children: [
                 CircularProgressIndicator(color: Colors.white),
                 SizedBox(height: 10),
                 Text(
@@ -1178,13 +1162,10 @@ class _PlaylistPageState extends State<PlaylistPage> {
     );
 
     // Melakukan query
-    var result = context
-        .read<PlaylistCubit>()
-        .deletePlaylist(widget.playlistEntity.id!);
+    var result =
+        context.read<PlaylistCubit>().deletePlaylist(widget.playlistEntity.id!);
     // Menghapus Dialog Loading
     Navigator.of(context, rootNavigator: true).pop();
-
-
 
     // Menampilkan hasil
     // result.fold(
@@ -1203,4 +1184,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
     //   },
     // );
   }
+
+
 }

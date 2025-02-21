@@ -16,7 +16,7 @@ import 'package:spotify_clone/service_locator.dart';
 import '../../../core/configs/constants/app_methods.dart';
 
 class SignInPage extends StatefulWidget {
-  SignInPage({super.key});
+  const SignInPage({super.key});
 
   @override
   State<SignInPage> createState() => _SignInPageState();
@@ -79,7 +79,7 @@ class _SignInPageState extends State<SignInPage> {
                       Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => GenrePicks(),
+                            builder: (context) => const GenrePicks(),
                           ),
                           (route) => false);
                     }
@@ -165,7 +165,7 @@ class _SignInPageState extends State<SignInPage> {
           TextButton(
               onPressed: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (context) => SignUpPage(),
+                  builder: (context) => const SignUpPage(),
                 ));
               },
               child: const Text('Register now'))

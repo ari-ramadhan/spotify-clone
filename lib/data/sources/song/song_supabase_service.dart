@@ -4,9 +4,11 @@ import 'package:spotify_clone/data/models/artist/artist.dart';
 import 'package:spotify_clone/data/models/auth/user.dart';
 import 'package:spotify_clone/data/models/song/song.dart';
 import 'package:spotify_clone/domain/entity/album/album.dart';
+import 'package:spotify_clone/domain/entity/artist/artist.dart';
 import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/main.dart';
+import 'package:spotify_clone/presentation/search/bloc/popular_song/popular_song_cubit.dart';
 
 abstract class SongSupabaseService {
   Future<Either> getNewsSongs();
@@ -20,8 +22,10 @@ abstract class SongSupabaseService {
   Future<Either> getPlaylistSongs(String playlistId);
   Future<Either> getRecentSongs();
   Future<Either> addRecentSongs(int songId);
+  Future<Either> popularSongsFromFavoriteArtists();
 
   Future<Either<String, Map<String, dynamic>>> searchSongBasedOnKeyword(String keyword);
+  Future<Either> searchSongs(String keyword);
 }
 
 class SongSupabaseServiceImpl extends SongSupabaseService {
@@ -339,7 +343,7 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
       // Jika lagu dengan songId sudah ada, return pesan
       final songExists = recentSongs.any((song) => song['song_id'] == songId);
       if (songExists) {
-        return Right('Song already in recent');
+        return const Right('Song already in recent');
       }
 
       // Jika sudah ada 5 lagu, hapus lagu paling lama
@@ -359,6 +363,55 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
       return Right(message);
     } catch (e) {
       return const Left('Error occurred when adding to recent song');
+    }
+  }
+
+  @override
+  Future<Either> searchSongs(String keyword) async {
+    try {
+      final response = await supabase.from('songs').select().ilike('title', '%$keyword%');
+
+      final songs = await Future.wait(
+        (response as List).map((item) async {
+          bool isFavorite = await isFavoriteSong(item['id']);
+          return SongWithFavorite(SongModel.fromJson(item).toEntity(), isFavorite);
+        }).toList(),
+      );
+
+      return Right(songs);
+    } catch (e) {
+      return const Left('Error while searching songs');
+    }
+  }
+
+  @override
+  Future<Either> popularSongsFromFavoriteArtists() async {
+    try {
+      List<SongWithFavorite> songs = [];
+      List<ArtistEntity> artists = [];
+
+      final followedArtist = await supabase.from('artist_follower').select().eq('user_id', supabase.auth.currentUser!.id);
+
+      for (final artist in followedArtist) {
+        final artistSongs = await supabase.from('songs').select().eq('artist_id', artist['artist_id']).limit(2);
+
+        final songList = await Future.wait(
+          (artistSongs as List).map((item) async {
+            bool isFavorite = await isFavoriteSong(item['id']);
+            return SongWithFavorite(SongModel.fromJson(item).toEntity(), isFavorite);
+          }).toList(),
+        );
+        songs = [...songs, ...songList];
+
+        final artistData = await supabase.from('artist').select().eq('id', artist['artist_id']).single();
+
+        artists.add(ArtistModel.fromJson(artistData).toEntity());
+      }
+
+
+      return Right(SongAndArtistList(songs, artists));
+    } catch (e) {
+      return const Left('Error while searching songs');
     }
   }
 }

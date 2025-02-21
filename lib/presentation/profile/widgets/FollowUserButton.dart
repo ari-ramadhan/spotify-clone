@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:spotify_clone/core/configs/theme/app_colors.dart';
 import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/usecases/user/check_following_status.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/follow_button/follow_button_state.dart';
@@ -11,7 +10,7 @@ import 'package:spotify_clone/service_locator.dart';
 
 class FollowUserButton extends StatefulWidget {
   final UserWithStatus user;
-  const FollowUserButton({Key? key, required this.user}) : super(key: key);
+  const FollowUserButton({super.key, required this.user});
 
   @override
   _FollowUserButtonState createState() => _FollowUserButtonState();
