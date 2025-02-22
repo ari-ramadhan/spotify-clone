@@ -315,19 +315,13 @@ Future<Object?> blurryDialogForPlaylist({
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  // padding: EdgeInsets.symmetric(horizontal: 4.w),
-                                  child: Text(
-                                    'This is',
-                                    style: TextStyle(fontWeight: FontWeight.w500, color: Colors.white70, fontSize: 11.2.sp),
-                                  ),
+                                Text(
+                                  'This is',
+                                  style: TextStyle(fontWeight: FontWeight.w500, color: Colors.white70, fontSize: 11.2.sp),
                                 ),
-                                Container(
-                                  // padding: EdgeInsets.symmetric(horizontal: 4.w),
-                                  child: Text(
-                                    '${artist.name}',
-                                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.sp, letterSpacing: 0.4),
-                                  ),
+                                Text(
+                                  '${artist.name}',
+                                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.sp, letterSpacing: 0.4),
                                 ),
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(15.sp),

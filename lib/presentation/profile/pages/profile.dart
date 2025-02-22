@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/data/models/auth/user.dart';
 import 'package:spotify_clone/domain/usecases/user/update_username.dart';
@@ -66,10 +67,12 @@ class _ProfilePageState extends State<ProfilePage> {
         ? Scaffold(
             appBar: BasicAppbar(
               hideBackButton: widget.hideBackButton,
-              backgroundColor: context.isDarkMode ? const Color(0xff2c2b2b) : Colors.white,
+              backgroundColor:
+                  context.isDarkMode ? const Color(0xff2c2b2b) : Colors.white,
               title: Text(
                 'Profile',
-                style: TextStyle(color: context.isDarkMode ? Colors.white : Colors.black),
+                style: TextStyle(
+                    color: context.isDarkMode ? Colors.white : Colors.black),
               ),
               action: isCurrentUser
                   ? IconButton(
@@ -95,19 +98,28 @@ class _ProfilePageState extends State<ProfilePage> {
                         height: 0.h,
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 0).copyWith(right: 5.w),
+                        padding: const EdgeInsets.symmetric(horizontal: 0)
+                            .copyWith(right: 5.w),
                         // child: playlistsList(),
                         child: MultiBlocProvider(
                           providers: [
                             BlocProvider(
-                              create: (context) => PlaylistCubit()..getCurrentuserPlaylist(isCurrentUser ? '' : widget.userEntity.userEntity.userId!),
+                              create: (context) => PlaylistCubit()
+                                ..getCurrentuserPlaylist(isCurrentUser
+                                    ? ''
+                                    : widget.userEntity.userEntity.userId!),
                             ),
                             BlocProvider(
-                              create: (context) => FavoriteSongCubit()..getFavoriteSongs(isCurrentUser ? '' : widget.userEntity.userEntity.userId!),
+                              create: (context) => FavoriteSongCubit()
+                                ..getFavoriteSongs(isCurrentUser
+                                    ? ''
+                                    : widget.userEntity.userEntity.userId!),
                             ),
                             BlocProvider(
-                              create: (context) =>
-                                  FollowedArtistsCubit()..getFollowedArtists(isCurrentUser ? '' : widget.userEntity.userEntity.userId!),
+                              create: (context) => FollowedArtistsCubit()
+                                ..getFollowedArtists(isCurrentUser
+                                    ? ''
+                                    : widget.userEntity.userEntity.userId!),
                             ),
                           ],
                           child: BlocBuilder<PlaylistCubit, PlaylistState>(
@@ -115,19 +127,27 @@ class _ProfilePageState extends State<ProfilePage> {
                             builder: (context, state) => Column(
                               children: [
                                 Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: isCurrentUser ? 5.h : 10.h)
-                                      .copyWith(bottom: isCurrentUser ? 0 : 10.h),
+                                  padding: EdgeInsets.symmetric(
+                                          horizontal: 10.w,
+                                          vertical: isCurrentUser ? 5.h : 10.h)
+                                      .copyWith(
+                                          bottom: isCurrentUser ? 0 : 10.h),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Text(
                                         'My Library',
                                         style: TextStyle(
                                             fontSize: 14.sp,
                                             fontWeight: FontWeight.bold,
-                                            color: context.isDarkMode ? AppColors.grey : AppColors.darkGrey),
+                                            color: context.isDarkMode
+                                                ? AppColors.grey
+                                                : AppColors.darkGrey),
                                       ),
-                                      isCurrentUser ? createPlaylistButton(context) : const SizedBox.shrink(),
+                                      isCurrentUser
+                                          ? createPlaylistButton(context)
+                                          : const SizedBox.shrink(),
                                     ],
                                   ),
                                 ),
@@ -162,7 +182,8 @@ class _ProfilePageState extends State<ProfilePage> {
           );
   }
 
-  BlocBuilder<FollowedArtistsCubit, FollowedArtistsState> artistFollowedBuilder() {
+  BlocBuilder<FollowedArtistsCubit, FollowedArtistsState>
+      artistFollowedBuilder() {
     return BlocBuilder<FollowedArtistsCubit, FollowedArtistsState>(
       builder: (context, state) {
         if (state is FollowedArtistsFailure) {
@@ -171,6 +192,35 @@ class _ProfilePageState extends State<ProfilePage> {
             child: const Center(
               child: Text('Failed to get your favorite artists'),
             ),
+          );
+        }
+
+        if (state is FollowedArtistsLoading) {
+          return Column(
+            children: [
+              ElementTitleWidget(
+                onTap: () {},
+                elementTitle: 'Artist followed',
+                limit: 4,
+                list: [],
+              ),
+              const SkeletonPlaylistTile(
+                isRounded: true,
+                isCircle: false,
+              ),
+              const SkeletonPlaylistTile(
+                isRounded: true,
+                isCircle: false,
+              ),
+              const SkeletonPlaylistTile(
+                isRounded: true,
+                isCircle: false,
+              ),
+              const SkeletonPlaylistTile(
+                isRounded: true,
+                isCircle: false,
+              ),
+            ],
           );
         }
 
@@ -257,7 +307,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 6.w),
                   child: BlocProvider(
-                    create: (context) => FavoriteSongCubit()..getFavoriteSongs(isCurrentUser ? '' : widget.userEntity.userEntity.userId!),
+                    create: (context) => FavoriteSongCubit()
+                      ..getFavoriteSongs(isCurrentUser
+                          ? ''
+                          : widget.userEntity.userEntity.userId!),
                     child: BlocBuilder<FavoriteSongCubit, FavoriteSongState>(
                       builder: (context, state) {
                         if (state is FavoriteSongLoading) {
@@ -270,7 +323,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           );
                         }
                         if (state is FavoriteSongFailure) {
-                          return Container(alignment: Alignment.center, height: 100, child: const Text('Failed to fetch songs'));
+                          return Container(
+                              alignment: Alignment.center,
+                              height: 100,
+                              child: const Text('Failed to fetch songs'));
                         }
                         if (state is FavoriteSongLoaded) {
                           return Container(
@@ -280,7 +336,9 @@ class _ProfilePageState extends State<ProfilePage> {
                               children: [
                                 Text(
                                   'From your favorites',
-                                  style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500),
+                                  style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w500),
                                 ),
                                 ListView.separated(
                                   physics: const NeverScrollableScrollPhysics(),
@@ -296,19 +354,25 @@ class _ProfilePageState extends State<ProfilePage> {
                                         setState(() {
                                           if (selectedSong != null) {
                                             // Tambahkan jika tidak ada di daftar
-                                            if (!selectedSongs.contains(selectedSong)) {
+                                            if (!selectedSongs
+                                                .contains(selectedSong)) {
                                               selectedSongs.add(selectedSong);
-                                              print('Added: ${selectedSong.song.title}');
+                                              print(
+                                                  'Added: ${selectedSong.song.title}');
                                             }
                                           } else {
                                             // Hapus berdasarkan id jika ada
-                                            selectedSongs.removeWhere((song) => song.song.id == songModel.song.id);
-                                            print('Removed: ${songModel.song.title}');
+                                            selectedSongs.removeWhere((song) =>
+                                                song.song.id ==
+                                                songModel.song.id);
+                                            print(
+                                                'Removed: ${songModel.song.title}');
                                           }
                                         });
 
                                         // Debugging: Tampilkan semua ID lagu yang dipilih
-                                        print('Current Selected Songs: ${selectedSongs.map((s) => s.song.id).toList()}');
+                                        print(
+                                            'Current Selected Songs: ${selectedSongs.map((s) => s.song.id).toList()}');
                                       },
 
                                       // isSelected: true,
@@ -367,12 +431,38 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Widget playlistListBuilder(PlaylistState state) {
     if (state is PlaylistLoading) {
-      return Container(
-        alignment: Alignment.center,
-        height: 100.h,
-        child: const CircularProgressIndicator(
-          color: AppColors.primary,
-        ),
+      // return Container(
+      //   alignment: Alignment.center,
+      //   height: 100.h,
+      //   child: const CircularProgressIndicator(
+      //     color: AppColors.primary,
+      //   ),
+      // );
+      return Column(
+        children: [
+          ElementTitleWidget(
+            onTap: () {},
+            elementTitle: 'Playlists',
+            limit: 4,
+            list: [],
+          ),
+          const SkeletonPlaylistTile(
+            isRounded: false,
+            isCircle: false,
+          ),
+          const SkeletonPlaylistTile(
+            isRounded: false,
+            isCircle: false,
+          ),
+          const SkeletonPlaylistTile(
+            isRounded: false,
+            isCircle: false,
+          ),
+          const SkeletonPlaylistTile(
+            isRounded: false,
+            isCircle: false,
+          ),
+        ],
       );
     }
     if (state is PlaylistFailure) {
@@ -411,13 +501,21 @@ class _ProfilePageState extends State<ProfilePage> {
                           // ),
                           MaterialPageRoute(
                             builder: (context) => PlaylistPage(
-                              playlistEntity: playlist, // Pass the playlist object
-                              userEntity: isCurrentUser ? UserEntity(email: email, fullName: fullName, userId: userId) : widget.userEntity.userEntity,
+                              playlistEntity:
+                                  playlist, // Pass the playlist object
+                              userEntity: isCurrentUser
+                                  ? UserEntity(
+                                      email: email,
+                                      fullName: fullName,
+                                      userId: userId)
+                                  : widget.userEntity.userEntity,
                               onPlaylistDeleted: () {
-
                                 // Refresh PlaylistView
-                                context.read<PlaylistCubit>().getCurrentuserPlaylist('');
-                                Navigator.pop(context); // Pop back to PlaylistView
+                                context
+                                    .read<PlaylistCubit>()
+                                    .getCurrentuserPlaylist('');
+                                Navigator.pop(
+                                    context); // Pop back to PlaylistView
                               },
                             ),
                           ),
@@ -447,66 +545,77 @@ class _ProfilePageState extends State<ProfilePage> {
   BlocBuilder<FavoriteSongCubit, FavoriteSongState> favoriteSongsButton() {
     return BlocBuilder<FavoriteSongCubit, FavoriteSongState>(
       builder: (context, state) {
-        if (state is FavoriteSongLoaded) {
-          return MaterialButton(
-            splashColor: Colors.transparent,
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MyFavorite(
-                    length: state.songs.length,
-                    userEntity: isCurrentUser ? UserEntity(email: email, fullName: fullName, userId: userId) : widget.userEntity.userEntity,
+        bool isLoading = state is FavoriteSongLoading;
+
+        // if (state is FavoriteSongLoaded) {
+        return MaterialButton(
+          splashColor: Colors.transparent,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MyFavorite(
+                  length: state is FavoriteSongLoaded ? state.songs.length : 0,
+                  userEntity: isCurrentUser
+                      ? UserEntity(
+                          email: email, fullName: fullName, userId: userId)
+                      : widget.userEntity.userEntity,
+                ),
+              ),
+            );
+          },
+          padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 5.h),
+          child: Row(
+            children: [
+              Container(
+                // padding: EdgeInsets.all(1.sp),
+                alignment: Alignment.center,
+                height: 40.h,
+                width: 44.w,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [Color(0xfffb3a6a), Color(0xff1c61f5)],
+                    stops: [0.3, 1],
+                    begin: Alignment.bottomRight,
+                    end: Alignment.topLeft,
                   ),
                 ),
-              );
-            },
-            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 5.h),
-            child: Row(
-              children: [
-                Container(
-                  // padding: EdgeInsets.all(1.sp),
-                  alignment: Alignment.center,
-                  height: 40.h,
-                  width: 44.w,
-                  decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [Color(0xfffb3a6a), Color(0xff1c61f5)],
-                      stops: [0.3, 1],
-                      begin: Alignment.bottomRight,
-                      end: Alignment.topLeft,
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.favorite_rounded,
-                    color: Colors.white,
-                    size: 26.sp,
-                  ),
+                child: Icon(
+                  Icons.favorite_rounded,
+                  color: Colors.white,
+                  size: 26.sp,
                 ),
-                SizedBox(
-                  width: 12.w,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
+              ),
+              SizedBox(
+                width: 12.w,
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Skeletonizer(
+                    enabled: isLoading,
+                    child: Text(
                       'My Favorites',
                       style: TextStyle(fontSize: 14.sp),
                     ),
-                    SizedBox(
-                      height: 3.h,
-                    ),
-                    Text(
-                      'Playlist | ${state.songs.length} songs',
+                  ),
+                  SizedBox(
+                    height: 3.h,
+                  ),
+                  Skeletonizer(
+                    enabled: isLoading,
+                    child: Text(
+                      'Playlist | ${state is FavoriteSongLoaded ? state.songs.length : 0} songs',
                       style: TextStyle(fontSize: 10.sp, color: Colors.white70),
                     ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        }
-        return Container();
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+        // }
+        // return Container();
       },
     );
   }
@@ -543,7 +652,8 @@ class _ProfilePageState extends State<ProfilePage> {
               Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => const GetStartedPage()),
-                (Route<dynamic> route) => false, // Menghapus semua halaman sebelumnya
+                (Route<dynamic> route) =>
+                    false, // Menghapus semua halaman sebelumnya
               );
             },
             child: const Text('Sign Out')),
@@ -551,7 +661,8 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-  Future<void> createPlaylist(BuildContext context, List<SongWithFavorite> selectedSong) async {
+  Future<void> createPlaylist(
+      BuildContext context, List<SongWithFavorite> selectedSong) async {
     List<int> selectedSongsId = selectedSong.map((e) => e.song.id).toList();
 
     // Menampilkan Loading Dialog
@@ -580,9 +691,11 @@ class _ProfilePageState extends State<ProfilePage> {
         },
       );
 
-      var result2 = await context
-          .read<PlaylistCubit>()
-          .createPlaylist(playlistTitle: playlistController.text.toString(), playlistDesc: '', isPublic: true, selectedSongsId: selectedSongsId);
+      var result2 = await context.read<PlaylistCubit>().createPlaylist(
+          playlistTitle: playlistController.text.toString(),
+          playlistDesc: '',
+          isPublic: true,
+          selectedSongsId: selectedSongsId);
 
       Navigator.of(context, rootNavigator: true).pop();
 
@@ -696,7 +809,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                   color: Colors.blue,
                                   shape: const CircleBorder(),
                                   child: Icon(
-                                    state is AvatarLoaded || state is AvatarInitial ? Icons.more_vert : Icons.edit,
+                                    state is AvatarLoaded ||
+                                            state is AvatarInitial
+                                        ? Icons.more_vert
+                                        : Icons.edit,
                                     size: 15.sp,
                                     color: Colors.white,
                                   ),
@@ -726,13 +842,15 @@ class _ProfilePageState extends State<ProfilePage> {
                                     children: [
                                       CircleAvatar(
                                         radius: 46.sp,
-                                        backgroundImage: FileImage(state.imageFile),
+                                        backgroundImage:
+                                            FileImage(state.imageFile),
                                       ),
                                       state is AvatarUploading
                                           ? CircleAvatar(
                                               radius: 46.sp,
                                               child: const Center(
-                                                child: CircularProgressIndicator(
+                                                child:
+                                                    CircularProgressIndicator(
                                                   color: AppColors.primary,
                                                 ),
                                               ),
@@ -746,7 +864,10 @@ class _ProfilePageState extends State<ProfilePage> {
                                     child: MaterialButton(
                                       padding: EdgeInsets.zero,
                                       onPressed: () {
-                                        context.read<AvatarCubit>().uploadAvatar(state.imageFile, userId);
+                                        context
+                                            .read<AvatarCubit>()
+                                            .uploadAvatar(
+                                                state.imageFile, userId);
                                         Navigator.pop(context);
                                       },
                                       color: AppColors.primary,
@@ -778,7 +899,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 if (state is AvatarError)
                   Padding(
                     padding: const EdgeInsets.all(10),
-                    child: Text(state.message, style: const TextStyle(color: Colors.red)),
+                    child: Text(state.message,
+                        style: const TextStyle(color: Colors.red)),
                   ),
 
                 SizedBox(
@@ -827,23 +949,32 @@ class _ProfilePageState extends State<ProfilePage> {
                   onPressed: () async {
                     if (_editProfileKey.currentState!.validate()) {
                       if (state is AvatarPicked) {
-                        context.read<AvatarCubit>().uploadAvatar(state.imageFile, userId);
+                        context
+                            .read<AvatarCubit>()
+                            .uploadAvatar(state.imageFile, userId);
                       }
-                      var result = await sl<UpdateUsernameUseCase>().call(params: usernameController.text);
+                      var result = await sl<UpdateUsernameUseCase>()
+                          .call(params: usernameController.text);
                       result.fold(
                         (l) {
-                          customSnackBar(isSuccess: false, text: l, context: context);
+                          customSnackBar(
+                              isSuccess: false, text: l, context: context);
                         },
                         (r) {
-                          customSnackBar(isSuccess: false, text: r, context: context);
-                          AuthService().saveUserLoggedInInfo(UserModel(userId: userId, email: email, fullName: usernameController.text));
+                          customSnackBar(
+                              isSuccess: false, text: r, context: context);
+                          AuthService().saveUserLoggedInInfo(UserModel(
+                              userId: userId,
+                              email: email,
+                              fullName: usernameController.text));
                           getUserInfo();
                           close();
                         },
                       );
                     }
                   },
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.sp)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20.sp)),
                   color: AppColors.primary,
                   minWidth: double.infinity,
                   padding: EdgeInsets.symmetric(vertical: 8.h),
@@ -863,72 +994,60 @@ class _ProfilePageState extends State<ProfilePage> {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-            create: (context) => FollowerCubit()
-              ..getFollowerAndFollowing(
-                isCurrentUser ? userId : widget.userEntity.userEntity.userId!,
-              )),
+          create: (context) => FollowerCubit()
+            ..getFollowerAndFollowing(
+              isCurrentUser ? userId : widget.userEntity.userEntity.userId!,
+            ),
+        ),
       ],
       child: BlocBuilder<FollowerCubit, FollowerState>(
         builder: (context, state) {
-          if (state is FollowerLoading) {
-            return Container(
-              alignment: Alignment.center,
-              height: 100.h,
-              child: const CircularProgressIndicator(
-                color: AppColors.darkGrey,
+          bool isLoading = state is FollowerLoading;
+          return Container(
+            decoration: BoxDecoration(
+              color:
+                  context.isDarkMode ? const Color(0xff2c2b2b) : Colors.white,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(60.w),
+                bottomRight: Radius.circular(60.w),
               ),
-            );
-          }
-          if (state is FollowerFailure) {
-            return Container(
-              alignment: Alignment.center,
-              height: 100.h,
-              child: const Text('Failed to get follower statistic'),
-            );
-          }
-
-          if (state is FollowerLoaded) {
-            return Container(
-                decoration: BoxDecoration(
-                  color: context.isDarkMode ? const Color(0xff2c2b2b) : Colors.white,
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(60.w),
-                    bottomRight: Radius.circular(60.w),
-                  ),
-                ),
-                width: double.infinity,
-                child: Stack(
+            ),
+            width: double.infinity,
+            child: Stack(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        SvgPicture.asset(AppVectors.profilePattern),
-                        RotatedBox(
-                          quarterTurns: 90,
-                          child: SvgPicture.asset(
-                            AppVectors.profilePattern,
-                          ),
-                        )
-                      ],
-                    ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            height: 10.h,
-                          ),
-                          isCurrentUser
-                              ? currentUserProfileImage()
-                              : SizedBox(
-                                  height: 92.sp,
-                                  width: 92.sp,
-                                  child: ClipOval(
-                                    child: widget.userEntity.userEntity.avatarUrl != ''
+                    SvgPicture.asset(AppVectors.profilePattern),
+                    RotatedBox(
+                      quarterTurns: 90,
+                      child: SvgPicture.asset(AppVectors.profilePattern),
+                    )
+                  ],
+                ),
+                Align(
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(height: 10.h),
+
+                      // Profile Picture (Not Wrapped in Skeletonizer)
+                      isCurrentUser
+                          ? currentUserProfileImage()
+                          : SizedBox(
+                              height: 92.sp,
+                              width: 92.sp,
+                              child: ClipOval(
+                                child:
+                                    widget.userEntity?.userEntity?.avatarUrl !=
+                                                null &&
+                                            widget.userEntity!.userEntity!
+                                                .avatarUrl!.isNotEmpty
                                         ? CachedNetworkImage(
-                                            imageUrl: widget.userEntity.userEntity.avatarUrl!,
+                                            imageUrl: widget.userEntity!
+                                                .userEntity!.avatarUrl!,
                                             fit: BoxFit.cover,
                                           )
                                         : Container(
@@ -939,57 +1058,231 @@ class _ProfilePageState extends State<ProfilePage> {
                                               size: 70.sp,
                                             ),
                                           ),
-                                  ),
-                                ),
-                          SizedBox(
-                            height: isCurrentUser ? 10.h : 0,
-                          ),
-                          isCurrentUser
-                              ? Text(
-                                  email,
-                                  style: TextStyle(fontSize: 13.sp, fontWeight: FontWeight.w300, letterSpacing: 0.3),
-                                )
-                              : const SizedBox.shrink(),
-                          SizedBox(
-                            height: 10.h,
-                          ),
-                          Text(
-                            isCurrentUser ? fullName : widget.userEntity.userEntity.fullName!,
-                            style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w500, letterSpacing: 0.3),
-                          ),
-                          SizedBox(
-                            height: 7.h,
-                          ),
-                          !isCurrentUser ? FollowUserButton(user: widget.userEntity) : const SizedBox.shrink(),
-                          SizedBox(
-                            height: 4.h,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              FollowCount(
-                                count: state.followEntity.following!.count,
-                                title: 'Following',
                               ),
-                              FollowCount(
-                                count: state.followEntity.follower!.count,
-                                title: 'Followers',
-                              ),
-                            ],
-                          ),
-                          SizedBox(
-                            height: 20.h,
-                          )
-                        ],
+                            ),
+
+                      SizedBox(height: isCurrentUser ? 10.h : 0),
+
+                      // Email (Wrapped in Skeletonizer)
+                      Skeletonizer(
+                        enabled: isLoading,
+                        child: isCurrentUser
+                            ? Text(
+                                email,
+                                style: TextStyle(
+                                    fontSize: 13.sp,
+                                    fontWeight: FontWeight.w300,
+                                    letterSpacing: 0.3),
+                              )
+                            : const SizedBox.shrink(),
                       ),
-                    ),
-                  ],
-                ));
-          }
-          return Container();
+
+                      SizedBox(height: 10.h),
+
+                      // Full Name (Wrapped in Skeletonizer)
+                      Skeletonizer(
+                        enabled: isLoading,
+                        child: Text(
+                          isCurrentUser
+                              ? fullName
+                              : widget.userEntity.userEntity.fullName ?? '',
+                          style: TextStyle(
+                              fontSize: 18.sp,
+                              fontWeight: FontWeight.w500,
+                              letterSpacing: 0.3),
+                        ),
+                      ),
+
+                      SizedBox(height: 7.h),
+
+                      // Follow Button (Wrapped in Skeletonizer)
+                      Skeletonizer(
+                        enabled: isLoading,
+                        child: !isCurrentUser
+                            ? FollowUserButton(user: widget.userEntity)
+                            : const SizedBox.shrink(),
+                      ),
+
+                      SizedBox(height: 4.h),
+
+                      // Follower & Following Count (Wrapped in Skeletonizer)
+                      Skeletonizer(
+                        enabled: isLoading,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            FollowCount(
+                              count: state is FollowerLoaded
+                                  ? state.followEntity.following!.count
+                                  : 0, // Placeholder during loading
+                              title: 'Following',
+                            ),
+                            FollowCount(
+                              count: state is FollowerLoaded
+                                  ? state.followEntity.follower!.count
+                                  : 0, // Placeholder during loading
+                              title: 'Followers',
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(height: 20.h),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
         },
       ),
     );
+
+    // return MultiBlocProvider(
+    //   providers: [
+    //     BlocProvider(
+    //         create: (context) => FollowerCubit()
+    //           ..getFollowerAndFollowing(
+    //             isCurrentUser ? userId : widget.userEntity.userEntity.userId!,
+    //           )),
+    //   ],
+    //   child: BlocBuilder<FollowerCubit, FollowerState>(
+    //     builder: (context, state) {
+    //       if (state is FollowerLoading) {
+    //         return Container(
+    //           alignment: Alignment.center,
+    //           height: 100.h,
+    //           child: const CircularProgressIndicator(
+    //             color: AppColors.darkGrey,
+    //           ),
+    //         );
+    //       }
+    //       if (state is FollowerFailure) {
+    //         return Container(
+    //           alignment: Alignment.center,
+    //           height: 100.h,
+    //           child: const Text('Failed to get follower statistic'),
+    //         );
+    //       }
+
+    //       if (state is FollowerLoaded) {
+    //         return Container(
+    //             decoration: BoxDecoration(
+    //               color: context.isDarkMode
+    //                   ? const Color(0xff2c2b2b)
+    //                   : Colors.white,
+    //               borderRadius: BorderRadius.only(
+    //                 bottomLeft: Radius.circular(60.w),
+    //                 bottomRight: Radius.circular(60.w),
+    //               ),
+    //             ),
+    //             width: double.infinity,
+    //             child: Stack(
+    //               children: [
+    //                 Row(
+    //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    //                   children: [
+    //                     SvgPicture.asset(AppVectors.profilePattern),
+    //                     RotatedBox(
+    //                       quarterTurns: 90,
+    //                       child: SvgPicture.asset(
+    //                         AppVectors.profilePattern,
+    //                       ),
+    //                     )
+    //                   ],
+    //                 ),
+    //                 Align(
+    //                   alignment: Alignment.center,
+    //                   child: Column(
+    //                     mainAxisAlignment: MainAxisAlignment.center,
+    //                     crossAxisAlignment: CrossAxisAlignment.center,
+    //                     children: [
+    //                       SizedBox(
+    //                         height: 10.h,
+    //                       ),
+    //                       isCurrentUser
+    //                           ? currentUserProfileImage()
+    //                           : SizedBox(
+    //                               height: 92.sp,
+    //                               width: 92.sp,
+    //                               child: ClipOval(
+    //                                 child: widget.userEntity.userEntity
+    //                                             .avatarUrl !=
+    //                                         ''
+    //                                     ? CachedNetworkImage(
+    //                                         imageUrl: widget.userEntity
+    //                                             .userEntity.avatarUrl!,
+    //                                         fit: BoxFit.cover,
+    //                                       )
+    //                                     : Container(
+    //                                         color: Colors.grey.shade700,
+    //                                         child: Icon(
+    //                                           Icons.person,
+    //                                           color: Colors.grey,
+    //                                           size: 70.sp,
+    //                                         ),
+    //                                       ),
+    //                               ),
+    //                             ),
+    //                       SizedBox(
+    //                         height: isCurrentUser ? 10.h : 0,
+    //                       ),
+    //                       isCurrentUser
+    //                           ? Text(
+    //                               email,
+    //                               style: TextStyle(
+    //                                   fontSize: 13.sp,
+    //                                   fontWeight: FontWeight.w300,
+    //                                   letterSpacing: 0.3),
+    //                             )
+    //                           : const SizedBox.shrink(),
+    //                       SizedBox(
+    //                         height: 10.h,
+    //                       ),
+    //                       Text(
+    //                         isCurrentUser
+    //                             ? fullName
+    //                             : widget.userEntity.userEntity.fullName!,
+    //                         style: TextStyle(
+    //                             fontSize: 18.sp,
+    //                             fontWeight: FontWeight.w500,
+    //                             letterSpacing: 0.3),
+    //                       ),
+    //                       SizedBox(
+    //                         height: 7.h,
+    //                       ),
+    //                       !isCurrentUser
+    //                           ? FollowUserButton(user: widget.userEntity)
+    //                           : const SizedBox.shrink(),
+    //                       SizedBox(
+    //                         height: 4.h,
+    //                       ),
+    //                       Row(
+    //                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    //                         children: [
+    //                           FollowCount(
+    //                             count: state.followEntity.following!.count,
+    //                             title: 'Following',
+    //                           ),
+    //                           FollowCount(
+    //                             count: state.followEntity.follower!.count,
+    //                             title: 'Followers',
+    //                           ),
+    //                         ],
+    //                       ),
+    //                       SizedBox(
+    //                         height: 20.h,
+    //                       )
+    //                     ],
+    //                   ),
+    //                 ),
+    //               ],
+    //             ));
+    //       }
+    //       return Container();
+    //     },
+    //   ),
+    // );
   }
 
   BlocBuilder<AvatarCubit, AvatarState> currentUserProfileImage() {
@@ -1001,7 +1294,10 @@ class _ProfilePageState extends State<ProfilePage> {
             Container(
               width: 92.sp,
               height: 92.sp,
-              decoration: BoxDecoration(color: Colors.grey.shade700, shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade700,
+                shape: BoxShape.circle,
+              ),
               child: Center(
                 child: Icon(
                   Icons.person,
@@ -1010,39 +1306,38 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
               ),
             ),
-            state is AvatarLoaded || state is AvatarInitial
-                ? Stack(
-                    alignment: Alignment.bottomRight,
-                    children: [
-                      state is AvatarLoaded
-                          ? CircleAvatar(radius: 46.sp, backgroundImage: NetworkImage(state.imageUrl) // Ini sekarang akan selalu update,
-                              )
-                          : const SizedBox(),
-                      SizedBox(
-                        height: 23.sp,
-                        width: 23.sp,
-                        child: MaterialButton(
-                          padding: EdgeInsets.zero,
-                          onPressed: () {
-                            _profileEditDialog();
-                          },
-                          color: Colors.white,
-                          shape: const CircleBorder(),
-                          // height: 20.sp,
-                          child: Icon(
-                            Icons.edit,
-                            size: 15.sp,
-                            color: Colors.black,
-                          ),
-                        ),
-                      )
-                    ],
-                  )
-                : state is AvatarPicked
-                    ? ClipOval(
-                        child: state.imageUrl,
-                      )
-                    : const SizedBox.shrink()
+            if (state is AvatarLoaded || state is AvatarInitial)
+              Stack(
+                alignment: Alignment.bottomRight,
+                children: [
+                  if (state is AvatarLoaded)
+                    CircleAvatar(
+                      radius: 46.sp,
+                      backgroundImage: NetworkImage(state.imageUrl),
+                    ),
+                  SizedBox(
+                    height: 23.sp,
+                    width: 23.sp,
+                    child: MaterialButton(
+                      padding: EdgeInsets.zero,
+                      onPressed: () {
+                        _profileEditDialog();
+                      },
+                      color: Colors.white,
+                      shape: const CircleBorder(),
+                      child: Icon(
+                        Icons.edit,
+                        size: 15.sp,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            else if (state is AvatarPicked)
+              ClipOval(
+                child: state.imageUrl,
+              ),
           ],
         );
       },
@@ -1054,7 +1349,8 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       menuPadding: EdgeInsets.zero,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.sp)),
-      position: RelativeRect.fromLTRB(50.w, context.size!.height * 0.76, 40.w, -100.h),
+      position: RelativeRect.fromLTRB(
+          50.w, context.size!.height * 0.76, 40.w, -100.h),
       items: [
         PopupMenuItem(
           height: 28.h,
@@ -1073,7 +1369,10 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               Text(
                 'Upload profile picture',
-                style: TextStyle(color: Colors.blue, fontSize: 12.sp, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                    color: Colors.blue,
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500),
               )
             ],
           ),
@@ -1096,13 +1395,79 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 Text(
                   'Remove profile picture',
-                  style: TextStyle(color: Colors.red, fontSize: 12.sp, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 12.sp,
+                      fontWeight: FontWeight.w500),
                 )
               ],
             ),
           )
         ],
       ],
+    );
+  }
+}
+
+class SkeletonPlaylistTile extends StatelessWidget {
+  final bool isCircle;
+  final bool isRounded;
+  const SkeletonPlaylistTile({
+    required this.isCircle,
+    required this.isRounded,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 17.w),
+      child: Row(
+        children: [
+          Skeletonizer(
+            enabled: true,
+            child: Container(
+              height: 40.h,
+              width: 44.w,
+              decoration: BoxDecoration(
+                shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
+                color: Colors.grey.shade800,
+                borderRadius: BorderRadius.circular(isRounded ? 7.sp : 0)
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 12.w,
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Skeletonizer(
+                textBoneBorderRadius:
+                    TextBoneBorderRadius(BorderRadius.circular(0)),
+                enabled: true,
+                child: Text(
+                  'data data data data data data ',
+                  style: TextStyle(fontSize: 14.sp),
+                ),
+              ),
+              SizedBox(
+                height: 3.h,
+              ),
+              Skeletonizer(
+                enabled: true,
+                textBoneBorderRadius:
+                    TextBoneBorderRadius(BorderRadius.circular(0)),
+                child: Text(
+                  'Playlist | empty song',
+                  style: TextStyle(fontSize: 10.sp, color: Colors.white70),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

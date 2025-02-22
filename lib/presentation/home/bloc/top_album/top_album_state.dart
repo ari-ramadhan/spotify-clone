@@ -1,4 +1,3 @@
-import 'package:spotify_clone/data/models/album/album.dart';
 import 'package:spotify_clone/domain/entity/album/album.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
 

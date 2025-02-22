@@ -1,10 +1,8 @@
 import 'package:dartz/dartz.dart';
-import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/data/models/album/album.dart';
 import 'package:spotify_clone/data/models/artist/artist.dart';
 import 'package:spotify_clone/domain/entity/album/album.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
-import 'package:spotify_clone/domain/usecases/artist/is_following_artist.dart';
 import 'package:spotify_clone/main.dart';
 import 'package:spotify_clone/presentation/home/bloc/top_album/top_album_state.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

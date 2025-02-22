@@ -202,7 +202,7 @@ class HotArtistsWidget extends StatelessWidget {
                 ),
                 Container(
                   alignment: Alignment.center,
-                  padding: EdgeInsets.all(9),
+                  padding: const EdgeInsets.all(9),
                   decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     color: AppColors.primary

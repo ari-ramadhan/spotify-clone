@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage>
         ),
       ),
       body: SingleChildScrollView(
-        physics: PageScrollPhysics(),
+        physics: const PageScrollPhysics(),
 
 
         child: Column(
@@ -113,7 +113,7 @@ class _HomePageState extends State<HomePage>
               height: 27.h,
             ),
 
-            TopAlbum(),
+            const TopAlbum(),
             SizedBox(
               height: 30.h,
             )
@@ -228,7 +228,7 @@ class _HomePageState extends State<HomePage>
 }
 
 class TopAlbum extends StatelessWidget {
-  const TopAlbum({Key? key}) : super(key: key);
+  const TopAlbum({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -26,7 +26,11 @@ class _FollowUserButtonState extends State<FollowUserButton> {
   }
 
   Future isFollowing() async {
-    var result = await sl<CheckFollowingStatusUseCase>().call(params: widget.user.userEntity.userId);
+    var result = await sl<CheckFollowingStatusUseCase>()
+        .call(params: widget.user.userEntity.userId);
+
+    if (!mounted) return; // Prevent calling setState after disposal
+
     setState(() {
       isFollowed = result;
     });
@@ -58,7 +62,9 @@ class _FollowUserButtonState extends State<FollowUserButton> {
                   side: const BorderSide(color: Colors.white),
                 ),
                 onPressed: () async {
-                  context.read<FollowUserButtonCubit>().followButtonUpdated(widget.user.userEntity.userId!);
+                  context
+                      .read<FollowUserButtonCubit>()
+                      .followButtonUpdated(widget.user.userEntity.userId!);
                 },
                 child: Text(isFollowed ? 'Unfollow' : 'Follow'),
               );
@@ -73,7 +79,9 @@ class _FollowUserButtonState extends State<FollowUserButton> {
                   side: const BorderSide(color: Colors.white),
                 ),
                 onPressed: () async {
-                  context.read<FollowUserButtonCubit>().followButtonUpdated(widget.user.userEntity.userId!);
+                  context
+                      .read<FollowUserButtonCubit>()
+                      .followButtonUpdated(widget.user.userEntity.userId!);
                 },
                 child: Text(state.isFollowed ? 'Unfollow' : 'Follow'),
               );

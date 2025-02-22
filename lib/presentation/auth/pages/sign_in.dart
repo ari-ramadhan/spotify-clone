@@ -9,7 +9,6 @@ import 'package:spotify_clone/data/models/auth/signin_user_req.dart';
 import 'package:spotify_clone/domain/usecases/auth/signin.dart';
 import 'package:spotify_clone/presentation/auth/pages/sign_up.dart';
 import 'package:spotify_clone/presentation/genre_picks/pages/genre_picks.dart';
-import 'package:spotify_clone/presentation/home/pages/home.dart';
 import 'package:spotify_clone/presentation/home/pages/home_navigation.dart';
 import 'package:spotify_clone/service_locator.dart';
 

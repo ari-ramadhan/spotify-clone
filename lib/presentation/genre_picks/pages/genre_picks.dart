@@ -78,7 +78,10 @@ class _GenrePicksState extends State<GenrePicks> {
                       gradient: LinearGradient(
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
-                        colors: [AppColors.medDarkBackground.withOpacity(0), AppColors.medDarkBackground.withOpacity(0.6)],
+                        colors: [
+                          AppColors.medDarkBackground.withOpacity(0),
+                          AppColors.medDarkBackground.withOpacity(0.6)
+                        ],
                       ),
                     ),
                   ),
@@ -98,17 +101,24 @@ class _GenrePicksState extends State<GenrePicks> {
                               children: [
                                 Text(
                                   'Welcome ',
-                                  style: TextStyle(fontSize: 30.sp, color: Colors.white, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                      fontSize: 30.sp,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 Text(
                                   'Sekaizel',
-                                  style: TextStyle(fontSize: 30.sp, color: AppColors.primary, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                      fontSize: 30.sp,
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
                             Text(
                               'mind to pick your favorite music genre\'s ?',
-                              style: TextStyle(fontSize: 17.sp, color: Colors.white),
+                              style: TextStyle(
+                                  fontSize: 17.sp, color: Colors.white),
                             ),
                           ],
                         ),
@@ -123,13 +133,17 @@ class _GenrePicksState extends State<GenrePicks> {
                           runSpacing: 12.h,
                           children: genres.map(
                             (genre) {
-                              final isSelected = selectedGenres.contains(genre); // Check if THIS genre is selected
-                              final isEnabled = selectedGenres.length < 3 || isSelected; // Enable if less than 3 OR already selected
+                              final isSelected = selectedGenres.contains(
+                                  genre); // Check if THIS genre is selected
+                              final isEnabled = selectedGenres.length < 3 ||
+                                  isSelected; // Enable if less than 3 OR already selected
 
                               return GenreChip(
                                 genre: genre,
-                                enabled: isEnabled, // Use calculated enabled state
-                                isSelected: isSelected, // Pass the isSelected state
+                                enabled:
+                                    isEnabled, // Use calculated enabled state
+                                isSelected:
+                                    isSelected, // Pass the isSelected state
                                 onSelectionChanged: (selectedGenre) {
                                   setState(() {
                                     if (selectedGenre != null) {
@@ -138,9 +152,11 @@ class _GenrePicksState extends State<GenrePicks> {
                                         selectedGenres.add(selectedGenre);
                                       }
                                     } else {
-                                      selectedGenres.remove(genre); // Remove the specific genre
+                                      selectedGenres.remove(
+                                          genre); // Remove the specific genre
                                     }
-                                    print('Current Selected Genres: $selectedGenres');
+                                    print(
+                                        'Current Selected Genres: $selectedGenres');
                                   });
                                 },
                               );
@@ -159,27 +175,39 @@ class _GenrePicksState extends State<GenrePicks> {
                 padding: EdgeInsets.symmetric(vertical: 25.h, horizontal: 40.w),
                 child: MaterialButton(
                   onPressed: () async {
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
                     if (selectedGenres.isNotEmpty) {
-                      var result = await sl<UpdateFavoriteGenresUseCase>().call(params: selectedGenres);
+                      var result = await sl<UpdateFavoriteGenresUseCase>()
+                          .call(params: selectedGenres);
 
                       result.fold(
                         (l) {},
                         (r) async {
-                          SharedPreferences prefs = await SharedPreferences.getInstance();
                           prefs.setBool('onboarding_complete', true);
-                          customSnackBar(isSuccess: true, text: r, context: context);
+                          customSnackBar(
+                              isSuccess: true, text: r, context: context);
                         },
                       );
+                    } else {
+                      int appOpenedCount =
+                          prefs.getInt('app_opened_count') ?? 0;
+
+                      prefs.setInt('app_opened_count', appOpenedCount++);
+
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const HomeNavigation(),
+                        ),
+                      );
                     }
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => const HomeNavigation(),
-                      ),
-                    );
                   },
                   minWidth: double.infinity,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25.sp)),
-                  color: selectedGenres.isEmpty ? Colors.grey.shade600 : AppColors.primary,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(25.sp)),
+                  color: selectedGenres.isEmpty
+                      ? Colors.grey.shade600
+                      : AppColors.primary,
                   child: Text(
                     selectedGenres.isEmpty
                         ? 'Skip for now'
@@ -207,7 +235,12 @@ class GenreChip extends StatefulWidget {
   final bool isSelected;
   final bool enabled;
   final Function(String?) onSelectionChanged;
-  const GenreChip({super.key, required this.genre, this.enabled = true, this.isSelected = false, required this.onSelectionChanged});
+  const GenreChip(
+      {super.key,
+      required this.genre,
+      this.enabled = true,
+      this.isSelected = false,
+      required this.onSelectionChanged});
 
   @override
   State<GenreChip> createState() => _GenreChipState();
@@ -254,15 +287,21 @@ class _GenreChipState extends State<GenreChip> {
           },
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.sp),
-            side: BorderSide(color: isSelected ? Colors.white : Colors.white, width: 1.5),
+            side: BorderSide(
+                color: isSelected ? Colors.white : Colors.white, width: 1.5),
           ),
-          color: isSelected ? const Color.fromARGB(255, 74, 211, 67) : const Color.fromARGB(235, 32, 32, 32),
+          color: isSelected
+              ? const Color.fromARGB(255, 74, 211, 67)
+              : const Color.fromARGB(235, 32, 32, 32),
           padding: EdgeInsets.zero,
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 5.h),
             child: Text(
               widget.genre,
-              style: TextStyle(color: isSelected ? Colors.black : Colors.white, fontWeight: FontWeight.w500, fontSize: 17.sp),
+              style: TextStyle(
+                  color: isSelected ? Colors.black : Colors.white,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 17.sp),
             ),
           ),
         ),

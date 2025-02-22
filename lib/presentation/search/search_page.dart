@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/artist/artist_tile_widget.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
@@ -48,10 +49,7 @@ class _SearchPageState extends State<SearchPage> {
         _isFocused = _focusNode.hasFocus;
       });
       if (_isFocused) {
-        print('TextField is focused');
-      } else {
-        print('TextField is not focused');
-      }
+      } else {}
     });
   }
 
@@ -244,13 +242,47 @@ class _SearchPageState extends State<SearchPage> {
                           bloc: popularSongCubit,
                           builder: (context, state) {
                             if (state is PopularSongLoading) {
-                              return const SizedBox(
-                                height: 100,
-                                child: Center(
-                                  child: CircularProgressIndicator(
-                                    color: AppColors.primary,
+                              // return Container(
+                              //   child: CircularProgressIndicator(),
+                              // );
+                              return Column(
+                                children: [
+                                  const EntityTitleSearch(
+                                      title: 'Various songs from',
+                                      icons: Icons.music_note),
+                                  Wrap(
+                                    alignment: WrapAlignment.start,
+                                    crossAxisAlignment:
+                                        WrapCrossAlignment.start,
+                                    spacing: 8.w,
+                                    runSpacing: 6.h,
+                                    children: const [
+                                      SkeletonPopularArtistTile(),
+                                      SkeletonPopularArtistTile(),
+                                      SkeletonPopularArtistTile(),
+                                      SkeletonPopularArtistTile(),
+                                    ],
                                   ),
-                                ),
+                                  SizedBox(
+                                    height: 20.h,
+                                  ),
+                                  const SkeletonPlaylistTile(
+                                    isRounded: true,
+                                    isCircle: false,
+                                  ),
+                                  const SkeletonPlaylistTile(
+                                    isRounded: true,
+                                    isCircle: false,
+                                  ),
+                                  const SkeletonPlaylistTile(
+                                    isRounded: true,
+                                    isCircle: false,
+                                  ),
+                                  const SkeletonPlaylistTile(
+                                    isRounded: true,
+                                    isCircle: false,
+                                  ),
+                                ],
                               );
                             }
                             if (state is PopularSongError) {
@@ -263,8 +295,8 @@ class _SearchPageState extends State<SearchPage> {
                             }
                             if (state is PopularSongLoaded) {
                               final results = state.results;
-                              final songs =
-                                  results.songs.map((e) => e.song).toList();
+                              results.songs.map((e) => e.song).toList();
+                              results.songs.shuffle();
                               return Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -338,10 +370,9 @@ class _SearchPageState extends State<SearchPage> {
                                   ),
                                   ListView.builder(
                                     shrinkWrap: true,
+                                    physics: NeverScrollableScrollPhysics(),
                                     itemCount: results.songs.length,
                                     itemBuilder: (context, index) {
-                                      var song = results.songs[index].song;
-
                                       return SongTileWidget(
                                         index: index,
                                         songList: results.songs,
@@ -369,8 +400,25 @@ class _SearchPageState extends State<SearchPage> {
                               );
                             }
                             if (state is SearchLoading) {
-                              return const Center(
-                                child: CircularProgressIndicator(),
+                              return const Column(
+                                children: [
+                                  SkeletonPlaylistTile(
+                                    isRounded: true,
+                                    isCircle: false,
+                                  ),
+                                  SkeletonPlaylistTile(
+                                    isRounded: true,
+                                    isCircle: false,
+                                  ),
+                                  SkeletonPlaylistTile(
+                                    isRounded: true,
+                                    isCircle: false,
+                                  ),
+                                  SkeletonPlaylistTile(
+                                    isRounded: true,
+                                    isCircle: false,
+                                  ),
+                                ],
                               );
                             }
                             if (state is SearchLoaded) {
@@ -469,6 +517,48 @@ class _SearchPageState extends State<SearchPage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class SkeletonPopularArtistTile extends StatelessWidget {
+  const SkeletonPopularArtistTile({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      // padding: EdgeInsets.all(3.sp).copyWith(right: 10.w),
+      width: 100.w,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(15.sp),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Skeletonizer(
+            enabled: true,
+            child: CircleAvatar(
+              radius: 10.sp,
+              backgroundColor: Colors.grey.shade800,
+            ),
+          ),
+          SizedBox(
+            width: 6.w,
+          ),
+          Skeletonizer(
+            enabled: true,
+            child: Text(
+              'data data',
+              style: TextStyle(
+                fontSize: 12.5.sp,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          )
+        ],
       ),
     );
   }

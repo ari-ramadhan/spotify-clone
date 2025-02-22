@@ -7,7 +7,6 @@ import 'package:spotify_clone/common/widgets/album_song_tile/album_tile_widget.d
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
-import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_cubit.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_state.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/artist_page_cubit.dart';
@@ -310,7 +309,6 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      SongWithFavorite songs = state.songEntity[index];
                       return SongTileWidget(
                         songList: state.songEntity,
                         onSelectionChanged: (isSelected) {},
@@ -325,7 +323,6 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      SongWithFavorite songs = state.songEntity[index];
                       return SongTileWidget(
                         songList: state.songEntity,
                         index: index,
@@ -345,7 +342,6 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
   }
 
   Padding artistInfo(ArtistWithFollowing artist) {
-    bool followStatus = artist.isFollowed;
 
     return Padding(
       padding: EdgeInsets.only(left: 50.w),

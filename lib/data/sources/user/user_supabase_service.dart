@@ -138,7 +138,6 @@ class UserSupabaseServiceImpl implements UserSupabaseService {
       final publicUrl = supabase.storage.from('songs').getPublicUrl('userProfile/$fileName');
 
       // // Simpan URL ke database user
-      var count = await supabase.from('avatar').select().contains('avatarUrl', publicUrl).count();
 
       // if (count == 0) {
       await supabase.from('avatar').insert({'avatarUrl': publicUrl});

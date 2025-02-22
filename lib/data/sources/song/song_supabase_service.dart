@@ -408,6 +408,7 @@ class SongSupabaseServiceImpl extends SongSupabaseService {
         artists.add(ArtistModel.fromJson(artistData).toEntity());
       }
 
+      songs.shuffle();
 
       return Right(SongAndArtistList(songs, artists));
     } catch (e) {

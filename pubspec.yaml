@@ -45,6 +45,7 @@ dependencies:
   path_provider: ^2.1.5
   persistent_bottom_nav_bar: ^6.2.1
   shared_preferences: ^2.3.3
+  skeletonizer: ^1.4.3
   supabase_flutter: ^2.8.1
 
 dev_dependencies:

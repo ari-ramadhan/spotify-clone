@@ -612,8 +612,6 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                                                               () {
                                                                             selectedSongCount++;
                                                                           });
-                                                                          print(
-                                                                              'Added: ${selectedSong.song.title}');
                                                                         }
                                                                       } else {
                                                                         // Hapus berdasarkan id jika ada
@@ -624,14 +622,10 @@ class _PlaylistPageState extends State<PlaylistPage> {
                                                                             () {
                                                                           selectedSongCount--;
                                                                         });
-                                                                        print(
-                                                                            'Removed: ${realList[index].song.title}');
                                                                       }
                                                                     });
 
                                                                     // Debugging: Tampilkan semua ID lagu yang dipilih
-                                                                    print(
-                                                                        'Current Selected Songs: ${realList.length}');
                                                                   },
                                                                 );
                                                               },
@@ -1162,8 +1156,7 @@ class _PlaylistPageState extends State<PlaylistPage> {
     );
 
     // Melakukan query
-    var result =
-        context.read<PlaylistCubit>().deletePlaylist(widget.playlistEntity.id!);
+    context.read<PlaylistCubit>().deletePlaylist(widget.playlistEntity.id!);
     // Menghapus Dialog Loading
     Navigator.of(context, rootNavigator: true).pop();
 

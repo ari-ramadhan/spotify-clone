@@ -16,10 +16,13 @@ import 'package:spotify_clone/presentation/song_player/bloc/song_player_cubit.da
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+  SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
 
   HydratedBloc.storage = await HydratedStorage.build(
-    storageDirectory: kIsWeb ? HydratedStorage.webStorageDirectory : await getApplicationDocumentsDirectory(),
+    storageDirectory: kIsWeb
+        ? HydratedStorage.webStorageDirectory
+        : await getApplicationDocumentsDirectory(),
   );
 
   await Supabase.initialize(
@@ -46,12 +49,19 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   bool _isLoggedIn = false;
   bool _onBoarded = false;
+  bool _onBoardAutoSkip = true;
+  int _appOpenedCount = 0;
   String username = '';
   String email = '';
 
   Future<void> _checkOnBoardStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _onBoarded = prefs.getBool('onboarding_complete') ?? false;
+    _appOpenedCount = prefs.getInt('app_opened_count') ?? 0;
+
+    if (_appOpenedCount == 20) {
+      _onBoardAutoSkip = false;
+    }
   }
 
   Future<void> _checkLoginStatus() async {
@@ -91,7 +101,11 @@ class _MyAppState extends State<MyApp> {
               darkTheme: AppTheme.darkTheme,
               themeMode: mode,
               debugShowCheckedModeBanner: false,
-              home: _isLoggedIn ? _onBoarded ? const HomeNavigation() : const GenrePicks() : const SplashPage(),
+              home: _isLoggedIn
+                  ? _onBoarded || _onBoardAutoSkip
+                      ? const HomeNavigation()
+                      : const GenrePicks()
+                  : const SplashPage(),
               // home: GenrePicks(),
             ),
           ),

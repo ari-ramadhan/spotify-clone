@@ -19,4 +19,14 @@ class PlaylistEntity {
     required this.songCount,
   });
 
+  PlaylistEntity.empty(){
+    id = '';
+    createdAt = '';
+    isPublic = false;
+    userId = '';
+    name = '';
+    description = '';
+    songCount = 0;
+  }
+
 }
