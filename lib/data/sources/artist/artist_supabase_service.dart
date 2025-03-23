@@ -62,7 +62,6 @@ class ArtistSupabaseServiceImpl extends ArtistSupabaseService {
   @override
   Future<Either> getFollowedArtists(String userId) async {
     try {
-      print('aa');
       List<ArtistWithFollowing> artistList = [];
 
       var artistIdResult = await supabase
@@ -70,7 +69,7 @@ class ArtistSupabaseServiceImpl extends ArtistSupabaseService {
           .select()
           .match({
         'user_id': userId == '' ? supabase.auth.currentUser!.id : userId
-      });
+      }).order('id', ascending: false);
 
       for (var artistId in artistIdResult) {
         var artist = await supabase
@@ -78,7 +77,6 @@ class ArtistSupabaseServiceImpl extends ArtistSupabaseService {
             .select()
             .eq('id', artistId['artist_id'])
             .single();
-        print(artistId.toString());
         artistList.add(
             ArtistWithFollowing(ArtistModel.fromJson(artist).toEntity(), true));
       }

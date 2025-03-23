@@ -1,0 +1,2 @@
+E:/flutterProj/spotify_clone/android/app/.cxx/RelWithDebInfo/y5541u40/armeabi-v7a/CMakeFiles/edit_cache.dir
+E:/flutterProj/spotify_clone/android/app/.cxx/RelWithDebInfo/y5541u40/armeabi-v7a/CMakeFiles/rebuild_cache.dir

@@ -16,41 +16,17 @@ class _HomeNavigationState extends State<HomeNavigation> {
   String email = '';
   // String userId = '';
   bool isCurrentUser = false;
+
   Future getUserInfo() async {
     List<String>? userInfo = await AuthService().getUserLoggedInInfo();
     if (userInfo != null) {
       setState(() {
-        // userId = userInfo[0];
         email = userInfo[1];
         fullName = userInfo[2];
       });
     }
     return userInfo![0];
   }
-
-  // final List<Widget> _pages = [
-  //   const HomePage(),
-  //   SearchPage()
-  //   // Scaffold(),
-  //   // Scaffold(
-  //   //   body: Center(
-  //   //     child: Container(
-  //   //       child: const Text('Hallo'),
-  //   //     ),
-  //   //   ),
-  //   // ),
-  //   ,
-  //   ProfilePage(
-  //     userEntity: UserEntity(userId: supabase.auth.currentUser!.id, fullName: fullname),
-  //   ),
-  //   Scaffold(
-  //     body: Center(
-  //       child: Container(
-  //         child: const Text('Hallo'),
-  //       ),
-  //     ),
-  //   ),
-  // ];
 
   int _selectedIndex = 0;
 
@@ -65,16 +41,7 @@ class _HomeNavigationState extends State<HomeNavigation> {
     return Scaffold(
       body: [
         const HomePage(),
-        const SearchPage()
-        // Scaffold(),
-        // Scaffold(
-        //   body: Center(
-        //     child: Container(
-        //       child: const Text('Hallo'),
-        //     ),
-        //   ),
-        // ),
-        ,
+        const SearchPage(),
         ProfilePage(
           hideBackButton: true,
           userEntity: UserWithStatus(
@@ -83,13 +50,6 @@ class _HomeNavigationState extends State<HomeNavigation> {
                   fullName: fullName,
                   email: email),
               isFollowed: false),
-        ),
-        Scaffold(
-          body: Center(
-            child: Container(
-              child: const Text('Hallo'),
-            ),
-          ),
         ),
       ][_selectedIndex],
       bottomNavigationBar: Column(
@@ -130,11 +90,6 @@ class _HomeNavigationState extends State<HomeNavigation> {
                     Icons.my_library_music_sharp,
                   ),
                   label: 'My Library'),
-              BottomNavigationBarItem(
-                  icon: Icon(
-                    Icons.assistant,
-                  ),
-                  label: 'Premium'),
             ],
           ),
         ],

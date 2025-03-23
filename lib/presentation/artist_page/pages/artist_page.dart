@@ -299,7 +299,7 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
           if (state is ArtistSongsLoaded) {
           int songsLength = state.songEntity.take(5).length;
             return SizedBox(
-              height: (songsLength * 40.h) + ((songsLength - 1) * 13.h),
+              height: (songsLength * 52.h),
               child: TabBarView(
                 controller: _tabController,
                 children: [
@@ -468,7 +468,7 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
                     ],
                   ),
                   SizedBox(
-                    height: 20.h,
+                    height: 10.h,
                   ),
                   artistAboutCard(artist.artist),
                   SizedBox(

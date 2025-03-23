@@ -11,7 +11,8 @@ class PlaylistCubit extends Cubit<PlaylistState> {
   PlaylistCubit() : super(PlaylistLoading());
 
   Future<void> getCurrentuserPlaylist(String userId) async {
-    var playlists = await sl<GetCurrentuserPlaylistUseCase>().call(params: userId);
+    var playlists =
+        await sl<GetCurrentuserPlaylistUseCase>().call(params: userId);
 
     playlists.fold(
       (l) {
@@ -29,7 +30,8 @@ class PlaylistCubit extends Cubit<PlaylistState> {
     try {
       emit(PlaylistLoading()); // Emit loading state before deleting
 
-      final deleteResult = await sl<DeletePlaylistUseCase>().call(params: playlistId);
+      final deleteResult =
+          await sl<DeletePlaylistUseCase>().call(params: playlistId);
       String returnObject = "";
 
       deleteResult.fold(
@@ -43,8 +45,11 @@ class PlaylistCubit extends Cubit<PlaylistState> {
             final currentState = state as PlaylistLoaded;
             // final updatedPlaylists = currentState.playlistModel.where((playlist) => playlist.id != playlistId).toList();
 
-            final updatedPlaylists = List<PlaylistEntity>.from(currentState.playlistModel)..removeWhere((playlist) => playlist.id == playlistId);
-            emit(PlaylistLoaded(playlistModel: updatedPlaylists)); // Emit updated state
+            final updatedPlaylists =
+                List<PlaylistEntity>.from(currentState.playlistModel)
+                  ..removeWhere((playlist) => playlist.id == playlistId);
+            emit(PlaylistLoaded(
+                playlistModel: updatedPlaylists)); // Emit updated state
           } else if (state is PlaylistLoading) {
             // Handle the case where the state is PlaylistLoading (though unlikely at this point)
             // You might want to re-fetch the data or show a message.
@@ -97,13 +102,10 @@ class PlaylistCubit extends Cubit<PlaylistState> {
         (r) async {
           final currentState = state as PlaylistLoaded;
 
-          print("Before emit: ${currentState.playlistModel.map((e) => e.name).toList()}");
-
-          final updatedPlaylists = List<PlaylistEntity>.from(currentState.playlistModel)..add(r);
+          final updatedPlaylists =
+              List<PlaylistEntity>.from(currentState.playlistModel)..add(r);
 
           emit(PlaylistLoaded(playlistModel: updatedPlaylists));
-
-          print("After emit: ${updatedPlaylists.map((e) => e.name).toList()}");
 
           returnObject = 'Playlist created';
         },

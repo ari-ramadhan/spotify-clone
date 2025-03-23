@@ -102,7 +102,8 @@ class PlaylistSongsCubit extends Cubit<PlaylistSongsState> {
   PlaylistSongsCubit() : super(PlaylistSongsLoading());
 
   Future<void> getPlaylistSongs(String playlistId) async {
-    var playlistSongs = await sl<GetPlaylistSongsUseCase>().call(params: playlistId);
+    var playlistSongs =
+        await sl<GetPlaylistSongsUseCase>().call(params: playlistId);
 
     playlistSongs.fold(
       (l) {
@@ -116,26 +117,31 @@ class PlaylistSongsCubit extends Cubit<PlaylistSongsState> {
     );
   }
 
-  Future<void> addSongByKeyword(String playlistId, String keyword, List<SongWithFavorite> songList) async {
-    var addSongResult = await sl<AddSongByKeywordUseCase>().call(params: AddSongByKeywordParams(playlistId: playlistId, title: keyword));
+  Future<void> addSongByKeyword(String playlistId, String keyword,
+      List<SongWithFavorite> songList) async {
+    var addSongResult = await sl<AddSongByKeywordUseCase>().call(
+        params: AddSongByKeywordParams(playlistId: playlistId, title: keyword));
 
     addSongResult.fold(
       (l) {},
       (r) {
         if (state is PlaylistSongsLoaded) {
           final currentState = state as PlaylistSongsLoaded;
-          final updatedSongs = List<SongWithFavorite>.from(currentState.songs)..add(r);
+          final updatedSongs = List<SongWithFavorite>.from(currentState.songs)
+            ..add(r);
           emit(PlaylistSongsLoaded(songs: updatedSongs));
         }
       },
     );
   }
 
-  Future<void> addSongToPlaylist(String playlistId, List<SongWithFavorite> songIds, BuildContext context) async {
+  Future<void> addSongToPlaylist(String playlistId,
+      List<SongWithFavorite> songIds, BuildContext context) async {
     List<int> selectedSongIds = songIds.map((song) => song.song.id).toList();
 
     final addSongResult = await sl<AddSongsToPlaylistUseCase>().call(
-      params: AddSongsToPlaylistParams(playlistId: playlistId, selectedSongs: selectedSongIds),
+      params: AddSongsToPlaylistParams(
+          playlistId: playlistId, selectedSongs: selectedSongIds),
     );
 
     addSongResult.fold(
@@ -145,18 +151,16 @@ class PlaylistSongsCubit extends Cubit<PlaylistSongsState> {
       (r) async {
         final currentState = state as PlaylistSongsLoaded;
 
-        print("Before emit: ${currentState.songs.map((e) => e.song.title).toList()}");
-
-        final updatedSongs = List<SongWithFavorite>.from(currentState.songs)..addAll(songIds);
+        final updatedSongs = List<SongWithFavorite>.from(currentState.songs)
+          ..addAll(songIds);
 
         emit(PlaylistSongsLoaded(songs: updatedSongs));
-
-        print("After emit: ${updatedSongs.map((e) => e.song.title).toList()}");
       },
     );
   }
 
-  Future<Either> removeSongFromPlaylist(String playlistId, SongWithFavorite song) async {
+  Future<Either> removeSongFromPlaylist(
+      String playlistId, SongWithFavorite song) async {
     String message = '';
 
     try {
@@ -164,7 +168,8 @@ class PlaylistSongsCubit extends Cubit<PlaylistSongsState> {
         final currentState = state as PlaylistSongsLoaded;
 
         final result = await sl<DeleteSongFromPlaylistUseCase>().call(
-          params: DeleteSongFromPlaylistParams(playlistId: playlistId, songId: song.song.id),
+          params: DeleteSongFromPlaylistParams(
+              playlistId: playlistId, songId: song.song.id),
         );
 
         result.fold(
@@ -173,7 +178,8 @@ class PlaylistSongsCubit extends Cubit<PlaylistSongsState> {
             message = l;
           },
           (r) {
-            final updatedSongs = List<SongWithFavorite>.from(currentState.songs)..removeWhere((s) => s.song.id == song.song.id);
+            final updatedSongs = List<SongWithFavorite>.from(currentState.songs)
+              ..removeWhere((s) => s.song.id == song.song.id);
             emit(PlaylistSongsLoaded(songs: updatedSongs));
             message = r;
           },
@@ -199,7 +205,9 @@ class PlaylistSongsCubit extends Cubit<PlaylistSongsState> {
       emit(PlaylistSongsLoaded(songs: updatedSongs));
 
       // Kembalikan status isFavorite terbaru
-      return updatedSongs.firstWhere((song) => song.song.id == songId).isFavorite;
+      return updatedSongs
+          .firstWhere((song) => song.song.id == songId)
+          .isFavorite;
     }
     return null;
   }

@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/favorite_button/favorite_button.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
+import 'package:spotify_clone/domain/usecases/search/set_recent_search_keyword.dart';
 import 'package:spotify_clone/presentation/profile/pages/export.dart';
 import 'package:spotify_clone/presentation/song_player/pages/song_player.dart';
 
@@ -11,6 +13,7 @@ class SongTileWidget extends StatefulWidget {
   final bool isShowArtist;
   final int index;
   final bool isOnSearch;
+  final String searchKeyword;
   final bool showAction;
   final Function(bool) onSelectionChanged;
 
@@ -21,6 +24,7 @@ class SongTileWidget extends StatefulWidget {
       required this.index,
       required this.songList,
       this.isShowArtist = false,
+      this.searchKeyword = '',
       required this.onSelectionChanged,
       this.isOnSearch = false});
 
@@ -46,11 +50,12 @@ class _SongTileWidgetState extends State<SongTileWidget> {
   Widget build(BuildContext context) {
     SongWithFavorite songEntity = widget.songList[widget.index];
     Color textColor = Colors.white;
-    String songDuration = songEntity.song.duration.toString().replaceAll('.', ':');
+    String songDuration =
+        songEntity.song.duration.toString().replaceAll('.', ':');
 
     return InkWell(
       splashColor: Colors.transparent,
-      onTap: () {
+      onTap: () async {
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (context) => SongPlayerPage(
@@ -59,10 +64,16 @@ class _SongTileWidgetState extends State<SongTileWidget> {
             ),
           ),
         );
+
+        if (widget.isOnSearch && widget.searchKeyword.isNotEmpty) {
+          sl<SetRecentSearchKeywordUseCase>()
+              .call(params: widget.searchKeyword);
+        }
         // Kode sebelumnya
       },
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 17.w, vertical: 6.h).copyWith(),
+        padding:
+            EdgeInsets.symmetric(horizontal: 17.w, vertical: 6.h).copyWith(),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -75,11 +86,15 @@ class _SongTileWidgetState extends State<SongTileWidget> {
                         width: 44.w,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: context.isDarkMode ? AppColors.darkGrey : const Color(0xffE6E6E6),
+                          color: context.isDarkMode
+                              ? AppColors.darkGrey
+                              : const Color(0xffE6E6E6),
                         ),
                         child: Icon(
                           Icons.play_arrow_rounded,
-                          color: context.isDarkMode ? const Color(0xff959595) : const Color(0xff555555),
+                          color: context.isDarkMode
+                              ? const Color(0xff959595)
+                              : const Color(0xff555555),
                         ),
                       )
                     : Container(
@@ -89,8 +104,8 @@ class _SongTileWidgetState extends State<SongTileWidget> {
                           borderRadius: BorderRadius.circular(7.sp),
                           image: DecorationImage(
                             fit: BoxFit.cover,
-                            image:
-                                CachedNetworkImageProvider('${AppURLs.supabaseCoverStorage}${songEntity.song.artist} - ${songEntity.song.title}.jpg'),
+                            image: CachedNetworkImageProvider(
+                                '${AppURLs.supabaseCoverStorage}${songEntity.song.artist} - ${songEntity.song.title}.jpg'),
                           ),
                         ),
                       ),
@@ -105,14 +120,22 @@ class _SongTileWidgetState extends State<SongTileWidget> {
                       Text(
                         songEntity.song.title,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontWeight: FontWeight.w500, color: textColor, fontSize: 14.sp),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: textColor,
+                            fontSize: 14.sp),
                       ),
                       SizedBox(
                         height: 3.h,
                       ),
                       Text(
-                        widget.isOnHome || widget.isShowArtist ? songEntity.song.artist : '239.114',
-                        style: TextStyle(fontWeight: FontWeight.w400, color: Colors.white.withOpacity(0.8), fontSize: 11.sp),
+                        widget.isOnHome || widget.isShowArtist
+                            ? songEntity.song.artist
+                            : '239.114',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 11.sp),
                       ),
                     ],
                   ),
@@ -123,7 +146,9 @@ class _SongTileWidgetState extends State<SongTileWidget> {
                 ? Row(
                     children: [
                       Text(
-                        songDuration.length == 3 ? '${songDuration}0' : songDuration,
+                        songDuration.length == 3
+                            ? '${songDuration}0'
+                            : songDuration,
                         style: TextStyle(
                           color: textColor,
                         ),
@@ -139,7 +164,9 @@ class _SongTileWidgetState extends State<SongTileWidget> {
                     : Row(
                         children: [
                           Text(
-                            songDuration.length == 3 ? '${songDuration}0' : songDuration,
+                            songDuration.length == 3
+                                ? '${songDuration}0'
+                                : songDuration,
                             style: TextStyle(
                               color: textColor,
                             ),
@@ -153,7 +180,8 @@ class _SongTileWidgetState extends State<SongTileWidget> {
                                   width: 21.sp,
                                   child: IconButton(
                                     onPressed: () {
-                                      blurryDialogForSongTile(context: context, song: songEntity);
+                                      blurryDialogForSongTile(
+                                          context: context, song: songEntity);
                                     },
                                     splashRadius: 21.sp,
                                     padding: const EdgeInsets.all(0),

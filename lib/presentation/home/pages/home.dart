@@ -1,3 +1,4 @@
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/data/repository/auth/auth_service.dart';
@@ -5,6 +6,7 @@ import 'package:spotify_clone/presentation/album/page/artist_album.dart';
 import 'package:spotify_clone/presentation/home/bloc/top_album/top_album_state.dart';
 import 'package:spotify_clone/presentation/home/widgets/hot_artists.dart';
 import 'package:spotify_clone/presentation/home/widgets/recent_songs.dart';
+import 'package:spotify_clone/presentation/common/widgets/mini_player.dart';
 
 import '../bloc/top_album/top_album_cubit.dart';
 
@@ -76,49 +78,52 @@ class _HomePageState extends State<HomePage>
           width: 34.w,
         ),
       ),
-      body: SingleChildScrollView(
-        physics: const PageScrollPhysics(),
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            physics: const PageScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // SizedBox(
+                //   height: 20.h,
+                // ),
+                carousel(),
+                _tabs(),
+                SizedBox(
+                  height: 170.h,
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: const [
+                      NewsSongs(),
+                      HotArtists(),
+                      // Container(
+                      //   alignment: Alignment.center,
+                      //   child: Text(
+                      //     'Comming soon..',
+                      //     style: TextStyle(fontSize: 20.sp, color: Colors.grey),
+                      //   ),
+                      // ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  height: 15.h,
+                ),
+                const RecentSongs(),
+                SizedBox(
+                  height: 27.h,
+                ),
 
-
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // SizedBox(
-            //   height: 20.h,
-            // ),
-            carousel(),
-            _tabs(),
-            SizedBox(
-              height: 170.h,
-              child: TabBarView(
-                controller: _tabController,
-                children: const [
-                  NewsSongs(),
-                  HotArtists(),
-                  // Container(
-                  //   alignment: Alignment.center,
-                  //   child: Text(
-                  //     'Comming soon..',
-                  //     style: TextStyle(fontSize: 20.sp, color: Colors.grey),
-                  //   ),
-                  // ),
-                ],
-              ),
+                const TopAlbum(),
+                SizedBox(
+                  height: 30.h,
+                )
+              ],
             ),
-            SizedBox(
-              height: 15.h,
-            ),
-            const RecentSongs(),
-            SizedBox(
-              height: 27.h,
-            ),
-
-            const TopAlbum(),
-            SizedBox(
-              height: 30.h,
-            )
-          ],
-        ),
+          ),
+          const MiniPlayer(),
+        ],
       ),
     );
   }
@@ -234,83 +239,85 @@ class TopAlbum extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<TopAlbumsCubit, TopAlbumsState>(
       builder: (context, state) {
-        if (state is TopAlbumsLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
+        final isLoading = state is TopAlbumsLoading;
+        final isLoaded = state is TopAlbumsLoaded;
+        final albums = isLoaded ? (state as TopAlbumsLoaded).albums : [];
 
-        if (state is TopAlbumsLoaded) {
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(
-                  left: 20.w,
-                ),
-                child: Text(
-                  'Most Popular Album',
-                  style: TextStyle(
-                    fontSize: 21.sp,
-                    fontWeight: FontWeight.w500,
-                  ),
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: EdgeInsets.only(left: 20.w),
+              child: Text(
+                'Most Popular Album',
+                style: TextStyle(
+                  fontSize: 21.sp,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(
-                height: 16.h,
+            ),
+            SizedBox(height: 16.h),
+            GridView.builder(
+              itemCount: isLoading ? 6 : albums.take(6).length,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              padding: EdgeInsets.symmetric(horizontal: 22.w),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 18.w,
+                crossAxisSpacing: 18.w,
+                childAspectRatio: 0.75,
               ),
-              GridView.builder(
-                itemCount: state.albums.take(6).length,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                padding: EdgeInsets.symmetric(
-                  horizontal: 22.w,
-                ),
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 18.w,
-                  crossAxisSpacing: 18.w,
-                  childAspectRatio: 0.75, // Adjust the aspect ratio as needed
-                ),
-                itemBuilder: (context, index) {
-                  var album = state.albums[index].albumEnitity;
-                  var artist = state.albums[index].artistEntity;
+              itemBuilder: (context, index) {
+                final album = isLoaded ? albums[index].albumEnitity : null;
+                final artist = isLoaded ? albums[index].artistEntity : null;
 
-                  // print('${AppURLs.supabaseAlbumStorage}${artistName} - ${album.name}.jpg');
-
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => ArtistAlbum(
-                            artist: artist,
-                            album: album,
-                          ),
-                        ),
-                      );
-                    },
+                return Skeletonizer(
+                  enabled: isLoading,
+                  child: GestureDetector(
+                    onTap: isLoading
+                        ? null
+                        : () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => ArtistAlbum(
+                                  artist: artist!,
+                                  album: album!,
+                                ),
+                              ),
+                            );
+                          },
                     child: Container(
                       height: 100.h,
                       width: double.infinity,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(18.sp),
-                        image: DecorationImage(
-                          fit: BoxFit.fitHeight,
-                          image: NetworkImage(
-                              '${AppURLs.supabaseAlbumStorage}${artist.name} - ${album.name}.jpg'),
-                        ),
+                        image: isLoading
+                            ? null
+                            : DecorationImage(
+                                fit: BoxFit.fitHeight,
+                                image: NetworkImage(
+                                  '${AppURLs.supabaseAlbumStorage}${artist?.name} - ${album?.name}.jpg',
+                                ),
+                              ),
+                        color: isLoading
+                            ? Colors.grey[800]
+                            : null, // Background warna saat loading
                       ),
                       child: Stack(
                         children: [
                           Container(
-                            padding: EdgeInsets.all(15.sp),
+                            padding:
+                                EdgeInsets.all(10.sp).copyWith(bottom: 15.h),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(18.sp),
                               gradient: LinearGradient(
                                 begin: Alignment.center,
                                 end: Alignment.bottomCenter,
                                 colors: [
-                                  AppColors.darkBackground.withOpacity(0),
-                                  // AppColors.darkBackground.withOpacity(0.6),
-                                  AppColors.darkBackground.withOpacity(1),
+                                  Colors.grey.shade900.withOpacity(0),
+                                  Colors.grey.shade900.withOpacity(0.7),
+                                  Colors.grey.shade900.withOpacity(1),
                                 ],
                               ),
                             ),
@@ -327,17 +334,22 @@ class TopAlbum extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      album.name.toString(),
+                                      isLoading
+                                          ? 'Loading...'
+                                          : album?.name ?? '',
                                       style: TextStyle(
-                                          fontSize: album.name!.length > 13
-                                              ? 12.sp
-                                              : 14.sp,
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.bold),
+                                        fontSize:
+                                            (album?.name?.length ?? 0) > 15
+                                                ? 12.sp
+                                                : 14.sp,
+                                        color: Colors.white,
+                                        height: (album?.name?.length ?? 0) > 15
+                                            ? 1.2
+                                            : 0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                    SizedBox(
-                                      height: 7.h,
-                                    ),
+                                    SizedBox(height: 3.h),
                                     Row(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.center,
@@ -347,27 +359,34 @@ class TopAlbum extends StatelessWidget {
                                           width: 16.sp,
                                           decoration: BoxDecoration(
                                             shape: BoxShape.circle,
-                                            image: DecorationImage(
-                                              fit: BoxFit.cover,
-                                              image: NetworkImage(
-                                                '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
-                                              ),
+                                            image: isLoading
+                                                ? null
+                                                : DecorationImage(
+                                                    fit: BoxFit.cover,
+                                                    image: NetworkImage(
+                                                      '${AppURLs.supabaseArtistStorage}${artist?.name?.toLowerCase()}.jpg',
+                                                    ),
+                                                  ),
+                                            color: isLoading
+                                                ? Colors.grey[400]
+                                                : null, // Warna placeholder untuk skeleton
+                                          ),
+                                        ),
+                                        SizedBox(width: 10.w),
+                                        Expanded(
+                                          child: Text(
+                                            isLoading
+                                                ? 'Loading...'
+                                                : artist?.name ?? '',
+                                            style: TextStyle(
+                                              fontSize: 11.sp,
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.white,
                                             ),
                                           ),
                                         ),
-                                        SizedBox(
-                                          width: 10.w,
-                                        ),
-                                        Expanded(
-                                            child: Text(
-                                          artist.name!,
-                                          style: TextStyle(
-                                              fontSize: 11.sp,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.white),
-                                        ))
                                       ],
-                                    )
+                                    ),
                                   ],
                                 ),
                               ],
@@ -376,17 +395,15 @@ class TopAlbum extends StatelessWidget {
                         ],
                       ),
                     ),
-                  );
-                },
-              ),
-            ],
-          );
-        }
-
-        return const Center(
-          child: Text('No albums available.'),
+                  ),
+                );
+              },
+            ),
+          ],
         );
       },
     );
+    ;
+    ;
   }
 }

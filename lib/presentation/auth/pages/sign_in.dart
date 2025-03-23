@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotify_clone/common/widgets/appbar/app_bar.dart';
 import 'package:spotify_clone/common/widgets/button/basic_app_button.dart';
 import 'package:spotify_clone/core/configs/assets/app_vectors.dart';
+import 'package:spotify_clone/core/configs/constants/app_key_feature.dart';
 import 'package:spotify_clone/data/models/auth/signin_user_req.dart';
 import 'package:spotify_clone/domain/usecases/auth/signin.dart';
 import 'package:spotify_clone/presentation/auth/pages/sign_up.dart';
@@ -70,8 +71,11 @@ class _SignInPageState extends State<SignInPage> {
                     customSnackBar(isSuccess: false, text: l, context: context);
                   },
                   (r) async {
-                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                    bool hasCompletedOnboarding = prefs.getBool('onboarding_complete') ?? false;
+                    SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    bool hasCompletedOnboarding =
+                        prefs.getBool(AppKeysFeature.SF_ONBOARDING_COMPLETE) ??
+                            false;
 
                     if (!hasCompletedOnboarding) {
                       // Navigate to the genre picking screen

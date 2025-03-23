@@ -15,6 +15,10 @@ class SongEntity {
       required this.duration,
       required this.artistId,
       required this.releaseDate});
+
+  SongEntity toEmpty(){
+    return SongEntity(title: '', id: 0, artist: '', duration: 0, artistId: 0, releaseDate: '');
+  }
 }
 
 class SongWithFavorite {

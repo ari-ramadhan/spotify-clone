@@ -1,11 +1,12 @@
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/album_song_tile/album_tile_widget.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
+import 'package:spotify_clone/core/configs/constants/app_methods.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/domain/entity/album/album.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
+import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/presentation/album/bloc/artist_album/artist_album_cubit.dart';
 import 'package:spotify_clone/presentation/album/bloc/artist_album/artist_album_state.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_cubit.dart';
@@ -15,7 +16,11 @@ class ArtistAlbum extends StatelessWidget {
   final ArtistEntity artist;
   final AlbumEntity album;
   final bool isAllSong;
-  ArtistAlbum({super.key, required this.artist, required this.album, this.isAllSong = false});
+  ArtistAlbum(
+      {super.key,
+      required this.artist,
+      required this.album,
+      this.isAllSong = false});
 
   double paddingAddition = 4;
 
@@ -23,6 +28,8 @@ class ArtistAlbum extends StatelessWidget {
   Widget build(BuildContext context) {
     // Merandomkan list
     AppColors.gradientList.shuffle();
+
+    List<SongWithFavorite> songs = [];
 
     // Mengambil elemen acak
     Map<String, Color> gradientAcak = AppColors.gradientList.first;
@@ -48,7 +55,8 @@ class ArtistAlbum extends StatelessWidget {
                                 fit: BoxFit.fitWidth,
                                 alignment: const Alignment(0, -0.5),
                                 opacity: 0.7,
-                                image: CachedNetworkImageProvider('${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg'),
+                                image: CachedNetworkImageProvider(
+                                    '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg'),
                               ),
                             )
                           : BoxDecoration(
@@ -88,7 +96,8 @@ class ArtistAlbum extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 13.w + paddingAddition.w),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 13.w + paddingAddition.w),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -99,7 +108,9 @@ class ArtistAlbum extends StatelessWidget {
                               ? Text(
                                   artist.name!,
                                   style: TextStyle(
-                                    fontSize: artist.name!.length <= 9 ? 20.sp : 16.sp,
+                                    fontSize: artist.name!.length <= 9
+                                        ? 20.sp
+                                        : 16.sp,
                                     fontWeight: FontWeight.w500,
                                     letterSpacing: 0.4,
                                   ),
@@ -117,7 +128,8 @@ class ArtistAlbum extends StatelessWidget {
                               : Text(
                                   album.name!,
                                   style: TextStyle(
-                                    fontSize: album.name!.length < 17 ? 23.sp : 18.sp,
+                                    fontSize:
+                                        album.name!.length < 17 ? 23.sp : 18.sp,
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: 0.4,
                                   ),
@@ -199,7 +211,8 @@ class ArtistAlbum extends StatelessWidget {
                       height: 10.h,
                     ),
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 3.w + paddingAddition.w),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 3.w + paddingAddition.w),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -208,7 +221,72 @@ class ArtistAlbum extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  blurryDialogForPlaylist(
+                                      backgroundImage:
+                                          '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
+                                      context: context,
+                                      artist: artist,
+                                      songList: songs,
+                                      contentToCopy: Row(
+                                        children: [
+                                          Container(
+                                            height: 50.w,
+                                            width: 50.w,
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                image: NetworkImage(
+                                                  '${AppURLs.supabaseAlbumStorage}${artist.name} - ${album.name}.jpg',
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: 9.w,
+                                          ),
+                                          Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                '${artist.name}\'s',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.white70,
+                                                    fontSize: 11.2.sp),
+                                              ),
+                                              Text(
+                                                '${album.name}',
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.w500,
+                                                    fontSize: 16.sp,
+                                                    letterSpacing: 0.4),
+                                              ),
+                                              ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        15.sp),
+                                                child: Container(
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 5.w,
+                                                      vertical: 1.h),
+                                                  color: Colors.white,
+                                                  child: Text(
+                                                    '${songs.length} Songs',
+                                                    style: TextStyle(
+                                                        color: AppColors
+                                                            .darkBackground,
+                                                        fontSize: 8.sp,
+                                                        fontWeight:
+                                                            FontWeight.w500),
+                                                  ),
+                                                ),
+                                              )
+                                            ],
+                                          )
+                                        ],
+                                      ));
+                                },
                                 splashRadius: 18.sp,
                                 icon: Icon(
                                   Icons.playlist_add,
@@ -241,7 +319,9 @@ class ArtistAlbum extends StatelessWidget {
                             child: Container(
                               // margin: EdgeInsets.only(right: 10.w),
                               padding: EdgeInsets.all(5.h),
-                              decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+                              decoration: const BoxDecoration(
+                                  color: AppColors.primary,
+                                  shape: BoxShape.circle),
                               child: IconButton(
                                 onPressed: () {},
                                 icon: Icon(
@@ -268,7 +348,8 @@ class ArtistAlbum extends StatelessWidget {
                   children: [
                     // Album Songs
                     BlocProvider(
-                      create: (context) => AlbumSongsCubit()..getAlbumSongs(album.albumId!),
+                      create: (context) =>
+                          AlbumSongsCubit()..getAlbumSongs(album.albumId!),
                       child: BlocBuilder<AlbumSongsCubit, AlbumSongsState>(
                         builder: (context, state) {
                           if (state is AlbumSongsLoading) {
@@ -290,13 +371,15 @@ class ArtistAlbum extends StatelessWidget {
                             );
                           }
                           if (state is AlbumSongsLoaded) {
+                            songs = state.songs;
                             return SingleChildScrollView(
                               child: Column(
                                 children: [
                                   ListView.builder(
                                     // padding: EdgeInsets.only(
                                     //     left: 13.w, top: 5.h,),
-                                    physics: const NeverScrollableScrollPhysics(),
+                                    physics:
+                                        const NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
                                     itemBuilder: (context, index) {
                                       return SongTileWidget(
@@ -347,7 +430,8 @@ class ArtistAlbum extends StatelessWidget {
 
                     // Other album
                     BlocProvider(
-                      create: (context) => AlbumListCubit()..getAlbum(artist.id!),
+                      create: (context) =>
+                          AlbumListCubit()..getAlbum(artist.id!),
                       child: BlocBuilder<AlbumListCubit, AlbumListState>(
                         builder: (context, state) {
                           if (state is AlbumListLoading) {
@@ -372,13 +456,19 @@ class ArtistAlbum extends StatelessWidget {
                                 children: List.generate(
                                   state.albumEntity.length,
                                   (index) {
-                                    return state.albumEntity[index].albumId != album.albumId
+                                    return state.albumEntity[index].albumId !=
+                                            album.albumId
                                         ? AlbumTileWidget(
                                             album: albumEntity[index],
                                             artist: artist,
                                             isOnAlbumPage: true,
                                             rightPadding: 7.w,
-                                            leftPadding: index == 0 || albumEntity[index].albumId != albumEntity[0].albumId ? 17.w : 0,
+                                            leftPadding: index == 0 ||
+                                                    albumEntity[index]
+                                                            .albumId !=
+                                                        albumEntity[0].albumId
+                                                ? 17.w
+                                                : 0,
                                           )
                                         : Container();
                                   },

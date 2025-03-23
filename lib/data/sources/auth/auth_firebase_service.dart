@@ -19,24 +19,28 @@ class AuthSupabaseServiceImpl extends AuthSupabaseService {
     try {
       // await FirebaseAuth.instance.signInWithEmailAndPassword(email: signInUserReq.email, password: signInUserReq.password);
 
-      await supabase.auth.signInWithPassword(password: signInUserReq.password, email: signInUserReq.email);
+      await supabase.auth.signInWithPassword(
+          password: signInUserReq.password, email: signInUserReq.email);
 
-      var result = await supabase.from('users').select().eq('email', signInUserReq.email).single();
+      var result = await supabase
+          .from('users')
+          .select()
+          .eq('email', signInUserReq.email)
+          .single();
 
       authService.saveLoginStatus(true);
 
-      print(result);
-
       if (result.isEmpty) {
-        authService.saveUserLoggedInInfo(UserModel(email: 'null', fullName: 'null'));
+        authService
+            .saveUserLoggedInInfo(UserModel(email: 'null', fullName: 'null'));
       } else {
-        authService.saveUserLoggedInInfo(UserModel(email: signInUserReq.email, fullName: result['name'], userId : result['user_id']));
+        authService.saveUserLoggedInInfo(UserModel(
+            email: signInUserReq.email,
+            fullName: result['name'],
+            userId: result['user_id']));
       }
 
-      print(supabase.auth.currentSession!.user.id);
-
       return const Right('Sign In was succesfull');
-
     } on AuthApiException catch (e) {
       String message = '';
       if (e.code!.contains("email")) {
@@ -53,13 +57,15 @@ class AuthSupabaseServiceImpl extends AuthSupabaseService {
     try {
       // await FirebaseAuth.instance.createUserWithEmailAndPassword(email: createUserReq.email, password: createUserReq.password);
 
-      await supabase.auth.signUp(password: createUserReq.password, email: createUserReq.email);
+      await supabase.auth
+          .signUp(password: createUserReq.password, email: createUserReq.email);
 
       await supabase.from('users').insert({
         "email": createUserReq.email,
         "name": createUserReq.fullName,
       });
-      authService.saveUserLoggedInInfo(UserModel(email: createUserReq.email, fullName: createUserReq.fullName));
+      authService.saveUserLoggedInInfo(UserModel(
+          email: createUserReq.email, fullName: createUserReq.fullName));
 
       authService.saveLoginStatus(true);
 
@@ -78,7 +84,11 @@ class AuthSupabaseServiceImpl extends AuthSupabaseService {
   @override
   Future<Either> getUser() async {
     try {
-      var data = await supabase.from('users').select('*').eq('user_id', supabase.auth.currentUser!.id).single();
+      var data = await supabase
+          .from('users')
+          .select('*')
+          .eq('user_id', supabase.auth.currentUser!.id)
+          .single();
 
       UserModel userModel = UserModel.fromJson(data);
       return Right(userModel);

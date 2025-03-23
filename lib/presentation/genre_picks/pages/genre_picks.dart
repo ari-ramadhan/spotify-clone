@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
+import 'package:spotify_clone/core/configs/constants/app_key_feature.dart';
 import 'package:spotify_clone/domain/usecases/user/update_favorite_genres.dart';
 import 'package:spotify_clone/presentation/home/pages/home_navigation.dart';
 
@@ -155,8 +156,6 @@ class _GenrePicksState extends State<GenrePicks> {
                                       selectedGenres.remove(
                                           genre); // Remove the specific genre
                                     }
-                                    print(
-                                        'Current Selected Genres: $selectedGenres');
                                   });
                                 },
                               );
@@ -184,16 +183,18 @@ class _GenrePicksState extends State<GenrePicks> {
                       result.fold(
                         (l) {},
                         (r) async {
-                          prefs.setBool('onboarding_complete', true);
+                          prefs.setBool(
+                              AppKeysFeature.SF_ONBOARDING_COMPLETE, true);
                           customSnackBar(
                               isSuccess: true, text: r, context: context);
                         },
                       );
                     } else {
                       int appOpenedCount =
-                          prefs.getInt('app_opened_count') ?? 0;
+                          prefs.getInt(AppKeysFeature.SF_APP_OPENED_COUNT) ?? 0;
 
-                      prefs.setInt('app_opened_count', appOpenedCount++);
+                      prefs.setInt(
+                          AppKeysFeature.SF_APP_OPENED_COUNT, appOpenedCount++);
 
                       Navigator.of(context).push(
                         MaterialPageRoute(

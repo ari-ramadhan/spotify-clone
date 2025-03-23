@@ -237,7 +237,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: state.artists.length,
+                      itemCount: state.artists.take(4).length,
                       itemBuilder: (context, index) {
                         var artist = state.artists[index].artist;
 
@@ -312,85 +312,103 @@ class _ProfilePageState extends State<ProfilePage> {
                           ? ''
                           : widget.userEntity.userEntity.userId!),
                     child: BlocBuilder<FavoriteSongCubit, FavoriteSongState>(
-                      builder: (context, state) {
-                        if (state is FavoriteSongLoading) {
-                          return Container(
-                            alignment: Alignment.center,
-                            height: 100,
-                            child: const CircularProgressIndicator(
-                              color: AppColors.primary,
+                        builder: (context, state) {
+                      // if (state is FavoriteSongLoading) {
+                      //   return Container(
+                      //     alignment: Alignment.center,
+                      //     height: 100,
+                      //     child: const CircularProgressIndicator(
+                      //       color: AppColors.primary,
+                      //     ),
+                      //   );
+                      // }
+                      // if (state is FavoriteSongFailure) {
+                      //   return Container(
+                      //       alignment: Alignment.center,
+                      //       height: 100,
+                      //       child: const Text('Failed to fetch songs'));
+                      // }
+                      // if (state is FavoriteSongLoaded) {
+                      final isLoading = state is FavoriteSongLoading;
+                      final isLoaded = state is FavoriteSongLoaded;
+                      final songs =
+                          isLoaded ? (state as FavoriteSongLoaded).songs : [];
+
+                      return Container(
+                        alignment: Alignment.center,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'From your favorites',
+                              style: TextStyle(
+                                  fontSize: 16.sp, fontWeight: FontWeight.w500),
                             ),
-                          );
-                        }
-                        if (state is FavoriteSongFailure) {
-                          return Container(
-                              alignment: Alignment.center,
-                              height: 100,
-                              child: const Text('Failed to fetch songs'));
-                        }
-                        if (state is FavoriteSongLoaded) {
-                          return Container(
-                            alignment: Alignment.center,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'From your favorites',
-                                  style: TextStyle(
-                                      fontSize: 16.sp,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                                ListView.separated(
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  shrinkWrap: true,
-                                  padding: EdgeInsets.only(top: 10.w),
-                                  itemCount: state.songs.take(5).length,
-                                  itemBuilder: (context, index) {
-                                    var songModel = state.songs[index];
+                            ListView.separated(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              padding: EdgeInsets.only(top: 10.w),
+                              itemCount: isLoading ? 5 : songs.take(5).length,
+                              itemBuilder: (context, index) {
+                                SongWithFavorite emptySong = SongWithFavorite(
+                                    SongEntity(
+                                        title: 'data data data',
+                                        id: 1,
+                                        artist: 'data data',
+                                        duration: 1,
+                                        artistId: 1,
+                                        releaseDate: 'data data'),
+                                    false);
+                                var songModel =
+                                    isLoaded ? songs[index] : emptySong;
 
-                                    return SongTileWidgetSelectable(
-                                      songEntity: songModel,
-                                      onSelectionChanged: (selectedSong) {
-                                        setState(() {
-                                          if (selectedSong != null) {
-                                            // Tambahkan jika tidak ada di daftar
-                                            if (!selectedSongs
-                                                .contains(selectedSong)) {
-                                              selectedSongs.add(selectedSong);
-                                              print(
-                                                  'Added: ${selectedSong.song.title}');
-                                            }
-                                          } else {
-                                            // Hapus berdasarkan id jika ada
-                                            selectedSongs.removeWhere((song) =>
-                                                song.song.id ==
-                                                songModel.song.id);
-                                            print(
-                                                'Removed: ${songModel.song.title}');
-                                          }
-                                        });
+                                return Skeletonizer(
+                                  enabled: isLoading,
+                                  child: SongTileWidgetSelectable(
+                                    isLoading: isLoading,
+                                    songEntity: songModel,
+                                    onSelectionChanged: (selectedSong) {
+                                      isLoading
+                                          ? null
+                                          : setState(() {
+                                              if (selectedSong != null) {
+                                                // Tambahkan jika tidak ada di daftar
+                                                if (!selectedSongs
+                                                    .contains(selectedSong)) {
+                                                  selectedSongs
+                                                      .add(selectedSong);
+                                                }
+                                              } else {
+                                                // Hapus berdasarkan id jika ada
+                                                selectedSongs.removeWhere(
+                                                    (song) =>
+                                                        song.song.id ==
+                                                        songModel.song.id);
+                                              }
+                                            });
 
-                                        // Debugging: Tampilkan semua ID lagu yang dipilih
-                                        print(
-                                            'Current Selected Songs: ${selectedSongs.map((s) => s.song.id).toList()}');
-                                      },
+                                      // Debugging: Tampilkan semua ID lagu yang dipilih
+                                      // print(
+                                      //     'Current Selected Songs: ${selectedSongs.map((s) => s.song.id).toList()}');
+                                    },
 
-                                      // isSelected: true,
-                                    );
-                                  },
-                                  separatorBuilder: (context, index) {
-                                    return SizedBox(
-                                      height: 6.h,
-                                    );
-                                  },
-                                )
-                              ],
-                            ),
-                          );
-                        }
-                        return Container();
-                      },
-                    ),
+                                    // isSelected: true,
+                                  ),
+                                );
+                              },
+                              separatorBuilder: (context, index) {
+                                return SizedBox(
+                                  height: 6.h,
+                                );
+                              },
+                            )
+                          ],
+                        ),
+                      );
+                    }
+                        // return Container();
+                        // },
+                        ),
                   ),
                 )
               ],
@@ -594,6 +612,8 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   Skeletonizer(
                     enabled: isLoading,
+                    textBoneBorderRadius:
+                        TextBoneBorderRadius(BorderRadius.circular(0)),
                     child: Text(
                       'My Favorites',
                       style: TextStyle(fontSize: 14.sp),
@@ -603,6 +623,8 @@ class _ProfilePageState extends State<ProfilePage> {
                     height: 3.h,
                   ),
                   Skeletonizer(
+                    textBoneBorderRadius:
+                        TextBoneBorderRadius(BorderRadius.circular(0)),
                     enabled: isLoading,
                     child: Text(
                       'Playlist | ${state is FavoriteSongLoaded ? state.songs.length : 0} songs',
@@ -1412,9 +1434,11 @@ class _ProfilePageState extends State<ProfilePage> {
 class SkeletonPlaylistTile extends StatelessWidget {
   final bool isCircle;
   final bool isRounded;
+  final double extraPadding;
   const SkeletonPlaylistTile({
     required this.isCircle,
     required this.isRounded,
+    this.extraPadding = 0,
     super.key,
   });
 
@@ -1422,7 +1446,8 @@ class SkeletonPlaylistTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.symmetric(vertical: 5.h, horizontal: 17.w),
+      padding:
+          EdgeInsets.symmetric(vertical: 5.h, horizontal: 17.w + extraPadding),
       child: Row(
         children: [
           Skeletonizer(
@@ -1431,10 +1456,9 @@ class SkeletonPlaylistTile extends StatelessWidget {
               height: 40.h,
               width: 44.w,
               decoration: BoxDecoration(
-                shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
-                color: Colors.grey.shade800,
-                borderRadius: BorderRadius.circular(isRounded ? 7.sp : 0)
-              ),
+                  shape: isCircle ? BoxShape.circle : BoxShape.rectangle,
+                  color: Colors.grey.shade800,
+                  borderRadius: BorderRadius.circular(isRounded ? 7.sp : 0)),
             ),
           ),
           SizedBox(

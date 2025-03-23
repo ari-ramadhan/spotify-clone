@@ -257,6 +257,7 @@ Future<Object?> blurryDialogForPlaylist({
   required BuildContext context,
   required ArtistEntity artist,
   required List<SongWithFavorite> songList,
+  required Widget contentToCopy
 }) async {
   return showGeneralDialog(
     barrierDismissible: true,
@@ -296,48 +297,7 @@ Future<Object?> blurryDialogForPlaylist({
                       left: 0,
                       child: Padding(
                         padding: EdgeInsets.only(left: 12.w, bottom: 15.h),
-                        child: Row(
-                          children: [
-                            Container(
-                              height: 50.w,
-                              width: 50.w,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(
-                                    '${AppURLs.supabaseThisIsMyStorage}${artist.name!.toLowerCase()}.jpg',
-                                  ),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 9.w,
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'This is',
-                                  style: TextStyle(fontWeight: FontWeight.w500, color: Colors.white70, fontSize: 11.2.sp),
-                                ),
-                                Text(
-                                  '${artist.name}',
-                                  style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.sp, letterSpacing: 0.4),
-                                ),
-                                ClipRRect(
-                                  borderRadius: BorderRadius.circular(15.sp),
-                                  child: Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 5.w, vertical: 1.h),
-                                    color: Colors.white,
-                                    child: Text(
-                                      '12 Songs',
-                                      style: TextStyle(color: AppColors.darkBackground, fontSize: 8.sp, fontWeight: FontWeight.w500),
-                                    ),
-                                  ),
-                                )
-                              ],
-                            )
-                          ],
-                        ),
+                        child: contentToCopy,
                       ),
                     ),
                     Positioned(

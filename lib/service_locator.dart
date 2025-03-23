@@ -3,16 +3,19 @@ import 'package:spotify_clone/data/repository/album/album_repository_impl.dart';
 import 'package:spotify_clone/data/repository/artist/artist_repository_impl.dart';
 import 'package:spotify_clone/data/repository/auth/auth_repository_impl.dart';
 import 'package:spotify_clone/data/repository/playlist/playlist_repository.dart';
+import 'package:spotify_clone/data/repository/search/recent_search_repository_impl.dart';
 import 'package:spotify_clone/data/repository/song/song_repository_impl.dart';
 import 'package:spotify_clone/data/sources/album/album_supabase_service.dart';
 import 'package:spotify_clone/data/sources/artist/artist_supabase_service.dart';
 import 'package:spotify_clone/data/sources/auth/auth_firebase_service.dart';
 import 'package:spotify_clone/data/sources/playlist/playlist_supabase_service.dart';
+import 'package:spotify_clone/data/sources/search/search_supabase_service.dart';
 import 'package:spotify_clone/data/sources/song/song_supabase_service.dart';
 import 'package:spotify_clone/domain/repository/album/album.dart';
 import 'package:spotify_clone/domain/repository/artist/artist.dart';
 import 'package:spotify_clone/domain/repository/auth/auth.dart';
 import 'package:spotify_clone/domain/repository/playlist/playlist.dart';
+import 'package:spotify_clone/domain/repository/search/recent_search.dart';
 import 'package:spotify_clone/domain/repository/song/song.dart';
 import 'package:spotify_clone/domain/repository/user/user.dart';
 import 'package:spotify_clone/domain/usecases/album/get_all_songs.dart';
@@ -36,6 +39,13 @@ import 'package:spotify_clone/domain/usecases/playlist/delete_song_from_playlist
 import 'package:spotify_clone/domain/usecases/playlist/get_currentUser_playlist.dart';
 import 'package:spotify_clone/domain/usecases/playlist/add_song_by_keyword.dart';
 import 'package:spotify_clone/domain/usecases/playlist/update_playlist_info.dart';
+import 'package:spotify_clone/domain/usecases/search/delete_all_recent_search_keyword.dart';
+import 'package:spotify_clone/domain/usecases/search/delete_recent_search_keyword.dart';
+import 'package:spotify_clone/domain/usecases/search/get_recent_albums.dart';
+import 'package:spotify_clone/domain/usecases/search/get_recent_artists.dart';
+import 'package:spotify_clone/domain/usecases/search/get_recent_playlists.dart';
+import 'package:spotify_clone/domain/usecases/search/get_recent_search_keyword.dart';
+import 'package:spotify_clone/domain/usecases/search/set_recent_search_keyword.dart';
 import 'package:spotify_clone/domain/usecases/song/add_or_remove_favorite_song.dart';
 import 'package:spotify_clone/domain/usecases/song/add_recent_song.dart';
 import 'package:spotify_clone/domain/usecases/song/get_album_songs.dart';
@@ -61,179 +71,96 @@ import 'data/sources/user/user_supabase_service.dart';
 
 final sl = GetIt.instance;
 
-Future<void> initializeDependencies () async {
-
+Future<void> initializeDependencies() async {
   // auth
-  sl.registerSingleton<AuthSupabaseService>(
-    AuthSupabaseServiceImpl()
-  );
-  sl.registerSingleton<AuthRepository>(
-    AuthRepositoryImpl()
-  );
-  sl.registerSingleton<SignUpUseCase>(
-    SignUpUseCase()
-  );
-  sl.registerSingleton<SignInUseCase>(
-    SignInUseCase()
-  );
-  sl.registerSingleton<GetUserUseCase>(
-    GetUserUseCase()
-  );
+  sl.registerSingleton<AuthSupabaseService>(AuthSupabaseServiceImpl());
+  sl.registerSingleton<AuthRepository>(AuthRepositoryImpl());
+  sl.registerSingleton<SignUpUseCase>(SignUpUseCase());
+  sl.registerSingleton<SignInUseCase>(SignInUseCase());
+  sl.registerSingleton<GetUserUseCase>(GetUserUseCase());
 
   // songs
-  sl.registerSingleton<SongRepository>(
-    SongRepositoryImpl()
-  );
-  sl.registerSingleton<SongSupabaseService>(
-    SongSupabaseServiceImpl()
-  );
-  sl.registerSingleton<GetNewsSongsUseCase>(
-    GetNewsSongsUseCase()
-  );
-  sl.registerSingleton<GetPlaylistUseCase>(
-    GetPlaylistUseCase()
-  );
+  sl.registerSingleton<SongRepository>(SongRepositoryImpl());
+  sl.registerSingleton<SongSupabaseService>(SongSupabaseServiceImpl());
+  sl.registerSingleton<GetNewsSongsUseCase>(GetNewsSongsUseCase());
+  sl.registerSingleton<GetPlaylistUseCase>(GetPlaylistUseCase());
   sl.registerSingleton<GetUserFavoriteSongUseCase>(
-    GetUserFavoriteSongUseCase()
-  );
+      GetUserFavoriteSongUseCase());
   sl.registerSingleton<AddOrRemoveFavoriteSongUseCase>(
-    AddOrRemoveFavoriteSongUseCase()
-  );
-  sl.registerSingleton<IsFavoriteSongUseCase>(
-    IsFavoriteSongUseCase()
-  );
-  sl.registerSingleton<GetArtistSongsUseCase>(
-    GetArtistSongsUseCase()
-  );
-  sl.registerSingleton<GetAlbumSongsUseCase>(
-    GetAlbumSongsUseCase()
-  );
-  sl.registerSingleton<GetAllSongsUseCase>(
-    GetAllSongsUseCase()
-  );
-  sl.registerSingleton<GetPlaylistSongsUseCase>(
-    GetPlaylistSongsUseCase()
-  );
+      AddOrRemoveFavoriteSongUseCase());
+  sl.registerSingleton<IsFavoriteSongUseCase>(IsFavoriteSongUseCase());
+  sl.registerSingleton<GetArtistSongsUseCase>(GetArtistSongsUseCase());
+  sl.registerSingleton<GetAlbumSongsUseCase>(GetAlbumSongsUseCase());
+  sl.registerSingleton<GetAllSongsUseCase>(GetAllSongsUseCase());
+  sl.registerSingleton<GetPlaylistSongsUseCase>(GetPlaylistSongsUseCase());
   sl.registerSingleton<SearchSongByKeywordUseCase>(
-    SearchSongByKeywordUseCase()
-  );
-  sl.registerSingleton<GetRecentSongsUseCase>(
-    GetRecentSongsUseCase()
-  );
-  sl.registerSingleton<AddRecentSongUseCase>(
-    AddRecentSongUseCase()
-  );
-  sl.registerSingleton<SearchSongUseCase>(
-    SearchSongUseCase()
-  );
+      SearchSongByKeywordUseCase());
+  sl.registerSingleton<GetRecentSongsUseCase>(GetRecentSongsUseCase());
+  sl.registerSingleton<AddRecentSongUseCase>(AddRecentSongUseCase());
+  sl.registerSingleton<SearchSongUseCase>(SearchSongUseCase());
   sl.registerSingleton<PopularSongsFromFavArtistUseCase>(
-    PopularSongsFromFavArtistUseCase()
-  );
-
+      PopularSongsFromFavArtistUseCase());
 
   // artist
-  sl.registerSingleton<ArtistRepository>(
-    ArtistRepositoryImpl()
-  );
-  sl.registerSingleton<ArtistSupabaseService>(
-    ArtistSupabaseServiceImpl()
-  );
-  sl.registerSingleton<GetArtistInfoUseCase>(
-    GetArtistInfoUseCase()
-  );
-  sl.registerSingleton<GetAllArtistUseCase>(
-    GetAllArtistUseCase()
-  );
+  sl.registerSingleton<ArtistRepository>(ArtistRepositoryImpl());
+  sl.registerSingleton<ArtistSupabaseService>(ArtistSupabaseServiceImpl());
+  sl.registerSingleton<GetArtistInfoUseCase>(GetArtistInfoUseCase());
+  sl.registerSingleton<GetAllArtistUseCase>(GetAllArtistUseCase());
   sl.registerSingleton<FollowUnfollowArtistUseCase>(
-    FollowUnfollowArtistUseCase()
-  );
-  sl.registerSingleton<IsFollowingArtistUseCase>(
-    IsFollowingArtistUseCase()
-  );
+      FollowUnfollowArtistUseCase());
+  sl.registerSingleton<IsFollowingArtistUseCase>(IsFollowingArtistUseCase());
   sl.registerSingleton<GetRecommendedArtistBasedOnPlaylistUseCase>(
-    GetRecommendedArtistBasedOnPlaylistUseCase()
-  );
-  sl.registerSingleton<GetFollowedArtistsUseCase>(
-    GetFollowedArtistsUseCase()
-  );
-  sl.registerSingleton<GetArtistSingleSongs>(
-    GetArtistSingleSongs()
-  );
-  sl.registerSingleton<HotArtistsUseCase>(
-    HotArtistsUseCase()
-  );
+      GetRecommendedArtistBasedOnPlaylistUseCase());
+  sl.registerSingleton<GetFollowedArtistsUseCase>(GetFollowedArtistsUseCase());
+  sl.registerSingleton<GetArtistSingleSongs>(GetArtistSingleSongs());
+  sl.registerSingleton<HotArtistsUseCase>(HotArtistsUseCase());
 
   // album
-  sl.registerSingleton<AlbumRepository>(
-    AlbumRepositoryImpl()
-  );
-  sl.registerSingleton<AlbumSupabaseService>(
-    AlbumSupabaseServiceImpl()
-  );
-  sl.registerSingleton<GetArtistAlbumUseCase>(
-    GetArtistAlbumUseCase()
-  );
-  sl.registerSingleton<GetTopAlbumsUseCase>(
-    GetTopAlbumsUseCase()
-  );
+  sl.registerSingleton<AlbumRepository>(AlbumRepositoryImpl());
+  sl.registerSingleton<AlbumSupabaseService>(AlbumSupabaseServiceImpl());
+  sl.registerSingleton<GetArtistAlbumUseCase>(GetArtistAlbumUseCase());
+  sl.registerSingleton<GetTopAlbumsUseCase>(GetTopAlbumsUseCase());
 
   // playlist
-  sl.registerSingleton<PlaylistRepository>(
-    PlaylistRepositoryImpl()
-  );
-  sl.registerSingleton<PlaylistSupabaseService>(
-    PlaylistSupabaseServiceImpl()
-  );
+  sl.registerSingleton<PlaylistRepository>(PlaylistRepositoryImpl());
+  sl.registerSingleton<PlaylistSupabaseService>(PlaylistSupabaseServiceImpl());
   sl.registerSingleton<GetCurrentuserPlaylistUseCase>(
-    GetCurrentuserPlaylistUseCase()
-  );
-  sl.registerSingleton<AddNewPlaylistUseCase>(
-    AddNewPlaylistUseCase()
-  );
-  sl.registerSingleton<UpdatePlaylistInfoUseCase>(
-    UpdatePlaylistInfoUseCase()
-  );
-  sl.registerSingleton<AddSongsToPlaylistUseCase>(
-    AddSongsToPlaylistUseCase()
-  );
-  sl.registerSingleton<DeletePlaylistUseCase>(
-    DeletePlaylistUseCase()
-  );
-  sl.registerSingleton<AddSongByKeywordUseCase>(
-    AddSongByKeywordUseCase()
-  );
+      GetCurrentuserPlaylistUseCase());
+  sl.registerSingleton<AddNewPlaylistUseCase>(AddNewPlaylistUseCase());
+  sl.registerSingleton<UpdatePlaylistInfoUseCase>(UpdatePlaylistInfoUseCase());
+  sl.registerSingleton<AddSongsToPlaylistUseCase>(AddSongsToPlaylistUseCase());
+  sl.registerSingleton<DeletePlaylistUseCase>(DeletePlaylistUseCase());
+  sl.registerSingleton<AddSongByKeywordUseCase>(AddSongByKeywordUseCase());
   sl.registerSingleton<DeleteSongFromPlaylistUseCase>(
-    DeleteSongFromPlaylistUseCase()
-  );
-  sl.registerSingleton<BatchAddToPlaylistUseCase>(
-    BatchAddToPlaylistUseCase()
-  );
+      DeleteSongFromPlaylistUseCase());
+  sl.registerSingleton<BatchAddToPlaylistUseCase>(BatchAddToPlaylistUseCase());
 
   // user
-  sl.registerSingleton<UserRepository>(
-    UserRepositoryImpl()
-  );
-  sl.registerSingleton<UserSupabaseService>(
-    UserSupabaseServiceImpl()
-  );
+  sl.registerSingleton<UserRepository>(UserRepositoryImpl());
+  sl.registerSingleton<UserSupabaseService>(UserSupabaseServiceImpl());
   sl.registerSingleton<GetFollowerandfollowingUseCase>(
-    GetFollowerandfollowingUseCase()
-  );
-  sl.registerSingleton<FollowUserUseCase>(
-    FollowUserUseCase()
-  );
+      GetFollowerandfollowingUseCase());
+  sl.registerSingleton<FollowUserUseCase>(FollowUserUseCase());
   sl.registerSingleton<CheckFollowingStatusUseCase>(
-    CheckFollowingStatusUseCase()
-  );
+      CheckFollowingStatusUseCase());
   sl.registerSingleton<UploadProfilePictureUseCase>(
-    UploadProfilePictureUseCase()
-  );
-  sl.registerSingleton<UpdateUsernameUseCase>(
-    UpdateUsernameUseCase()
-  );
+      UploadProfilePictureUseCase());
+  sl.registerSingleton<UpdateUsernameUseCase>(UpdateUsernameUseCase());
   sl.registerSingleton<UpdateFavoriteGenresUseCase>(
-    UpdateFavoriteGenresUseCase()
-  );
+      UpdateFavoriteGenresUseCase());
 
-
+  // search
+  sl.registerSingleton<RecentSearchRepository>(RecentSearchRepositoryImpl());
+  sl.registerSingleton<SearchSupabaseService>(SearchSupabaseServiceImpl());
+  sl.registerSingleton<SetRecentSearchKeywordUseCase>(
+      SetRecentSearchKeywordUseCase());
+  sl.registerSingleton<GetRecentSearchKeywordUseCase>(
+      GetRecentSearchKeywordUseCase());
+  sl.registerSingleton<DeleteRecentSearchKeywordUseCase>(
+      DeleteRecentSearchKeywordUseCase());
+  sl.registerSingleton<DeleteAllRecentSearchKeywordUseCase>(
+      DeleteAllRecentSearchKeywordUseCase());
+  sl.registerSingleton<GetRecentArtistsUseCase>(GetRecentArtistsUseCase());
+  sl.registerSingleton<GetRecentAlbumssUseCase>(GetRecentAlbumssUseCase());
+  sl.registerSingleton<GetRecentPlaylistsUseCase>(GetRecentPlaylistsUseCase());
 }

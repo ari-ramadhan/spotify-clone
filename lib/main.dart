@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
+import 'package:spotify_clone/core/configs/constants/app_key_feature.dart';
 import 'package:spotify_clone/data/repository/auth/auth_service.dart';
 import 'package:spotify_clone/presentation/genre_picks/pages/genre_picks.dart';
 import 'package:spotify_clone/presentation/home/bloc/all_song/allSong_cubit.dart';
@@ -12,6 +13,7 @@ import 'package:spotify_clone/presentation/playlist/bloc/playlist_songs_cubit.da
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/profile_image_upload/profile_image_cubit.dart';
 import 'package:spotify_clone/presentation/song_player/bloc/song_player_cubit.dart';
+import 'package:spotify_clone/presentation/common/widgets/mini_player.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -56,8 +58,8 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> _checkOnBoardStatus() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _onBoarded = prefs.getBool('onboarding_complete') ?? false;
-    _appOpenedCount = prefs.getInt('app_opened_count') ?? 0;
+    _onBoarded = prefs.getBool(AppKeysFeature.SF_ONBOARDING_COMPLETE) ?? false;
+    _appOpenedCount = prefs.getInt(AppKeysFeature.SF_APP_OPENED_COUNT) ?? 0;
 
     if (_appOpenedCount == 20) {
       _onBoardAutoSkip = false;

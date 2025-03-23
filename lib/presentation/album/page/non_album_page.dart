@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/album_song_tile/album_tile_widget.dart';
@@ -33,6 +35,27 @@ class _NonAlbumPageState extends State<NonAlbumPage> {
   Widget build(BuildContext context) {
     // Merandomkan list
     AppColors.gradientList.shuffle();
+    final _textKey = GlobalKey();
+
+    bool judgeTitleTextMarquee(double parentWidth) {
+      final textPainter = TextPainter(
+        textDirection: TextDirection.ltr,
+        text: TextSpan(
+          text: widget.nonAlbumPageTitle,
+          style: TextStyle(
+              fontSize: 20.sp,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.4,
+              color: Colors.black),
+        ),
+      );
+      textPainter.layout();
+      var textWidth = textPainter.width;
+      if (textWidth > parentWidth) {
+        return true;
+      }
+      return false;
+    }
 
     return Scaffold(
       backgroundColor: AppColors.medDarkBackground,
@@ -40,154 +63,315 @@ class _NonAlbumPageState extends State<NonAlbumPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Column(
+            Stack(
               children: [
-                // Header Section (Album Picture)
-                Stack(
-                  children: [
-                    // Album Picture
-                    Container(
-                        width: double.infinity,
-                        height: 200.h,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            fit: BoxFit.fitWidth,
-                            alignment: const Alignment(0, -0.5),
-                            opacity: 0.7,
-                            image: CachedNetworkImageProvider('${AppURLs.supabaseArtistStorage}${widget.artist.name!.toLowerCase()}.jpg'),
-                          ),
-                        )),
-                    // Back Button
-                    Padding(
-                      padding: EdgeInsets.symmetric(vertical: 7.w),
-                      child: IconButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        icon: Icon(
-                          size: 24.sp,
-                          Icons.arrow_back_ios_rounded,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                // Body Section (Album Details)
                 Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 17.w),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(
-                            height: 14.h,
-                          ),
-                          Text(
-                            'Artist\'s entire songs',
-                            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500, letterSpacing: 0.4, color: Colors.white70),
-                          ),
-                          Text(
-                            widget.nonAlbumPageTitle,
-                            style: TextStyle(
-                              fontSize: 22.sp,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.4,
-                            ),
-                          ),
-                          SizedBox(
-                            height: 15.h,
-                          ),
-                          Text(
-                            '8.923.892 times played, 30m',
-                            style: TextStyle(
-                              fontSize: 12.sp,
-                              color: Colors.white.withOpacity(
-                                0.85,
+                    // Header Section (Album Picture)
+                    Stack(
+                      children: [
+                        // Album Picture
+                        Stack(
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              height: 200.h,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(50.sp),
+                                  bottomRight: Radius.circular(50.sp),
+                                ),
+                                image: DecorationImage(
+                                  fit: BoxFit.fitWidth,
+                                  // alignment: const Alignment(0, -0.5),
+                                  image: CachedNetworkImageProvider(
+                                      '${AppURLs.supabaseArtistStorage}${widget.artist.name!.toLowerCase()}.jpg'),
+                                ),
                               ),
                             ),
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(50.sp),
+                                  bottomRight: Radius.circular(50.sp),
+                                ),
+                              ),
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                                child: Container(
+                                  color: Colors.white.withOpacity(0.5),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        // Back Button
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 7.w),
+                          child: IconButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            icon: Icon(
+                              size: 24.sp,
+                              Icons.arrow_back_ios_rounded,
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    SizedBox(
-                      height: 10.h,
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 8.w).copyWith(right: 0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                               IconButton(
-                                onPressed: () {
-                                  blurryDialogForPlaylist(
-                                    context: context,
-                                    artist: widget.artist,
-                                    songList: songs,
-                                    backgroundImage: '${AppURLs.supabaseArtistStorage}${widget.artist.name!.toLowerCase()}.jpg',
 
-                                    // content: Column(
-                                    //   children: [],
-                                    // ),
-                                    // horizontalPadding: 10.w,
-                                  );
-                                },
-                                iconSize: 20.sp,
-                                splashRadius: 20.sp,
-                                icon: Icon(
-                                  Icons.playlist_add_circle_rounded,
-                                  color: AppColors.primary,
-                                  size: 28.sp,
-                                ),
+                    // Body Section (Album Details)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          height: 50.h,
+                        ),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.w)
+                              .copyWith(right: 0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  IconButton(
+                                    onPressed: () {
+                                      blurryDialogForPlaylist(
+                                          context: context,
+                                          artist: widget.artist,
+                                          songList: songs,
+                                          backgroundImage:
+                                              '${AppURLs.supabaseArtistStorage}${widget.artist.name!.toLowerCase()}.jpg',
+                                          contentToCopy: Row(
+                                            children: [
+                                              Container(
+                                                height: 50.w,
+                                                width: 50.w,
+                                                decoration: BoxDecoration(
+                                                  image: DecorationImage(
+                                                    image: NetworkImage(
+                                                      '${AppURLs.supabaseThisIsMyStorage}${widget.artist.name!.toLowerCase()}.jpg',
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: 9.w,
+                                              ),
+                                              Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    widget.nonAlbumPageTitle
+                                                            .contains('This is')
+                                                        ? 'This is'
+                                                        : '${widget.artist.name}\'s',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: Colors.white70,
+                                                        fontSize: 11.2.sp),
+                                                  ),
+                                                  Text(
+                                                    widget.nonAlbumPageTitle
+                                                            .contains('This is')
+                                                        ? '${widget.artist.name}'
+                                                        : 'Singles',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        fontSize: 16.sp,
+                                                        letterSpacing: 0.4),
+                                                  ),
+                                                  ClipRRect(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            15.sp),
+                                                    child: Container(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal: 5.w,
+                                                              vertical: 1.h),
+                                                      color: Colors.white,
+                                                      child: Text(
+                                                        '${songs.length} Songs',
+                                                        style: TextStyle(
+                                                            color: AppColors
+                                                                .darkBackground,
+                                                            fontSize: 8.sp,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500),
+                                                      ),
+                                                    ),
+                                                  )
+                                                ],
+                                              )
+                                            ],
+                                          )
+
+                                          // content: Column(
+                                          //   children: [],
+                                          // ),
+                                          // horizontalPadding: 10.w,
+                                          );
+                                    },
+                                    iconSize: 20.sp,
+                                    splashRadius: 20.sp,
+                                    icon: Icon(
+                                      Icons.playlist_add_circle_rounded,
+                                      color: AppColors.primary,
+                                      size: 28.sp,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {},
+                                    iconSize: 20.sp,
+                                    splashRadius: 20.sp,
+                                    icon: Icon(
+                                      Icons.favorite_outline_rounded,
+                                      color: AppColors.primary,
+                                      size: 26.w,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {},
+                                    iconSize: 20.sp,
+                                    splashRadius: 20.sp,
+                                    icon: Icon(
+                                      Icons.more_horiz_rounded,
+                                      color: Colors.white70,
+                                      size: 28.w,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              IconButton(
-                                onPressed: () {},
-                                iconSize: 20.sp,
-                                splashRadius: 20.sp,
-                                icon: Icon(
-                                  Icons.favorite_outline_rounded,
-                                  color: AppColors.primary,
-                                  size: 26.w,
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () {},
-                                iconSize: 20.sp,
-                                splashRadius: 20.sp,
-                                icon: Icon(
-                                  Icons.more_horiz_rounded,
-                                  color: Colors.white70,
-                                  size: 28.w,
+                              GestureDetector(
+                                onTap: () {},
+                                child: Container(
+                                  margin: EdgeInsets.only(right: 5.w),
+                                  padding: EdgeInsets.all(5.h),
+                                  decoration: const BoxDecoration(
+                                      color: AppColors.primary,
+                                      shape: BoxShape.circle),
+                                  child: IconButton(
+                                    onPressed: () {},
+                                    icon: Icon(
+                                      Icons.play_arrow_rounded,
+                                      size: 25.h,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
-                          GestureDetector(
-                            onTap: () {},
-                            child: Container(
-                              margin: EdgeInsets.only(right: 5.w),
-                              padding: EdgeInsets.all(5.h),
-                              decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
-                              child: IconButton(
-                                onPressed: () {},
-                                icon: Icon(
-                                  Icons.play_arrow_rounded,
-                                  size: 25.h,
-                                  color: Colors.white,
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+                Padding(
+                  padding: EdgeInsets.only(top: 170.h, left: 25.w, right: 25.w),
+                  child: Container(
+                    padding: EdgeInsets.all(10.sp),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(17.sp),
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.5),
+                          spreadRadius: 4,
+                          blurRadius: 10,
+                          offset: Offset(0, 0),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              width: widget.nonAlbumPageTitle.length > 12
+                                  ? 64.sp
+                                  : 60.sp,
+                              height: widget.nonAlbumPageTitle.length > 12
+                                  ? 64.sp
+                                  : 60.sp,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(7.sp),
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: CachedNetworkImageProvider(
+                                      '${AppURLs.supabaseArtistStorage}${widget.artist.name!.toLowerCase()}.jpg'),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
+                            SizedBox(
+                              width: 15.w,
+                            ),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Artist\'s entire songs',
+                                    style: TextStyle(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w500,
+                                        letterSpacing: 0.4,
+                                        color: Colors.black),
+                                  ),
+                                  // TextPainter(
+                                  //   text:
+                                  // )
+                                  SizedBox(
+                                    child: Text(
+                                      widget.nonAlbumPageTitle,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.clip,
+                                      textScaler: TextScaler.linear(
+                                          widget.nonAlbumPageTitle.length > 12
+                                              ? 0.8
+                                              : 1),
+                                      style: TextStyle(
+                                          fontSize: 20.sp,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 0.4,
+                                          height: 1.4,
+                                          color: Colors.black),
+                                    ),
+                                  ),
+                                  Text(
+                                    '8.923.892 times played, 30m',
+                                    style: TextStyle(
+                                      fontSize: 8.sp,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.black.withOpacity(
+                                        0.85,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                        Divider(
+                          color: AppColors.grey,
+                          thickness: 0.7,
+                          height: 20.h,
+                        )
+                      ],
                     ),
-                  ],
+                  ),
                 )
               ],
             ),
@@ -200,7 +384,8 @@ class _NonAlbumPageState extends State<NonAlbumPage> {
                     // Album Songs
                     widget.nonAlbumPageTitle.contains('This is')
                         ? BlocProvider(
-                            create: (context) => AllSongsCubit()..getAllSongs(widget.artist.id!),
+                            create: (context) =>
+                                AllSongsCubit()..getAllSongs(widget.artist.id!),
                             child: BlocBuilder<AllSongsCubit, AllSongsState>(
                               builder: (context, state) {
                                 if (state is AllSongsLoading) {
@@ -229,12 +414,14 @@ class _NonAlbumPageState extends State<NonAlbumPage> {
                                       children: [
                                         ListView.builder(
                                           // padding: EdgeInsets.only(left: 22.w, top: 5.h),
-                                          physics: const NeverScrollableScrollPhysics(),
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
                                           shrinkWrap: true,
                                           itemBuilder: (context, index) {
                                             return SongTileWidget(
                                               songList: state.songs,
-                                              onSelectionChanged: (isSelected) {},
+                                              onSelectionChanged:
+                                                  (isSelected) {},
                                               index: index,
                                             );
                                           },
@@ -247,7 +434,10 @@ class _NonAlbumPageState extends State<NonAlbumPage> {
                                                 alignment: Alignment.center,
                                                 child: const Text(
                                                   'No other songs',
-                                                  style: TextStyle(fontStyle: FontStyle.italic, color: Colors.white54),
+                                                  style: TextStyle(
+                                                      fontStyle:
+                                                          FontStyle.italic,
+                                                      color: Colors.white54),
                                                 ),
                                               )
                                             : const SizedBox.shrink()
@@ -261,8 +451,10 @@ class _NonAlbumPageState extends State<NonAlbumPage> {
                             ),
                           )
                         : BlocProvider(
-                            create: (context) => SingleSongsCubit()..getSingleSongs(widget.artist.id!),
-                            child: BlocBuilder<SingleSongsCubit, SingleSongsState>(
+                            create: (context) => SingleSongsCubit()
+                              ..getSingleSongs(widget.artist.id!),
+                            child:
+                                BlocBuilder<SingleSongsCubit, SingleSongsState>(
                               builder: (context, state) {
                                 if (state is SingleSongsLoading) {
                                   return Container(
@@ -288,12 +480,14 @@ class _NonAlbumPageState extends State<NonAlbumPage> {
                                       children: [
                                         ListView.builder(
                                           // padding: EdgeInsets.only(left: 22.w, top: 5.h),
-                                          physics: const NeverScrollableScrollPhysics(),
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
                                           shrinkWrap: true,
                                           itemBuilder: (context, index) {
                                             return SongTileWidget(
                                               songList: state.songs,
-                                              onSelectionChanged: (isSelected) {},
+                                              onSelectionChanged:
+                                                  (isSelected) {},
                                               index: index,
                                             );
                                           },
@@ -306,7 +500,10 @@ class _NonAlbumPageState extends State<NonAlbumPage> {
                                                 alignment: Alignment.center,
                                                 child: const Text(
                                                   'No other songs',
-                                                  style: TextStyle(fontStyle: FontStyle.italic, color: Colors.white54),
+                                                  style: TextStyle(
+                                                      fontStyle:
+                                                          FontStyle.italic,
+                                                      color: Colors.white54),
                                                 ),
                                               )
                                             : const SizedBox.shrink()
@@ -339,7 +536,8 @@ class _NonAlbumPageState extends State<NonAlbumPage> {
 
                     // Other album
                     BlocProvider(
-                      create: (context) => AlbumListCubit()..getAlbum(widget.artist.id!),
+                      create: (context) =>
+                          AlbumListCubit()..getAlbum(widget.artist.id!),
                       child: BlocBuilder<AlbumListCubit, AlbumListState>(
                         builder: (context, state) {
                           if (state is AlbumListLoading) {
@@ -367,7 +565,11 @@ class _NonAlbumPageState extends State<NonAlbumPage> {
                                       album: albumEntity[index],
                                       artist: widget.artist,
                                       isOnAlbumPage: true,
-                                      leftPadding: index == 0 || albumEntity[index].albumId != albumEntity[0].albumId ? 17.w : 0,
+                                      leftPadding: index == 0 ||
+                                              albumEntity[index].albumId !=
+                                                  albumEntity[0].albumId
+                                          ? 17.w
+                                          : 0,
                                     );
                                   },
                                 ),

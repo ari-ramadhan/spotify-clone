@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/presentation/home/bloc/recent_songs/recent_songs_cubit.dart';
@@ -21,7 +23,43 @@ class _RecentSongsState extends State<RecentSongs> {
       child: BlocBuilder<RecentSongsCubit, RecentSongsState>(
         builder: (context, state) {
           if (state is RecentSongsLoading) {
-            return Container(padding: const EdgeInsets.only(top: 30), alignment: Alignment.center, child: const CircularProgressIndicator());
+            return Column(
+              children: [
+                Skeletonizer(
+                  textBoneBorderRadius:
+                      TextBoneBorderRadius(BorderRadius.circular(0)),
+                  enabled: true,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 22.w),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.history,
+                          size: 18.sp,
+                        ),
+                        SizedBox(
+                          width: 10.w,
+                        ),
+                        Text(
+                          'Recently Played',
+                          style: TextStyle(
+                            fontSize: 17.sp,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 5.h,
+                ),
+                const SkeletonPlaylistTile(isCircle: false, isRounded: true, extraPadding: 4,),
+                const SkeletonPlaylistTile(isCircle: false, isRounded: true, extraPadding: 4,),
+                const SkeletonPlaylistTile(isCircle: false, isRounded: true, extraPadding: 4,),
+                const SkeletonPlaylistTile(isCircle: false, isRounded: true, extraPadding: 4,),
+              ],
+            );
           }
 
           if (state is RecentSongsLoaded && state.songs.isNotEmpty) {

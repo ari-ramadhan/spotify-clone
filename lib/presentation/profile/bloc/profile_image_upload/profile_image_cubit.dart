@@ -72,11 +72,19 @@ class AvatarCubit extends Cubit<AvatarState> {
 
       publicUrl = "$publicUrl?t=${DateTime.now().millisecondsSinceEpoch}";
 
-      var count = await supabase.from('avatar').select().eq('user_id', supabase.auth.currentUser!.id).count();
+      var count = await supabase
+          .from('avatar')
+          .select()
+          .eq('user_id', supabase.auth.currentUser!.id)
+          .count();
       if (count.count == 0) {
-        await supabase.from('avatar').insert({'user_id': userId, 'avatarUrl': publicUrl});
+        await supabase
+            .from('avatar')
+            .insert({'user_id': userId, 'avatarUrl': publicUrl});
       }
-      await supabase.from('avatar').update({'avatarUrl': publicUrl}).eq('user_id', userId);
+      await supabase
+          .from('avatar')
+          .update({'avatarUrl': publicUrl}).eq('user_id', userId);
       isUploaded = true;
       await Future.delayed(const Duration(milliseconds: 1200));
 
@@ -88,9 +96,12 @@ class AvatarCubit extends Cubit<AvatarState> {
 
   Future<String> getUserAvatar() async {
     try {
-      print('get user avatar of : ${supabase.auth.currentUser!.id}');
-
-      var response = await supabase.from('avatar').select('avatarUrl').eq('user_id', supabase.auth.currentUser!.id).single().count();
+      var response = await supabase
+          .from('avatar')
+          .select('avatarUrl')
+          .eq('user_id', supabase.auth.currentUser!.id)
+          .single()
+          .count();
 
       if (response.data['avatarUrl'] != null) {
         emit(AvatarLoaded(response.data['avatarUrl']));
@@ -112,7 +123,10 @@ class AvatarCubit extends Cubit<AvatarState> {
 
   Future deleteAvatarImage() async {
     try {
-      var result = await supabase.from('avatar').select().eq('user_id', supabase.auth.currentUser!.id);
+      var result = await supabase
+          .from('avatar')
+          .select()
+          .eq('user_id', supabase.auth.currentUser!.id);
 
       if (result.isNotEmpty) {
         Uri uri = Uri.parse(result[0]['avatarUrl']);
@@ -120,13 +134,16 @@ class AvatarCubit extends Cubit<AvatarState> {
         String fileName = path.substring(path.lastIndexOf('/') + 1);
         String realFileName = fileName.split('?')[0];
 
-        await supabase.storage.from('songs').remove(['userProfile/$realFileName']);
-        await supabase.from('avatar').delete().eq('user_id', supabase.auth.currentUser!.id);
+        await supabase.storage
+            .from('songs')
+            .remove(['userProfile/$realFileName']);
+        await supabase
+            .from('avatar')
+            .delete()
+            .eq('user_id', supabase.auth.currentUser!.id);
 
         emit(AvatarInitial());
       }
-    } catch (e) {
-      print(e.toString());
-    }
+    } catch (e) {}
   }
 }

@@ -69,8 +69,6 @@ class AlbumSupabaseServiceImpl extends AlbumSupabaseService {
         ArtistEntity artistEntity = ArtistModel.fromJson(artist).toEntity();
         album.songTotal = songTotal.count;
 
-        print('${album.albumId} - ${album.name}');
-
         albumsDetail.add(AlbumDetail(
           albumEnitity: album.toEntity(),
           artistEntity: artistEntity,
