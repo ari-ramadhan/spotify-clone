@@ -1,6 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
@@ -54,10 +51,26 @@ class _RecentSongsState extends State<RecentSongs> {
                 SizedBox(
                   height: 5.h,
                 ),
-                const SkeletonPlaylistTile(isCircle: false, isRounded: true, extraPadding: 4,),
-                const SkeletonPlaylistTile(isCircle: false, isRounded: true, extraPadding: 4,),
-                const SkeletonPlaylistTile(isCircle: false, isRounded: true, extraPadding: 4,),
-                const SkeletonPlaylistTile(isCircle: false, isRounded: true, extraPadding: 4,),
+                const SkeletonPlaylistTile(
+                  isCircle: false,
+                  isRounded: true,
+                  extraPadding: 4,
+                ),
+                const SkeletonPlaylistTile(
+                  isCircle: false,
+                  isRounded: true,
+                  extraPadding: 4,
+                ),
+                const SkeletonPlaylistTile(
+                  isCircle: false,
+                  isRounded: true,
+                  extraPadding: 4,
+                ),
+                const SkeletonPlaylistTile(
+                  isCircle: false,
+                  isRounded: true,
+                  extraPadding: 4,
+                ),
               ],
             );
           }

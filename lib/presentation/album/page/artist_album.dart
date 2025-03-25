@@ -1,38 +1,49 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:intl/intl.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/album_song_tile/album_tile_widget.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
-import 'package:spotify_clone/core/configs/constants/app_methods.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/domain/entity/album/album.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
-import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/presentation/album/bloc/artist_album/artist_album_cubit.dart';
 import 'package:spotify_clone/presentation/album/bloc/artist_album/artist_album_state.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_cubit.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_state.dart';
+import 'package:spotify_clone/presentation/profile/pages/export.dart';
 
-class ArtistAlbum extends StatelessWidget {
+class ArtistAlbum extends StatefulWidget {
   final ArtistEntity artist;
   final AlbumEntity album;
   final bool isAllSong;
-  ArtistAlbum(
+  const ArtistAlbum(
       {super.key,
       required this.artist,
       required this.album,
       this.isAllSong = false});
 
+  @override
+  State<ArtistAlbum> createState() => _ArtistAlbumState();
+}
+
+class _ArtistAlbumState extends State<ArtistAlbum> {
   double paddingAddition = 4;
+  List<SongWithFavorite> songs = [];
+  late final Map<String, Color> gradientAcak;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize gradientAcak once
+    AppColors.gradientList.shuffle();
+    gradientAcak = AppColors.gradientList.first;
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Merandomkan list
-    AppColors.gradientList.shuffle();
-
-    List<SongWithFavorite> songs = [];
-
-    // Mengambil elemen acak
-    Map<String, Color> gradientAcak = AppColors.gradientList.first;
+    final artist = widget.artist;
+    final album = widget.album;
+    final isAllSong = widget.isAllSong;
 
     return Scaffold(
       backgroundColor: AppColors.darkBackground,
@@ -196,7 +207,9 @@ class ArtistAlbum extends StatelessWidget {
                             height: 3.h,
                           ),
                           Text(
-                            '8.923.892 times played, 30m',
+                            songs.isEmpty
+                                ? '--- times played'
+                                : '${NumberFormat.decimalPattern().format(songs.fold<int>(0, (sum, song) => sum + song.song.playCount))} times played, 30m',
                             style: TextStyle(
                               fontSize: 12.sp,
                               color: Colors.white.withOpacity(
@@ -221,72 +234,7 @@ class ArtistAlbum extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               IconButton(
-                                onPressed: () {
-                                  blurryDialogForPlaylist(
-                                      backgroundImage:
-                                          '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
-                                      context: context,
-                                      artist: artist,
-                                      songList: songs,
-                                      contentToCopy: Row(
-                                        children: [
-                                          Container(
-                                            height: 50.w,
-                                            width: 50.w,
-                                            decoration: BoxDecoration(
-                                              image: DecorationImage(
-                                                image: NetworkImage(
-                                                  '${AppURLs.supabaseAlbumStorage}${artist.name} - ${album.name}.jpg',
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            width: 9.w,
-                                          ),
-                                          Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                '${artist.name}\'s',
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w500,
-                                                    color: Colors.white70,
-                                                    fontSize: 11.2.sp),
-                                              ),
-                                              Text(
-                                                '${album.name}',
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.w500,
-                                                    fontSize: 16.sp,
-                                                    letterSpacing: 0.4),
-                                              ),
-                                              ClipRRect(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        15.sp),
-                                                child: Container(
-                                                  padding: EdgeInsets.symmetric(
-                                                      horizontal: 5.w,
-                                                      vertical: 1.h),
-                                                  color: Colors.white,
-                                                  child: Text(
-                                                    '${songs.length} Songs',
-                                                    style: TextStyle(
-                                                        color: AppColors
-                                                            .darkBackground,
-                                                        fontSize: 8.sp,
-                                                        fontWeight:
-                                                            FontWeight.w500),
-                                                  ),
-                                                ),
-                                              )
-                                            ],
-                                          )
-                                        ],
-                                      ));
-                                },
+                                onPressed: () {},
                                 splashRadius: 18.sp,
                                 icon: Icon(
                                   Icons.playlist_add,
@@ -371,7 +319,11 @@ class ArtistAlbum extends StatelessWidget {
                             );
                           }
                           if (state is AlbumSongsLoaded) {
-                            songs = state.songs;
+                            WidgetsBinding.instance.addPostFrameCallback((_) {
+                              setState(() {
+                                songs = state.songs;
+                              });
+                            });
                             return SingleChildScrollView(
                               child: Column(
                                 children: [

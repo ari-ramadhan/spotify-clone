@@ -6,7 +6,7 @@ import 'package:spotify_clone/presentation/album/page/artist_album.dart';
 import 'package:spotify_clone/presentation/home/bloc/top_album/top_album_state.dart';
 import 'package:spotify_clone/presentation/home/widgets/hot_artists.dart';
 import 'package:spotify_clone/presentation/home/widgets/recent_songs.dart';
-import 'package:spotify_clone/presentation/common/widgets/mini_player.dart';
+import 'package:spotify_clone/presentation/song_player/bloc/song_player_cubit.dart';
 
 import '../bloc/top_album/top_album_cubit.dart';
 
@@ -46,84 +46,82 @@ class _HomePageState extends State<HomePage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // backgroundColor: AppColors.black,
-      appBar: BasicAppbar(
-        leading: Container(
-          margin: EdgeInsets.only(left: 13.w),
-          child: IconButton.outlined(
-            onPressed: () {},
-            splashRadius: 20.sp,
-            icon: const Icon(
-              Icons.search_rounded,
+    return BlocProvider(
+      create: (context) => SongPlayerCubit(),
+      child: Scaffold(
+        // backgroundColor: AppColors.black,
+        appBar: BasicAppbar(
+          leading: Container(
+            margin: EdgeInsets.only(left: 13.w),
+            child: IconButton.outlined(
+              onPressed: () {},
+              splashRadius: 20.sp,
+              icon: const Icon(
+                Icons.search_rounded,
+              ),
             ),
           ),
-        ),
-        action: Padding(
-          padding: EdgeInsets.only(right: 5.w),
-          child: IconButton(
-            splashRadius: 20.sp,
-            // color: Colors.green,
-            onPressed: () {},
-            icon: Icon(
-              Icons.notifications,
-              color: context.isDarkMode ? Colors.white : Colors.black,
+          action: Padding(
+            padding: EdgeInsets.only(right: 5.w),
+            child: IconButton(
+              splashRadius: 20.sp,
+              // color: Colors.green,
+              onPressed: () {},
+              icon: Icon(
+                Icons.notifications,
+                color: context.isDarkMode ? Colors.white : Colors.black,
+              ),
             ),
           ),
+          hideBackButton: true,
+          title: SvgPicture.asset(
+            AppVectors.logo,
+            height: 34.h,
+            width: 34.w,
+          ),
         ),
-        hideBackButton: true,
-        title: SvgPicture.asset(
-          AppVectors.logo,
-          height: 34.h,
-          width: 34.w,
-        ),
-      ),
-      body: Stack(
-        children: [
-          SingleChildScrollView(
-            physics: const PageScrollPhysics(),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // SizedBox(
-                //   height: 20.h,
-                // ),
-                carousel(),
-                _tabs(),
-                SizedBox(
-                  height: 170.h,
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: const [
-                      NewsSongs(),
-                      HotArtists(),
-                      // Container(
-                      //   alignment: Alignment.center,
-                      //   child: Text(
-                      //     'Comming soon..',
-                      //     style: TextStyle(fontSize: 20.sp, color: Colors.grey),
-                      //   ),
-                      // ),
-                    ],
-                  ),
+        body: SingleChildScrollView(
+          physics: const PageScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // SizedBox(
+              //   height: 20.h,
+              // ),
+              carousel(),
+              _tabs(),
+              SizedBox(
+                height: 170.h,
+                child: TabBarView(
+                  controller: _tabController,
+                  children: const [
+                    NewsSongs(),
+                    HotArtists(),
+                    // Container(
+                    //   alignment: Alignment.center,
+                    //   child: Text(
+                    //     'Comming soon..',
+                    //     style: TextStyle(fontSize: 20.sp, color: Colors.grey),
+                    //   ),
+                    // ),
+                  ],
                 ),
-                SizedBox(
-                  height: 15.h,
-                ),
-                const RecentSongs(),
-                SizedBox(
-                  height: 27.h,
-                ),
+              ),
+              SizedBox(
+                height: 15.h,
+              ),
+              const RecentSongs(),
+              SizedBox(
+                height: 27.h,
+              ),
 
-                const TopAlbum(),
-                SizedBox(
-                  height: 30.h,
-                )
-              ],
-            ),
+              const TopAlbum(),
+              SizedBox(
+                height: 30.h,
+              )
+            ],
           ),
-          const MiniPlayer(),
-        ],
+        ),
       ),
     );
   }
@@ -241,7 +239,7 @@ class TopAlbum extends StatelessWidget {
       builder: (context, state) {
         final isLoading = state is TopAlbumsLoading;
         final isLoaded = state is TopAlbumsLoaded;
-        final albums = isLoaded ? (state as TopAlbumsLoaded).albums : [];
+        final albums = isLoaded ? (state).albums : [];
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -403,7 +401,5 @@ class TopAlbum extends StatelessWidget {
         );
       },
     );
-    ;
-    ;
   }
 }

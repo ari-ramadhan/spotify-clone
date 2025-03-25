@@ -24,7 +24,7 @@ class NewsSongs extends StatelessWidget {
           return SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             padding: EdgeInsets.only(left: 20.w),
-            child: Row(
+            child: const Row(
               children: [
                 SkeletonNewsSongCard(),
                 SkeletonNewsSongCard(),
@@ -170,9 +170,7 @@ class SkeletonNewsSongCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(
-        right: 12.w
-      ),
+      padding: EdgeInsets.only(right: 12.w),
       child: SizedBox(
         width: 111.w,
         child: Column(
@@ -183,11 +181,9 @@ class SkeletonNewsSongCard extends StatelessWidget {
                 enabled: true,
                 ignoreContainers: false,
                 child: Container(
-
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20.sp),
-                    color: Colors.grey.shade800
-                  ),
+                      borderRadius: BorderRadius.circular(20.sp),
+                      color: Colors.grey.shade800),
                 ),
               ),
             ),
@@ -199,7 +195,8 @@ class SkeletonNewsSongCard extends StatelessWidget {
                 children: [
                   Skeletonizer(
                     enabled: true,
-                    textBoneBorderRadius: TextBoneBorderRadius(BorderRadius.circular(0)),
+                    textBoneBorderRadius:
+                        TextBoneBorderRadius(BorderRadius.circular(0)),
                     child: Text(
                       'data data',
                       maxLines: 1,
@@ -213,7 +210,8 @@ class SkeletonNewsSongCard extends StatelessWidget {
                   SizedBox(height: 2.h),
                   Skeletonizer(
                     enabled: true,
-                    textBoneBorderRadius: TextBoneBorderRadius(BorderRadius.circular(0)),
+                    textBoneBorderRadius:
+                        TextBoneBorderRadius(BorderRadius.circular(0)),
                     child: Text(
                       'data',
                       style: TextStyle(

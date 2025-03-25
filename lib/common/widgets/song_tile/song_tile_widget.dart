@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:intl/intl.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/favorite_button/favorite_button.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
@@ -131,7 +131,8 @@ class _SongTileWidgetState extends State<SongTileWidget> {
                       Text(
                         widget.isOnHome || widget.isShowArtist
                             ? songEntity.song.artist
-                            : '239.114',
+                            : NumberFormat.decimalPattern()
+                                .format(songEntity.song.playCount),
                         style: TextStyle(
                             fontWeight: FontWeight.w400,
                             color: Colors.white.withOpacity(0.8),

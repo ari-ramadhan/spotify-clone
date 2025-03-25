@@ -202,7 +202,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 onTap: () {},
                 elementTitle: 'Artist followed',
                 limit: 4,
-                list: [],
+                list: const [],
               ),
               const SkeletonPlaylistTile(
                 isRounded: true,
@@ -331,8 +331,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       // if (state is FavoriteSongLoaded) {
                       final isLoading = state is FavoriteSongLoading;
                       final isLoaded = state is FavoriteSongLoaded;
-                      final songs =
-                          isLoaded ? (state as FavoriteSongLoaded).songs : [];
+                      final songs = isLoaded ? (state).songs : [];
 
                       return Container(
                         alignment: Alignment.center,
@@ -357,6 +356,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         artist: 'data data',
                                         duration: 1,
                                         artistId: 1,
+                                        playCount: 0,
                                         releaseDate: 'data data'),
                                     false);
                                 var songModel =
@@ -462,7 +462,7 @@ class _ProfilePageState extends State<ProfilePage> {
             onTap: () {},
             elementTitle: 'Playlists',
             limit: 4,
-            list: [],
+            list: const [],
           ),
           const SkeletonPlaylistTile(
             isRounded: false,
@@ -1062,24 +1062,23 @@ class _ProfilePageState extends State<ProfilePage> {
                               height: 92.sp,
                               width: 92.sp,
                               child: ClipOval(
-                                child:
-                                    widget.userEntity?.userEntity?.avatarUrl !=
-                                                null &&
-                                            widget.userEntity!.userEntity!
-                                                .avatarUrl!.isNotEmpty
-                                        ? CachedNetworkImage(
-                                            imageUrl: widget.userEntity!
-                                                .userEntity!.avatarUrl!,
-                                            fit: BoxFit.cover,
-                                          )
-                                        : Container(
-                                            color: Colors.grey.shade700,
-                                            child: Icon(
-                                              Icons.person,
-                                              color: Colors.grey,
-                                              size: 70.sp,
-                                            ),
-                                          ),
+                                child: widget.userEntity.userEntity.avatarUrl !=
+                                            null &&
+                                        widget.userEntity.userEntity.avatarUrl!
+                                            .isNotEmpty
+                                    ? CachedNetworkImage(
+                                        imageUrl: widget
+                                            .userEntity.userEntity.avatarUrl!,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Container(
+                                        color: Colors.grey.shade700,
+                                        child: Icon(
+                                          Icons.person,
+                                          color: Colors.grey,
+                                          size: 70.sp,
+                                        ),
+                                      ),
                               ),
                             ),
 

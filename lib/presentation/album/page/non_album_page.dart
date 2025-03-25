@@ -1,6 +1,5 @@
-import 'dart:ui';
-
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:intl/intl.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/album_song_tile/album_tile_widget.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget.dart';
@@ -35,349 +34,267 @@ class _NonAlbumPageState extends State<NonAlbumPage> {
   Widget build(BuildContext context) {
     // Merandomkan list
     AppColors.gradientList.shuffle();
-    final _textKey = GlobalKey();
-
-    bool judgeTitleTextMarquee(double parentWidth) {
-      final textPainter = TextPainter(
-        textDirection: TextDirection.ltr,
-        text: TextSpan(
-          text: widget.nonAlbumPageTitle,
-          style: TextStyle(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.4,
-              color: Colors.black),
-        ),
-      );
-      textPainter.layout();
-      var textWidth = textPainter.width;
-      if (textWidth > parentWidth) {
-        return true;
-      }
-      return false;
-    }
 
     return Scaffold(
-      backgroundColor: AppColors.medDarkBackground,
+      // backgroundColor: AppColors.medDarkBackground,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Stack(
+            Column(
               children: [
-                Column(
+                // Header Section (Album Picture)
+                Stack(
                   children: [
-                    // Header Section (Album Picture)
-                    Stack(
-                      children: [
-                        // Album Picture
-                        Stack(
-                          children: [
-                            Container(
-                              width: double.infinity,
-                              height: 200.h,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(50.sp),
-                                  bottomRight: Radius.circular(50.sp),
-                                ),
-                                image: DecorationImage(
-                                  fit: BoxFit.fitWidth,
-                                  // alignment: const Alignment(0, -0.5),
-                                  image: CachedNetworkImageProvider(
-                                      '${AppURLs.supabaseArtistStorage}${widget.artist.name!.toLowerCase()}.jpg'),
-                                ),
-                              ),
-                            ),
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                  bottomLeft: Radius.circular(50.sp),
-                                  bottomRight: Radius.circular(50.sp),
-                                ),
-                              ),
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-                                child: Container(
-                                  color: Colors.white.withOpacity(0.5),
-                                ),
-                              ),
-                            ),
-                          ],
+                    // Album Picture
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.only(top: 130.h),
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          fit: BoxFit.fitWidth,
+                          alignment: const Alignment(0, -0.5),
+                          image: CachedNetworkImageProvider(
+                              '${AppURLs.supabaseArtistStorage}${widget.artist.name!.toLowerCase()}.jpg'),
                         ),
-                        // Back Button
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 7.w),
-                          child: IconButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            icon: Icon(
-                              size: 24.sp,
-                              Icons.arrow_back_ios_rounded,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    // Body Section (Album Details)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          height: 50.h,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8.w)
-                              .copyWith(right: 0),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  IconButton(
-                                    onPressed: () {
-                                      blurryDialogForPlaylist(
-                                          context: context,
-                                          artist: widget.artist,
-                                          songList: songs,
-                                          backgroundImage:
-                                              '${AppURLs.supabaseArtistStorage}${widget.artist.name!.toLowerCase()}.jpg',
-                                          contentToCopy: Row(
-                                            children: [
-                                              Container(
-                                                height: 50.w,
-                                                width: 50.w,
-                                                decoration: BoxDecoration(
-                                                  image: DecorationImage(
-                                                    image: NetworkImage(
-                                                      '${AppURLs.supabaseThisIsMyStorage}${widget.artist.name!.toLowerCase()}.jpg',
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: 9.w,
-                                              ),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    widget.nonAlbumPageTitle
-                                                            .contains('This is')
-                                                        ? 'This is'
-                                                        : '${widget.artist.name}\'s',
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: Colors.white70,
-                                                        fontSize: 11.2.sp),
-                                                  ),
-                                                  Text(
-                                                    widget.nonAlbumPageTitle
-                                                            .contains('This is')
-                                                        ? '${widget.artist.name}'
-                                                        : 'Singles',
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        fontSize: 16.sp,
-                                                        letterSpacing: 0.4),
-                                                  ),
-                                                  ClipRRect(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15.sp),
-                                                    child: Container(
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 5.w,
-                                                              vertical: 1.h),
-                                                      color: Colors.white,
-                                                      child: Text(
-                                                        '${songs.length} Songs',
-                                                        style: TextStyle(
-                                                            color: AppColors
-                                                                .darkBackground,
-                                                            fontSize: 8.sp,
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .w500),
-                                                      ),
-                                                    ),
-                                                  )
-                                                ],
-                                              )
-                                            ],
-                                          )
-
-                                          // content: Column(
-                                          //   children: [],
-                                          // ),
-                                          // horizontalPadding: 10.w,
-                                          );
-                                    },
-                                    iconSize: 20.sp,
-                                    splashRadius: 20.sp,
-                                    icon: Icon(
-                                      Icons.playlist_add_circle_rounded,
-                                      color: AppColors.primary,
-                                      size: 28.sp,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    onPressed: () {},
-                                    iconSize: 20.sp,
-                                    splashRadius: 20.sp,
-                                    icon: Icon(
-                                      Icons.favorite_outline_rounded,
-                                      color: AppColors.primary,
-                                      size: 26.w,
-                                    ),
-                                  ),
-                                  IconButton(
-                                    onPressed: () {},
-                                    iconSize: 20.sp,
-                                    splashRadius: 20.sp,
-                                    icon: Icon(
-                                      Icons.more_horiz_rounded,
-                                      color: Colors.white70,
-                                      size: 28.w,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              GestureDetector(
-                                onTap: () {},
-                                child: Container(
-                                  margin: EdgeInsets.only(right: 5.w),
-                                  padding: EdgeInsets.all(5.h),
-                                  decoration: const BoxDecoration(
-                                      color: AppColors.primary,
-                                      shape: BoxShape.circle),
-                                  child: IconButton(
-                                    onPressed: () {},
-                                    icon: Icon(
-                                      Icons.play_arrow_rounded,
-                                      size: 25.h,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                      ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          // border: Border.all(color: Colors.white),
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              AppColors.medDarkBackground.withOpacity(0),
+                              AppColors.medDarkBackground.withOpacity(0.5),
+                              AppColors.medDarkBackground.withOpacity(0.7),
+                              AppColors.medDarkBackground,
+                              // AppColors.medDarkBackground,
                             ],
                           ),
                         ),
-                      ],
-                    )
-                  ],
-                ),
-                Padding(
-                  padding: EdgeInsets.only(top: 170.h, left: 25.w, right: 25.w),
-                  child: Container(
-                    padding: EdgeInsets.all(10.sp),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(17.sp),
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.5),
-                          spreadRadius: 4,
-                          blurRadius: 10,
-                          offset: Offset(0, 0),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Row(
+                        child: Column(
+                          mainAxisSize:
+                              MainAxisSize.min, // Adjust height to fit children
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Container(
-                              width: widget.nonAlbumPageTitle.length > 12
-                                  ? 64.sp
-                                  : 60.sp,
-                              height: widget.nonAlbumPageTitle.length > 12
-                                  ? 64.sp
-                                  : 60.sp,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(7.sp),
-                                image: DecorationImage(
-                                  fit: BoxFit.cover,
-                                  image: CachedNetworkImageProvider(
-                                      '${AppURLs.supabaseArtistStorage}${widget.artist.name!.toLowerCase()}.jpg'),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 15.w,
-                            ),
-                            Expanded(
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 17.w),
                               child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
+                                  SizedBox(
+                                    height: 14.h,
+                                  ),
                                   Text(
                                     'Artist\'s entire songs',
                                     style: TextStyle(
-                                        fontSize: 12.sp,
+                                        fontSize: 16.sp,
                                         fontWeight: FontWeight.w500,
                                         letterSpacing: 0.4,
-                                        color: Colors.black),
-                                  ),
-                                  // TextPainter(
-                                  //   text:
-                                  // )
-                                  SizedBox(
-                                    child: Text(
-                                      widget.nonAlbumPageTitle,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.clip,
-                                      textScaler: TextScaler.linear(
-                                          widget.nonAlbumPageTitle.length > 12
-                                              ? 0.8
-                                              : 1),
-                                      style: TextStyle(
-                                          fontSize: 20.sp,
-                                          fontWeight: FontWeight.w800,
-                                          letterSpacing: 0.4,
-                                          height: 1.4,
-                                          color: Colors.black),
-                                    ),
+                                        color: Colors.white70),
                                   ),
                                   Text(
-                                    '8.923.892 times played, 30m',
+                                    widget.nonAlbumPageTitle,
                                     style: TextStyle(
-                                      fontSize: 8.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.black.withOpacity(
+                                      fontSize: 22.sp,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 0.4,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 15.h,
+                                  ),
+                                  Text(
+                                    songs.isEmpty
+                                        ? '--- times played'
+                                        : '${NumberFormat.decimalPattern().format(songs.fold<int>(0, (sum, song) => sum + song.song.playCount))} times played, 30m',
+                                    style: TextStyle(
+                                      fontSize: 12.sp,
+                                      color: Colors.white.withOpacity(
                                         0.85,
                                       ),
                                     ),
                                   ),
                                 ],
                               ),
-                            )
+                            ),
+                            SizedBox(
+                              height: 10.h,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8.w)
+                                  .copyWith(right: 0),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      IconButton(
+                                        onPressed: () {
+                                          blurryDialogForPlaylist(
+                                              context: context,
+                                              artist: widget.artist,
+                                              songList: songs,
+                                              backgroundImage:
+                                                  '${AppURLs.supabaseArtistStorage}${widget.artist.name!.toLowerCase()}.jpg',
+                                              contentToCopy: Row(
+                                                children: [
+                                                  Container(
+                                                    height: 50.w,
+                                                    width: 50.w,
+                                                    decoration: BoxDecoration(
+                                                      image: DecorationImage(
+                                                        image: NetworkImage(
+                                                          '${AppURLs.supabaseThisIsMyStorage}${widget.artist.name!.toLowerCase()}.jpg',
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    width: 9.w,
+                                                  ),
+                                                  Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        widget.nonAlbumPageTitle
+                                                                .contains(
+                                                                    'This is')
+                                                            ? 'This is'
+                                                            : '${widget.artist.name}\'s',
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            color:
+                                                                Colors.white70,
+                                                            fontSize: 11.2.sp),
+                                                      ),
+                                                      Text(
+                                                        widget.nonAlbumPageTitle
+                                                                .contains(
+                                                                    'This is')
+                                                            ? '${widget.artist.name}'
+                                                            : 'Singles',
+                                                        style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w500,
+                                                            fontSize: 16.sp,
+                                                            letterSpacing: 0.4),
+                                                      ),
+                                                      ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(
+                                                                    15.sp),
+                                                        child: Container(
+                                                          padding: EdgeInsets
+                                                              .symmetric(
+                                                                  horizontal:
+                                                                      5.w,
+                                                                  vertical:
+                                                                      1.h),
+                                                          color: Colors.white,
+                                                          child: Text(
+                                                            '${songs.length} Songs',
+                                                            style: TextStyle(
+                                                                color: AppColors
+                                                                    .darkBackground,
+                                                                fontSize: 8.sp,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500),
+                                                          ),
+                                                        ),
+                                                      )
+                                                    ],
+                                                  )
+                                                ],
+                                              ));
+                                        },
+                                        iconSize: 20.sp,
+                                        splashRadius: 20.sp,
+                                        icon: Icon(
+                                          Icons.playlist_add_circle_rounded,
+                                          color: AppColors.primary,
+                                          size: 28.sp,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {},
+                                        iconSize: 20.sp,
+                                        splashRadius: 20.sp,
+                                        icon: Icon(
+                                          Icons.favorite_outline_rounded,
+                                          color: AppColors.primary,
+                                          size: 26.w,
+                                        ),
+                                      ),
+                                      IconButton(
+                                        onPressed: () {},
+                                        iconSize: 20.sp,
+                                        splashRadius: 20.sp,
+                                        icon: Icon(
+                                          Icons.more_horiz_rounded,
+                                          color: Colors.white70,
+                                          size: 28.w,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {},
+                                    child: Container(
+                                      margin: EdgeInsets.only(right: 5.w),
+                                      padding: EdgeInsets.all(5.h),
+                                      decoration: const BoxDecoration(
+                                          color: AppColors.primary,
+                                          shape: BoxShape.circle),
+                                      child: IconButton(
+                                        onPressed: () {},
+                                        icon: Icon(
+                                          Icons.play_arrow_rounded,
+                                          size: 25.h,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
-                        Divider(
-                          color: AppColors.grey,
-                          thickness: 0.7,
-                          height: 20.h,
-                        )
-                      ],
+                      ),
                     ),
-                  ),
-                )
+                    // Back Button
+                    Padding(
+                      padding: EdgeInsets.symmetric(vertical: 7.w),
+                      child: IconButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        icon: Icon(
+                          size: 24.sp,
+                          Icons.arrow_back_ios_rounded,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                // Body Section (Album Details)
               ],
             ),
             Expanded(
               child: SingleChildScrollView(
-                padding: EdgeInsets.only(top: 2.h),
+                padding: EdgeInsets.only(top: 10.h),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -407,7 +324,12 @@ class _NonAlbumPageState extends State<NonAlbumPage> {
                                   );
                                 }
                                 if (state is AllSongsLoaded) {
-                                  songs = state.songs;
+                                  WidgetsBinding.instance
+                                      .addPostFrameCallback((_) {
+                                    setState(() {
+                                      songs = state.songs;
+                                    });
+                                  });
 
                                   return SingleChildScrollView(
                                     child: Column(
@@ -475,6 +397,13 @@ class _NonAlbumPageState extends State<NonAlbumPage> {
                                   );
                                 }
                                 if (state is SingleSongsLoaded) {
+                                  WidgetsBinding.instance
+                                      .addPostFrameCallback((_) {
+                                    setState(() {
+                                      songs = state.songs;
+                                    });
+                                  });
+
                                   return SingleChildScrollView(
                                     child: Column(
                                       children: [

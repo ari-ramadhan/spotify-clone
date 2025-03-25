@@ -43,13 +43,16 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
   }
 
   void _playNewSong() {
-    context.read<SongPlayerCubit>().setPlaylist(
-          widget.songs
-              .map((song) =>
-                  '${AppURLs.supabaseSongStorage}${song.song.artist} - ${song.song.title}.mp3')
-              .toList(),
-          currentIndex,
-        );
+    final songPlayerCubit = context.read<SongPlayerCubit>();
+    if (songPlayerCubit.currentSong == null ||
+        songPlayerCubit.currentSong!.song.id !=
+            widget.songs[currentIndex].song.id) {
+      songPlayerCubit.setPlaylist(
+        widget.songs.map((song) => song).toList(),
+        currentIndex,
+      );
+      songPlayerCubit.playSong(); // Ensure the song starts playing immediately
+    }
   }
 
   void _changeSong(int newIndex) {
@@ -165,10 +168,10 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                   GestureDetector(
                     onTap: () async {
                       context.read<SongPlayerCubit>().playOrPauseSong();
-                      if (context.read<SongPlayerCubit>().audioPlayer.playing){
-                        await sl<AddRecentSongUseCase>().call(params: widget.songs[currentIndex].song.id);
+                      if (context.read<SongPlayerCubit>().audioPlayer.playing) {
+                        await sl<AddRecentSongUseCase>()
+                            .call(params: widget.songs[currentIndex].song.id);
                       }
-
                     },
                     child: Container(
                       height: 60,
@@ -188,13 +191,15 @@ class _SongPlayerPageState extends State<SongPlayerPage> {
                   SizedBox(
                     width: 14.w,
                   ),
-                  currentIndex != (widget.songs.length - 1) ? IconButton(
-                    icon: const Icon(Icons.skip_next),
-                    iconSize: 36,
-                    onPressed: () {
-                      _changeSong(currentIndex + 1);
-                    },
-                  ) : const SizedBox.shrink(),
+                  currentIndex != (widget.songs.length - 1)
+                      ? IconButton(
+                          icon: const Icon(Icons.skip_next),
+                          iconSize: 36,
+                          onPressed: () {
+                            _changeSong(currentIndex + 1);
+                          },
+                        )
+                      : const SizedBox.shrink(),
                 ],
               ),
               const SizedBox(height: 30),

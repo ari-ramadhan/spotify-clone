@@ -9,15 +9,30 @@ class SongTileWidgetSelectable extends StatefulWidget {
   final bool isLoading;
   final Function(SongWithFavorite?) onSelectionChanged;
 
-  const SongTileWidgetSelectable({super.key, required this.songEntity, this.isSelected = false, required this.onSelectionChanged, this.isLoading = false});
+  const SongTileWidgetSelectable(
+      {super.key,
+      required this.songEntity,
+      this.isSelected = false,
+      required this.onSelectionChanged,
+      this.isLoading = false});
 
   @override
-  State<SongTileWidgetSelectable> createState() => _SongTileWidgetSelectableState();
+  State<SongTileWidgetSelectable> createState() =>
+      _SongTileWidgetSelectableState();
 }
 
 class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
   bool isSelected = false;
-  SongWithFavorite emptySong = SongWithFavorite(SongEntity(title: 'data data data', id: 1, artist: 'data data', duration: 1, artistId: 1, releaseDate: 'data data'), false);
+  SongWithFavorite emptySong = SongWithFavorite(
+      SongEntity(
+          title: 'data data data',
+          id: 1,
+          artist: 'data data',
+          duration: 1,
+          artistId: 1,
+          releaseDate: 'data data',
+          playCount: 0),
+      false);
 
   @override
   void initState() {
@@ -58,11 +73,14 @@ class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
                   width: 31.w,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(7.sp),
-                    image: widget.isLoading ? null : DecorationImage(
-                      fit: BoxFit.cover,
-                      image: CachedNetworkImageProvider(
-                          widget.isLoading ? emptySong.song.title : '${AppURLs.supabaseCoverStorage}${widget.songEntity.song.artist} - ${widget.songEntity.song.title}.jpg'),
-                    ),
+                    image: widget.isLoading
+                        ? null
+                        : DecorationImage(
+                            fit: BoxFit.cover,
+                            image: CachedNetworkImageProvider(widget.isLoading
+                                ? emptySong.song.title
+                                : '${AppURLs.supabaseCoverStorage}${widget.songEntity.song.artist} - ${widget.songEntity.song.title}.jpg'),
+                          ),
                   ),
                 ),
                 SizedBox(
@@ -74,17 +92,27 @@ class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
                     SizedBox(
                       width: 180.w,
                       child: Text(
-                        widget.isLoading ? emptySong.song.title : widget.songEntity.song.title,
+                        widget.isLoading
+                            ? emptySong.song.title
+                            : widget.songEntity.song.title,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontWeight: FontWeight.w500, color: textColor, fontSize: 12.sp),
+                        style: TextStyle(
+                            fontWeight: FontWeight.w500,
+                            color: textColor,
+                            fontSize: 12.sp),
                       ),
                     ),
                     SizedBox(
                       height: 3.h,
                     ),
                     Text(
-                      widget.isLoading ? emptySong.song.artist :widget.songEntity.song.artist,
-                      style: TextStyle(fontWeight: FontWeight.w400, color: textColor, fontSize: 9.sp),
+                      widget.isLoading
+                          ? emptySong.song.artist
+                          : widget.songEntity.song.artist,
+                      style: TextStyle(
+                          fontWeight: FontWeight.w400,
+                          color: textColor,
+                          fontSize: 9.sp),
                     ),
                   ],
                 )
@@ -93,7 +121,9 @@ class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
             Row(
               children: [
                 Text(
-                  widget.isLoading ? emptySong.song.duration.toString() : widget.songEntity.song.duration.toString(),
+                  widget.isLoading
+                      ? emptySong.song.duration.toString()
+                      : widget.songEntity.song.duration.toString(),
                   style: TextStyle(color: textColor, fontSize: 11.sp),
                 ),
                 SizedBox(
@@ -101,7 +131,8 @@ class _SongTileWidgetSelectableState extends State<SongTileWidgetSelectable> {
                 ),
                 Container(
                   padding: EdgeInsets.all(2.sp),
-                  decoration: const BoxDecoration(shape: BoxShape.circle, color: AppColors.darkBackground),
+                  decoration: const BoxDecoration(
+                      shape: BoxShape.circle, color: AppColors.darkBackground),
                   child: Icon(
                     isSelected ? Icons.check : Icons.playlist_add,
                     color: Colors.white,

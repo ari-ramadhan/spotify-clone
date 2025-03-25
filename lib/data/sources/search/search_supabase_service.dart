@@ -5,7 +5,6 @@ import 'package:spotify_clone/core/configs/constants/app_key_feature.dart';
 import 'package:spotify_clone/data/models/album/album.dart';
 import 'package:spotify_clone/data/models/artist/artist.dart';
 import 'package:spotify_clone/data/models/playlist/playlist.dart';
-import 'package:spotify_clone/domain/entity/album/album.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
 import 'package:spotify_clone/domain/entity/playlist/playlist.dart';
 import 'package:spotify_clone/presentation/home/bloc/top_album/top_album_state.dart';

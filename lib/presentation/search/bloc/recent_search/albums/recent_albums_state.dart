@@ -1,6 +1,3 @@
-import 'package:spotify_clone/domain/entity/album/album.dart';
-import 'package:spotify_clone/domain/entity/artist/artist.dart';
-import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/presentation/home/bloc/top_album/top_album_state.dart';
 
 abstract class RecentAlbumsState {}

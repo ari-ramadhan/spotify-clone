@@ -4,6 +4,7 @@ class SongEntity {
   final String artist;
   final num duration;
   final String releaseDate;
+  final int playCount;
   final int artistId;
   // final bool isFavorite;
 
@@ -13,11 +14,19 @@ class SongEntity {
       required this.id,
       required this.artist,
       required this.duration,
+      required this.playCount,
       required this.artistId,
       required this.releaseDate});
 
-  SongEntity toEmpty(){
-    return SongEntity(title: '', id: 0, artist: '', duration: 0, artistId: 0, releaseDate: '');
+  SongEntity toEmpty() {
+    return SongEntity(
+        title: '',
+        id: 0,
+        artist: '',
+        duration: 0,
+        artistId: 0,
+        playCount: 0,
+        releaseDate: '');
   }
 }
 

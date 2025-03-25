@@ -13,7 +13,6 @@ import 'package:spotify_clone/presentation/playlist/bloc/playlist_songs_cubit.da
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/profile_image_upload/profile_image_cubit.dart';
 import 'package:spotify_clone/presentation/song_player/bloc/song_player_cubit.dart';
-import 'package:spotify_clone/presentation/common/widgets/mini_player.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

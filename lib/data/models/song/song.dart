@@ -8,6 +8,7 @@ class SongModel {
   String? releaseDate;
   int? artistId;
   String? albumName;
+  int? playCount;
   String? albumId;
   // bool? isFavorite;
 
@@ -16,6 +17,7 @@ class SongModel {
       required this.artist,
       required this.id,
       required this.duration,
+      required this.playCount,
       // required this.isFavorite,
       required this.releaseDate});
 
@@ -25,11 +27,10 @@ class SongModel {
     duration = data['duration'];
     releaseDate = data['release_date'];
     artistId = data['artist_id'];
+    playCount = data['play_count'];
     id = data['id'];
   }
 }
-
-
 
 extension SongModelX on SongModel {
   SongEntity toEntity() {
@@ -38,6 +39,7 @@ extension SongModelX on SongModel {
         title: title!,
         artist: artist!,
         artistId: artistId!,
+        playCount: playCount!,
         // isFavorite: isFavorite!,
         duration: duration!,
         releaseDate: releaseDate!);

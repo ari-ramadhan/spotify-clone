@@ -5,12 +5,14 @@ class ArtistModel {
   String? name;
   String? description;
   String? careerStart;
+  int? monthlyListeners;
 
   ArtistModel({
     this.id,
     this.name,
     this.description,
     this.careerStart,
+    this.monthlyListeners,
   });
 
   ArtistModel.fromJson(Map<String, dynamic> data) {
@@ -18,6 +20,7 @@ class ArtistModel {
     name = data['name'];
     description = data['description'];
     careerStart = data['career_start'].toString();
+    monthlyListeners = data['monthly_listeners'];
   }
 }
 
@@ -28,6 +31,7 @@ extension ArtistModelX on ArtistModel {
       name: name,
       description: description,
       careerStart: careerStart,
+      monthlyListeners: monthlyListeners,
     );
   }
 }

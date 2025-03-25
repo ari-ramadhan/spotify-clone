@@ -1,4 +1,5 @@
 // import 'package:dartz/dartz.dart';
+import 'package:intl/intl.dart';
 import 'dart:ui';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -19,13 +20,17 @@ import 'package:spotify_clone/presentation/artist_page/widgets/follow_artist_but
 
 class ArtistPage extends StatefulWidget {
   final int artistId;
-  const ArtistPage({super.key, required this.artistId,});
+  const ArtistPage({
+    super.key,
+    required this.artistId,
+  });
 
   @override
   _ArtistPageState createState() => _ArtistPageState();
 }
 
-class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateMixin {
+class _ArtistPageState extends State<ArtistPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -68,7 +73,8 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
                   children: [
                     SingleChildScrollView(
                       padding: EdgeInsets.zero,
-                      child: artistPictBackground(state.artistEntity, widget.artistId),
+                      child: artistPictBackground(
+                          state.artistEntity, widget.artistId),
                     ),
                     Container(
                       width: ScreenUtil().screenWidth,
@@ -78,7 +84,7 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          AppColors.medDarkBackground.withOpacity(1),
+                          AppColors.medDarkBackground.withOpacity(0.3),
                           AppColors.medDarkBackground.withOpacity(0),
                         ],
                       )),
@@ -141,7 +147,10 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
                   children: [
                     Text(
                       'about',
-                      style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold, color: AppColors.primary.withBlue(80)),
+                      style: TextStyle(
+                          fontSize: 24.sp,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary.withBlue(80)),
                       textAlign: TextAlign.justify,
                     ),
                   ],
@@ -161,12 +170,15 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
                       ],
                     ),
                     border: Border(
-                      left: BorderSide(color: AppColors.primary.withOpacity(0.8), width: 3.w),
+                      left: BorderSide(
+                          color: AppColors.primary.withOpacity(0.8),
+                          width: 3.w),
                     ),
                   ),
                   child: Text(
                     artist.description!,
-                    style: TextStyle(fontSize: 14.sp, fontStyle: FontStyle.italic),
+                    style:
+                        TextStyle(fontSize: 14.sp, fontStyle: FontStyle.italic),
                     textAlign: TextAlign.justify,
                   ),
                 ),
@@ -178,9 +190,12 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
                   runSpacing: 8.h,
                   spacing: 10.w,
                   children: [
-                    socialMediaChips(AppVectors.instagram, 'Instagram', Colors.redAccent),
-                    socialMediaChips(AppVectors.twitter, 'Twitter', Colors.lightBlue),
-                    socialMediaChips(AppVectors.facebook, 'Facebook', Colors.blue.shade600),
+                    socialMediaChips(
+                        AppVectors.instagram, 'Instagram', Colors.redAccent),
+                    socialMediaChips(
+                        AppVectors.twitter, 'Twitter', Colors.lightBlue),
+                    socialMediaChips(
+                        AppVectors.facebook, 'Facebook', Colors.blue.shade600),
                   ],
                 ),
               ],
@@ -191,8 +206,10 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
 
   Container socialMediaChips(String svgAsset, String socialMedia, Color color) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 4.w).copyWith(right: 12.w),
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.sp), color: color),
+      padding: EdgeInsets.symmetric(vertical: 4.h, horizontal: 4.w)
+          .copyWith(right: 12.w),
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(15.sp), color: color),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -295,9 +312,8 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
             );
           }
 
-
           if (state is ArtistSongsLoaded) {
-          int songsLength = state.songEntity.take(5).length;
+            int songsLength = state.songEntity.take(5).length;
             return SizedBox(
               height: (songsLength * 52.h),
               child: TabBarView(
@@ -338,11 +354,9 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
         },
       ),
     );
-
   }
 
   Padding artistInfo(ArtistWithFollowing artist) {
-
     return Padding(
       padding: EdgeInsets.only(left: 50.w),
       child: Column(
@@ -350,7 +364,10 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
         children: [
           Text(
             artist.artist.name!,
-            style: TextStyle(fontSize: artist.artist.name!.length > 14 ? 28.sp : 33.sp, fontWeight: FontWeight.bold, letterSpacing: 0.4),
+            style: TextStyle(
+                fontSize: artist.artist.name!.length > 14 ? 28.sp : 33.sp,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.4),
           ),
           SizedBox(
             height: artist.artist.name!.length > 14 ? 5.h : 0,
@@ -359,7 +376,7 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
             children: [
               FollowArtistButton(artistEntity: artist),
               Text(
-                '8.929.322 monthly listeners',
+                '${NumberFormat.decimalPattern().format(artist.artist.monthlyListeners)} monthly listeners',
                 style: TextStyle(fontSize: 13.sp),
               ),
             ],
@@ -377,7 +394,7 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
           alignment: Alignment.bottomCenter,
           children: [
             Container(
-              height: ScreenUtil().screenHeight / 1.2,
+              height: ScreenUtil().screenHeight / 1.4,
               decoration: BoxDecoration(
                 image: DecorationImage(
                   fit: BoxFit.cover,
@@ -407,8 +424,8 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
           ],
         ),
         Container(
-          margin: EdgeInsets.only(top: 300.h),
-          padding: EdgeInsets.only(top: 50.h),
+          margin: EdgeInsets.only(top: 260.h),
+          padding: EdgeInsets.only(top: 20.h),
           decoration: BoxDecoration(
             color: AppColors.medDarkBackground,
             gradient: LinearGradient(
@@ -460,7 +477,8 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Padding(padding: EdgeInsets.only(left: 30.w), child: _tabs()),
+                      Padding(
+                          padding: EdgeInsets.only(left: 30.w), child: _tabs()),
                       SizedBox(
                         height: 7.h,
                       ),
@@ -545,7 +563,9 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => ArtistPage(artistId: artistList.id!,),
+                                        builder: (context) => ArtistPage(
+                                          artistId: artistList.id!,
+                                        ),
                                       ),
                                     );
                                   },
@@ -555,18 +575,25 @@ class _ArtistPageState extends State<ArtistPage> with SingleTickerProviderStateM
                                       horizontal: 10.w,
                                       vertical: 10.h,
                                     ),
-                                    decoration: BoxDecoration(boxShadow: [
-                                      BoxShadow(
-                                          color: Colors.black.withOpacity(
-                                            0.3,
-                                          ),
-                                          // spreadRadius: 1,
-                                          blurRadius: 10,
-                                          offset: const Offset(3, 3) // changes position of shadow
-                                          ),
-                                    ], color: const Color.fromARGB(115, 54, 54, 54), borderRadius: BorderRadius.circular(10.sp)),
+                                    decoration: BoxDecoration(
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: Colors.black.withOpacity(
+                                                0.3,
+                                              ),
+                                              // spreadRadius: 1,
+                                              blurRadius: 10,
+                                              offset: const Offset(3,
+                                                  3) // changes position of shadow
+                                              ),
+                                        ],
+                                        color: const Color.fromARGB(
+                                            115, 54, 54, 54),
+                                        borderRadius:
+                                            BorderRadius.circular(10.sp)),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Center(
                                           child: CircleAvatar(

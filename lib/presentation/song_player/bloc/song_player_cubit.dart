@@ -1,14 +1,16 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:spotify_clone/domain/entity/song/song.dart';
+import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/presentation/song_player/bloc/song_player_state.dart';
+import 'package:spotify_clone/domain/entity/song/song.dart';
 
 class SongPlayerCubit extends Cubit<SongPlayerState> {
   AudioPlayer audioPlayer = AudioPlayer();
   Duration songDuration = Duration.zero;
   Duration songPosition = Duration.zero;
+  SongWithFavorite? currentSong; // Update this line
 
-  List<String> playlist = [];
+  List<SongWithFavorite> playlist = [];
   int currentIndex = 0;
 
   SongPlayerCubit() : super(SongPlayerLoading()) {
@@ -28,16 +30,19 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
     emit(SongPlayerLoading()); // Memperbarui state jika diperlukan
   }
 
-  void setPlaylist(List<String> songs, int startIndex) async {
+  void setPlaylist(List<SongWithFavorite> songs, int startIndex) async {
     playlist = songs;
     currentIndex = startIndex;
     await loadSong(playlist[currentIndex]);
+    playSong(); // Ensure the song starts playing immediately
   }
 
-  Future<void> loadSong(String url) async {
+  Future<void> loadSong(SongWithFavorite song) async {
     try {
       if (!isClosed) {
-        await audioPlayer.setUrl(url);
+        currentSong = song; // Update this line
+        await audioPlayer.setUrl(
+            '${AppURLs.supabaseSongStorage}${song.song.artist} - ${song.song.title}.mp3'); // Assuming the title is the URL
         emit(SongPlayerLoaded());
       }
     } catch (e) {
@@ -56,10 +61,18 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
     emit(SongPlayerLoaded());
   }
 
+  void playSong() {
+    if (!audioPlayer.playing) {
+      audioPlayer.play();
+      emit(SongPlayerLoaded());
+    }
+  }
+
   void nextSong() {
     if (currentIndex < playlist.length - 1) {
       currentIndex++;
       loadSong(playlist[currentIndex]);
+      playSong(); // Ensure the next song starts playing
     }
   }
 
@@ -67,6 +80,7 @@ class SongPlayerCubit extends Cubit<SongPlayerState> {
     if (currentIndex > 0) {
       currentIndex--;
       loadSong(playlist[currentIndex]);
+      playSong(); // Ensure the previous song starts playing
     }
   }
 

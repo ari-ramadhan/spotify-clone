@@ -1,5 +1,3 @@
-import 'package:spotify_clone/core/configs/constants/app_key.dart';
-
 class AppKeysFeature {
   static const SF_RECENT_SEARCHS_KEYWORD = 'RECENT_SEARCHS_KEYWORD';
   static const SF_ONBOARDING_COMPLETE = 'ONBOARDING_COMPLETE';
