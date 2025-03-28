@@ -46,76 +46,94 @@ class _ArtistPageState extends State<ArtistPage>
   Widget build(BuildContext context) {
     return Scaffold(
       // backgroundColor: AppColors.medDarkBackground,
-      body: SafeArea(
-        child: BlocProvider(
-          create: (context) => ArtistPageCubit()..getArtist(widget.artistId),
-          child: BlocBuilder<ArtistPageCubit, ArtistPageState>(
-            builder: (context, state) {
-              if (state is ArtistPageLoading) {
-                return Container(
-                  alignment: Alignment.center,
-                  height: double.infinity,
-                  width: double.infinity,
-                  child: const CircularProgressIndicator(
-                    color: AppColors.primary,
+      body: BlocProvider(
+        create: (context) => ArtistPageCubit()..getArtist(widget.artistId),
+        child: BlocBuilder<ArtistPageCubit, ArtistPageState>(
+          builder: (context, state) {
+            if (state is ArtistPageLoading) {
+              return Container(
+                alignment: Alignment.center,
+                height: double.infinity,
+                width: double.infinity,
+                child: const CircularProgressIndicator(
+                  color: AppColors.primary,
+                ),
+              );
+            }
+
+            if (state is ArtistPageFailure) {
+              return const Center(
+                child: Text('Artist profile fail to load'),
+              );
+            }
+
+            if (state is ArtistPageLoaded) {
+              return Stack(
+                children: [
+                  SingleChildScrollView(
+                    padding: EdgeInsets.zero,
+                    child: artistPictBackground(
+                        state.artistEntity, widget.artistId),
                   ),
-                );
-              }
-
-              if (state is ArtistPageFailure) {
-                return const Center(
-                  child: Text('Artist profile fail to load'),
-                );
-              }
-
-              if (state is ArtistPageLoaded) {
-                return Stack(
-                  children: [
-                    SingleChildScrollView(
-                      padding: EdgeInsets.zero,
-                      child: artistPictBackground(
-                          state.artistEntity, widget.artistId),
-                    ),
-                    Container(
-                      width: ScreenUtil().screenWidth,
-                      height: 100.h,
-                      decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          AppColors.medDarkBackground.withOpacity(0.3),
-                          AppColors.medDarkBackground.withOpacity(0),
-                        ],
-                      )),
-                      padding: EdgeInsets.only(left: 10.w, top: 10.h),
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Container(
-                          height: 35.h,
-                          width: 35.w,
-                          decoration: BoxDecoration(
-                            color: Colors.grey.withOpacity(0.3),
-                            shape: BoxShape.circle,
-                          ),
-                          child: IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: Icon(
-                              Icons.arrow_back_ios_rounded,
-                              size: 15.h,
+                  Column(
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(20),
+                          bottomRight: Radius.circular(20),
+                        ),
+                        child: BackdropFilter(
+                          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                          child: Container(
+                            height: MediaQuery.of(context).viewPadding.top,
+                            width: MediaQuery.of(context).size.width,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.2),
                             ),
                           ),
                         ),
                       ),
-                    )
-                  ],
-                );
-              }
-              return Container();
-            },
-          ),
+                      Container(
+                        width: ScreenUtil().screenWidth,
+                        height: 100.h,
+                        decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            AppColors.medDarkBackground.withOpacity(0.3),
+                            AppColors.medDarkBackground.withOpacity(0),
+                          ],
+                        )),
+                        padding: EdgeInsets.only(left: 10.w, top: 10.h),
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Container(
+                            height: 35.h,
+                            width: 35.w,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.withOpacity(0.3),
+                              shape: BoxShape.circle,
+                            ),
+                            child: IconButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: Icon(
+                                Icons.arrow_back_ios_rounded,
+                                size: 15.h,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              );
+            }
+            return Container();
+          },
         ),
       ),
     );

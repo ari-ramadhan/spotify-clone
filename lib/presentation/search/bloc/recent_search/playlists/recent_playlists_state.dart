@@ -1,4 +1,4 @@
-import 'package:spotify_clone/domain/entity/playlist/playlist.dart';
+import 'package:spotify_clone/data/models/playlist/playlist.dart';
 
 abstract class RecentPlaylistsState {}
 
@@ -7,7 +7,7 @@ class RecentPlaylistsInitial extends RecentPlaylistsState {}
 class RecentPlaylistsLoading extends RecentPlaylistsState {}
 
 class RecentPlaylistsLoaded extends RecentPlaylistsState {
-  final List<PlaylistEntity> playlists; // Map hasil pencarian
+  final List<PlaylistAndUser> playlists; // Map hasil pencarian
   RecentPlaylistsLoaded(this.playlists);
 }
 

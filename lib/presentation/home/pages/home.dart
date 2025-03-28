@@ -67,9 +67,9 @@ class _HomePageState extends State<HomePage>
               splashRadius: 20.sp,
               // color: Colors.green,
               onPressed: () {},
-              icon: Icon(
+              icon: const Icon(
                 Icons.notifications,
-                color: context.isDarkMode ? Colors.white : Colors.black,
+                color: Colors.grey,
               ),
             ),
           ),
@@ -85,9 +85,6 @@ class _HomePageState extends State<HomePage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // SizedBox(
-              //   height: 20.h,
-              // ),
               carousel(),
               _tabs(),
               SizedBox(
@@ -97,24 +94,16 @@ class _HomePageState extends State<HomePage>
                   children: const [
                     NewsSongs(),
                     HotArtists(),
-                    // Container(
-                    //   alignment: Alignment.center,
-                    //   child: Text(
-                    //     'Comming soon..',
-                    //     style: TextStyle(fontSize: 20.sp, color: Colors.grey),
-                    //   ),
-                    // ),
                   ],
                 ),
               ),
               SizedBox(
-                height: 15.h,
+                height: 20.h,
               ),
               const RecentSongs(),
               SizedBox(
                 height: 27.h,
               ),
-
               const TopAlbum(),
               SizedBox(
                 height: 30.h,

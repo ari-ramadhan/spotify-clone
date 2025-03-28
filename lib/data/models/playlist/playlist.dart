@@ -1,3 +1,4 @@
+import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/entity/playlist/playlist.dart';
 // ignore: unused_import
 import 'package:spotify_clone/domain/entity/song/song.dart';
@@ -43,4 +44,11 @@ extension PlaylistModelX on PlaylistModel {
         songCount: songCount!,
         description: description!);
   }
+}
+
+class PlaylistAndUser {
+  final PlaylistEntity playlist;
+  final UserWithStatus user;
+
+  PlaylistAndUser({required this.playlist, required this.user});
 }

@@ -17,8 +17,9 @@ import 'package:spotify_clone/presentation/song_player/bloc/song_player_cubit.da
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  SystemChrome.setSystemUIOverlayStyle(
-      const SystemUiOverlayStyle(statusBarColor: Colors.transparent));
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      systemNavigationBarColor: AppColors.darkBackground));
 
   HydratedBloc.storage = await HydratedStorage.build(
     storageDirectory: kIsWeb

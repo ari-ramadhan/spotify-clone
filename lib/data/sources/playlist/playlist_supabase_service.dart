@@ -223,7 +223,7 @@ class PlaylistSupabaseServiceImpl extends PlaylistSupabaseService {
           }
         }
       }
-      return const Right('Songs added to your ');
+      return const Right('Songs added to your playlist');
     } catch (e) {
       return const Left('error occured while adding songs to your playlist');
     }

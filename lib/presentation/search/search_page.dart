@@ -11,6 +11,7 @@ import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/domain/entity/song/song.dart';
 import 'package:spotify_clone/presentation/album/page/artist_album.dart';
 import 'package:spotify_clone/presentation/artist_page/pages/artist_page.dart';
+import 'package:spotify_clone/presentation/profile/pages/export.dart';
 import 'package:spotify_clone/presentation/search/bloc/popular_song/popular_song_cubit.dart';
 import 'package:spotify_clone/presentation/search/bloc/popular_song/popular_song_state.dart';
 import 'package:spotify_clone/presentation/search/bloc/recent_search/albums/recent_albums_cubit.dart';
@@ -218,7 +219,7 @@ class _SearchPageState extends State<SearchPage> {
           ),
           trailing: const Icon(Icons.saved_search_sharp),
           title: const Text(
-            'Songs from your Favorite Artists',
+            'Songs from your favorite artists',
           ),
           subtitle: const Text('most popular songs based on your taste'),
         ),
@@ -807,32 +808,40 @@ class _RecentArtists extends StatelessWidget {
                       state.artist.length,
                       (index) {
                         var artist = state.artist[index];
-                        return Container(
-                          width: 80.w,
-                          // height: 100.h,
-                          margin: EdgeInsets.only(
-                              left: index == 0 ? 15.w : 0, right: 12.w),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              CircleAvatar(
-                                backgroundColor: Colors.grey,
-                                backgroundImage: NetworkImage(
-                                  '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  ArtistPage(artistId: artist.id!),
+                            ));
+                          },
+                          child: Container(
+                            width: 80.w,
+                            // height: 100.h,
+                            margin: EdgeInsets.only(
+                                left: index == 0 ? 15.w : 0, right: 12.w),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor: Colors.grey,
+                                  backgroundImage: NetworkImage(
+                                    '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
+                                  ),
+                                  radius: 40.sp,
                                 ),
-                                radius: 40.sp,
-                              ),
-                              SizedBox(
-                                height: 4.h,
-                              ),
-                              Text(
-                                artist.name!,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
+                                SizedBox(
+                                  height: 4.h,
                                 ),
-                              )
-                            ],
+                                Text(
+                                  artist.name!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
                         );
                       },
@@ -939,118 +948,139 @@ class _RecentPlaylists extends StatelessWidget {
             );
           }
           if (state is RecentPlaylistsLoaded) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: EdgeInsets.only(left: 15.w),
-                  child: Text(
-                    'Recent Playlists',
-                    style: TextStyle(
-                        fontSize: 16.sp,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold),
-                  ),
-                ),
-                SizedBox(
-                  height: 5.h,
-                ),
-                SizedBox(
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: List.generate(
-                        state.playlists.length,
-                        (index) {
-                          var playlist = state.playlists[index];
-                          return Container(
-                            width: 80.w,
-                            // height: 115.h,
-                            padding: EdgeInsets.symmetric(horizontal: 2.w),
-                            margin: EdgeInsets.only(
-                              left: index == 0 ? 15.w : 0,
-                              right: 12.w,
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  height: 73.h,
-                                  width: double.infinity,
-                                  decoration: const BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Color(0xff091e3a),
-                                        Color(0xff2d6cbe),
-                                        Color(0xff64a9dd),
-                                      ],
-                                      stops: [0, 0.5, 0.75],
-                                      begin: Alignment.bottomRight,
-                                      end: Alignment.topLeft,
-                                    ),
-                                  ),
-                                  child: Padding(
-                                    padding: EdgeInsets.all(12.sp),
-                                    child: SvgPicture.asset(
-                                      AppVectors.playlist,
-                                      color: Colors.white,
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 4.h,
-                                ),
-                                SizedBox(
-                                  child: Text(
-                                    playlist.name!,
-                                    maxLines: 1,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Text(
-                                      'By',
-                                      style: TextStyle(
-                                          fontSize: 10.sp, color: Colors.white),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    SizedBox(
-                                      width: 2.w,
-                                    ),
-                                    Icon(
-                                      Icons.person_rounded,
-                                      size: 10.sp,
-                                    ),
-                                    SizedBox(
-                                      width: 2.w,
-                                    ),
-                                    Flexible(
-                                      child: Text(
-                                        'ari ramadhan',
-                                        style: TextStyle(
-                                            fontSize: 10.sp,
-                                            color: AppColors.primary),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          );
-                        },
+            return state.playlists.isNotEmpty
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 15.w),
+                        child: Text(
+                          'Recent Playlists',
+                          style: TextStyle(
+                              fontSize: 16.sp,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-              ],
-            );
+                      SizedBox(
+                        height: 5.h,
+                      ),
+                      SizedBox(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: List.generate(
+                              state.playlists.length,
+                              (index) {
+                                var playlist = state.playlists[index];
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => PlaylistPage(
+                                          userEntity: playlist.user.userEntity,
+                                          playlistEntity:
+                                              state.playlists[index].playlist,
+                                          onPlaylistDeleted: () {},
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    width: 80.w,
+                                    // height: 115.h,
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 2.w),
+                                    margin: EdgeInsets.only(
+                                      left: index == 0 ? 15.w : 0,
+                                      right: 12.w,
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          height: 68.h,
+                                          width: double.infinity,
+                                          decoration: const BoxDecoration(
+                                            gradient: LinearGradient(
+                                              colors: [
+                                                Color(0xff091e3a),
+                                                Color(0xff2d6cbe),
+                                                Color(0xff64a9dd),
+                                              ],
+                                              stops: [0, 0.5, 0.75],
+                                              begin: Alignment.bottomRight,
+                                              end: Alignment.topLeft,
+                                            ),
+                                          ),
+                                          child: Padding(
+                                            padding: EdgeInsets.all(12.sp),
+                                            child: SvgPicture.asset(
+                                              AppVectors.playlist,
+                                              color: Colors.white,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          height: 4.h,
+                                        ),
+                                        SizedBox(
+                                          child: Text(
+                                            playlist.playlist.name!,
+                                            maxLines: 1,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'By',
+                                              style: TextStyle(
+                                                  fontSize: 10.sp,
+                                                  color: Colors.white),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            SizedBox(
+                                              width: 2.w,
+                                            ),
+                                            Icon(
+                                              Icons.person_rounded,
+                                              size: 10.sp,
+                                            ),
+                                            SizedBox(
+                                              width: 2.w,
+                                            ),
+                                            Flexible(
+                                              child: Text(
+                                                playlist
+                                                    .user.userEntity.fullName!,
+                                                style: TextStyle(
+                                                    fontSize: 10.sp,
+                                                    color: AppColors.primary),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                : SizedBox.shrink();
           }
           return Container();
         },
@@ -1157,47 +1187,68 @@ class _RecentAlbums extends StatelessWidget {
                     state.albums.length,
                     (index) {
                       var albums = state.albums[index];
-                      return Container(
-                        width: 80.w,
-                        // height: 115.h,
-                        padding: EdgeInsets.symmetric(horizontal: 2.w),
-                        margin: EdgeInsets.only(
-                          left: index == 0 ? 15.w : 0,
-                          right: 12.w,
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Container(
-                              height: 73.h,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: NetworkImage(
-                                    '${AppURLs.supabaseAlbumStorage}${albums.artistEntity.name} - ${albums.albumEnitity.name}.jpg',
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => ArtistAlbum(
+                                artist: albums.artistEntity,
+                                album: albums.albumEnitity),
+                          ));
+                        },
+                        child: Container(
+                          width: 80.w,
+                          // height: 115.h,
+                          padding: EdgeInsets.symmetric(horizontal: 2.w),
+                          margin: EdgeInsets.only(
+                            left: index == 0 ? 15.w : 0,
+                            right: 12.w,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                height: 73.h,
+                                decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                    image: NetworkImage(
+                                      '${AppURLs.supabaseAlbumStorage}${albums.artistEntity.name} - ${albums.albumEnitity.name}.jpg',
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Text(
-                              albums.artistEntity.name!,
-                              style: TextStyle(
-                                  fontSize: 10.sp, color: AppColors.primary),
-                            ),
-                            SizedBox(
-                              height: 4.h,
-                            ),
-                            SizedBox(
-                              child: Text(
-                                albums.albumEnitity.name!,
-                                maxLines: 2,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.w500,
+                              InkWell(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => ArtistPage(
+                                        artistId: albums.artistEntity.id!,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  albums.artistEntity.name!,
+                                  style: TextStyle(
+                                      fontSize: 10.sp,
+                                      color: AppColors.primary),
                                 ),
-                                overflow: TextOverflow.ellipsis,
                               ),
-                            ),
-                          ],
+                              SizedBox(
+                                height: 4.h,
+                              ),
+                              SizedBox(
+                                child: Text(
+                                  albums.albumEnitity.name!,
+                                  maxLines: 2,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },

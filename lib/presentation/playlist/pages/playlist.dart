@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/favorite_button/playlist_song_tile_widget.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget_selectable.dart';
@@ -78,337 +80,336 @@ class _PlaylistPageState extends State<PlaylistPage> {
               create: (context) => FavoriteSongCubit()..getFavoriteSongs(''),
             ),
           ],
-          child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Column(
-                  children: [
-                    // Header Section (Album Picture)
-                    Stack(
-                      children: [
-                        BlocBuilder<PlaylistSongsCubit, PlaylistSongsState>(
-                          builder: (context, state) {
-                            return Container(
-                              width: double.infinity,
-                              height: 180.h,
-                              decoration: BoxDecoration(
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    gradientAcak['primaryGradient']!,
-                                    AppColors.medDarkBackground
-                                        .withOpacity(0.1),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                children: [
+                  // Header Section (Album Picture)
+                  Stack(
+                    children: [
+                      BlocBuilder<PlaylistSongsCubit, PlaylistSongsState>(
+                        builder: (context, state) {
+                          return Container(
+                            width: double.infinity,
+                            alignment: Alignment.bottomCenter,
+                            // padding: EdgeInsets.only(top: 10),
+                            height:
+                                180.h + MediaQuery.of(context).viewPadding.top,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  gradientAcak['primaryGradient']!,
+                                  AppColors.medDarkBackground.withOpacity(0.1),
+                                ],
+                              ),
+                            ),
+                            child: Container(
+                                height: 180.h,
+                                width: 180.h,
+                                // decoration: BoxDecoration(
+                                //     border: Border.all(color: Colors.red)),
+                                decoration: const BoxDecoration(
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      Color(0xff091e3a),
+                                      Color(0xff2d6cbe),
+                                      Color(0xff64a9dd),
+                                    ],
+                                    stops: [0, 0.5, 0.75],
+                                    begin: Alignment.bottomRight,
+                                    end: Alignment.topLeft,
+                                  ),
+                                ),
+                                child: Stack(
+                                  children: [
+                                    Center(
+                                      child: SvgPicture.asset(
+                                        AppVectors.playlist,
+                                        height: 90.w,
+                                        width: 90.w,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    if (state is PlaylistSongsLoaded) ...[
+                                      GridView.count(
+                                          crossAxisCount: 2,
+                                          padding: EdgeInsets.zero,
+                                          children: (state.songs.take(4)).map(
+                                            (e) {
+                                              return Image.network(
+                                                  '${AppURLs.supabaseCoverStorage}${e.song.artist} - ${e.song.title}.jpg');
+                                            },
+                                          ).toList())
+                                    ],
                                   ],
+                                )),
+                          );
+                        },
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(
+                            top: MediaQuery.of(context).viewPadding.top),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                IconButton(
+                                  onPressed: () {
+                                    Navigator.pop(context, true);
+                                  },
+                                  icon: Icon(
+                                    size: 24.sp,
+                                    Icons.arrow_back_ios_rounded,
+                                  ),
                                 ),
-                              ),
-                              child: Center(
-                                child: Container(
-                                    height: 180.h,
-                                    width: 180.h,
-                                    decoration: const BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Color(0xff091e3a),
-                                          Color(0xff2d6cbe),
-                                          Color(0xff64a9dd),
-                                        ],
-                                        stops: [0, 0.5, 0.75],
-                                        begin: Alignment.bottomRight,
-                                        end: Alignment.topLeft,
+                                IconButton(
+                                  onPressed: () async {
+                                    return showMenu(
+                                      context: context,
+                                      position:
+                                          RelativeRect.fromLTRB(1, 60.h, 0, 0),
+                                      menuPadding: EdgeInsets.zero,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          8.h,
+                                        ),
                                       ),
-                                    ),
-                                    child: (() {
-                                      if (state is PlaylistSongsFailure) {
-                                        return Center(
-                                            child: SvgPicture.asset(
-                                          AppVectors.playlist,
-                                          height: 90.w,
-                                          width: 90.w,
-                                          color: Colors.white,
-                                        ));
-                                      }
-                                      if (state is PlaylistSongsLoading) {
-                                        return const Center(
-                                          child: CircularProgressIndicator(
-                                            color: Colors.white,
-                                          ),
-                                        );
-                                      }
-                                      if (state is PlaylistSongsLoaded) {
-                                        return state.songs.length <= 1
-                                            ? Center(
-                                                child: SvgPicture.asset(
-                                                  AppVectors.playlist,
-                                                  height: 90.w,
-                                                  width: 90.w,
-                                                  color: Colors.white,
-                                                ),
-                                              )
-                                            : GridView.count(
-                                                crossAxisCount: 2,
-                                                children: state.songs.map(
-                                                  (e) {
-                                                    return Image.network(
-                                                        '${AppURLs.supabaseCoverStorage}${e.song.artist} - ${e.song.title}.jpg');
+                                      items: [
+                                        PopupMenuItem(
+                                            onTap: () async {
+                                              blurryDialog(
+                                                  context: context,
+                                                  horizontalPadding: 21,
+                                                  onClosed: () {
+                                                    Navigator.pop(context);
                                                   },
-                                                ).toList());
-                                      }
-                                    })()),
-                              ),
-                            );
-                          },
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(vertical: 7.w),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                onPressed: () {
-                                  Navigator.pop(context, true);
-                                },
-                                icon: Icon(
-                                  size: 24.sp,
-                                  Icons.arrow_back_ios_rounded,
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () async {
-                                  return showMenu(
-                                    context: context,
-                                    position:
-                                        RelativeRect.fromLTRB(1, 60.h, 0, 0),
-                                    // color: AppColors.darkBackground,
-                                    menuPadding: EdgeInsets.zero,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(
-                                        8.h,
-                                      ),
-                                    ),
-                                    items: [
-                                      PopupMenuItem(
-                                          onTap: () async {
-                                            blurryDialog(
-                                                context: context,
-                                                horizontalPadding: 21,
+                                                  content: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .stretch,
+                                                    children: [
+                                                      Form(
+                                                        key: _formKey,
+                                                        child: Column(
+                                                          children: [
+                                                            EditInfoField(
+                                                              validator:
+                                                                  (value) {
+                                                                if (value!
+                                                                    .isEmpty) {
+                                                                  return 'You must add some title';
+                                                                }
+                                                                return null;
+                                                              },
+                                                              value:
+                                                                  playlistName,
+                                                              controller:
+                                                                  _playlistNameController,
+                                                              label: 'Title',
+                                                            ),
+                                                            SizedBox(
+                                                              height: 10.h,
+                                                            ),
+                                                            SizedBox(
+                                                              height: 80.h,
+                                                              width: double
+                                                                  .maxFinite,
+                                                              child:
+                                                                  EditInfoField(
+                                                                validator:
+                                                                    (value) {
+                                                                  return null;
+                                                                },
+                                                                value:
+                                                                    playlistDesc,
+                                                                isExpanded:
+                                                                    true,
+                                                                controller:
+                                                                    _playlistDescController,
+                                                                label:
+                                                                    'Description',
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height: 16.h,
+                                                      ),
+                                                      MaterialButton(
+                                                        onPressed: () async {
+                                                          await updatePlaylist(
+                                                              context);
+                                                        },
+                                                        focusColor:
+                                                            Colors.black45,
+                                                        highlightColor:
+                                                            Colors.black12,
+                                                        splashColor: AppColors
+                                                            .darkBackground
+                                                            .withOpacity(0.3),
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                            15.sp,
+                                                          ),
+                                                        ),
+                                                        color:
+                                                            AppColors.primary,
+                                                        padding: EdgeInsets
+                                                            .symmetric(
+                                                                vertical: 5.h),
+                                                        child: Text(
+                                                          'Update',
+                                                          style: TextStyle(
+                                                              fontSize: 17.sp),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  dialogTitle:
+                                                      'Edit playlist Info');
+                                            },
+                                            child: const Text(
+                                                'Edit Playlist Info')),
+                                        PopupMenuItem(
+                                            child:
+                                                const Text('Delete playlist'),
+                                            onTap: () {
+                                              blurryDialog(
                                                 onClosed: () {
                                                   Navigator.pop(context);
                                                 },
+                                                context: context,
+                                                dialogTitle:
+                                                    'Delete this playlisttt',
+                                                horizontalPadding: 21,
                                                 content: Column(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
                                                   crossAxisAlignment:
-                                                      CrossAxisAlignment
-                                                          .stretch,
+                                                      CrossAxisAlignment.start,
                                                   children: [
-                                                    Form(
-                                                      key: _formKey,
-                                                      child: Column(
-                                                        children: [
-                                                          EditInfoField(
-                                                            validator: (value) {
-                                                              if (value!
-                                                                  .isEmpty) {
-                                                                return 'You must add some title';
-                                                              }
-                                                              return null;
-                                                            },
-                                                            value: playlistName,
-                                                            controller:
-                                                                _playlistNameController,
-                                                            label: 'Title',
-                                                          ),
-                                                          SizedBox(
-                                                            height: 10.h,
-                                                          ),
-                                                          SizedBox(
-                                                            height: 80.h,
-                                                            width: double
-                                                                .maxFinite,
-                                                            child:
-                                                                EditInfoField(
-                                                              validator:
-                                                                  (value) {
-                                                                    return null;
-                                                                  },
-                                                              value:
-                                                                  playlistDesc,
-                                                              isExpanded: true,
-                                                              controller:
-                                                                  _playlistDescController,
-                                                              label:
-                                                                  'Description',
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
+                                                    Text(
+                                                      'Confirm to delete this playlist?',
+                                                      style: TextStyle(
+                                                          fontSize: 16.sp),
                                                     ),
                                                     SizedBox(
-                                                      height: 16.h,
+                                                      height: 10.h,
                                                     ),
-                                                    MaterialButton(
-                                                      onPressed: () async {
-                                                        await updatePlaylist(
-                                                            context);
-                                                      },
-                                                      focusColor:
-                                                          Colors.black45,
-                                                      highlightColor:
-                                                          Colors.black12,
-                                                      splashColor: AppColors
-                                                          .darkBackground
-                                                          .withOpacity(0.3),
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(
-                                                          15.sp,
-                                                        ),
-                                                      ),
-                                                      color: AppColors.primary,
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              vertical: 5.h),
-                                                      child: Text(
-                                                        'Update',
-                                                        style: TextStyle(
-                                                            fontSize: 17.sp),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                dialogTitle:
-                                                    'Edit playlist Info');
-                                          },
-                                          child:
-                                              const Text('Edit Playlist Info')),
-                                      PopupMenuItem(
-                                          child: const Text('Delete playlist'),
-                                          onTap: () {
-                                            blurryDialog(
-                                              onClosed: () {
-                                                Navigator.pop(context);
-                                              },
-                                              context: context,
-                                              dialogTitle:
-                                                  'Delete this playlisttt',
-                                              horizontalPadding: 21,
-                                              content: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    'Confirm to delete this playlist?',
-                                                    style: TextStyle(
-                                                        fontSize: 16.sp),
-                                                  ),
-                                                  SizedBox(
-                                                    height: 10.h,
-                                                  ),
-                                                  Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .spaceBetween,
-                                                    children: [
-                                                      Expanded(
-                                                        child: MaterialButton(
-                                                          shape: RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          15.sp)),
-                                                          onPressed: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                          child: Padding(
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    vertical:
-                                                                        4.h),
-                                                            child: Text(
-                                                              'Cancel',
-                                                              style: TextStyle(
-                                                                  fontSize:
-                                                                      16.sp,
-                                                                  color: Colors
-                                                                      .white70),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Expanded(
+                                                          child: MaterialButton(
+                                                            shape: RoundedRectangleBorder(
+                                                                borderRadius:
+                                                                    BorderRadius
+                                                                        .circular(
+                                                                            15.sp)),
+                                                            onPressed: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            child: Padding(
+                                                              padding: EdgeInsets
+                                                                  .symmetric(
+                                                                      vertical:
+                                                                          4.h),
+                                                              child: Text(
+                                                                'Cancel',
+                                                                style: TextStyle(
+                                                                    fontSize:
+                                                                        16.sp,
+                                                                    color: Colors
+                                                                        .white70),
+                                                              ),
                                                             ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      Container(
-                                                        width: 1,
-                                                        height: 15.h,
-                                                        color: Colors.white,
-                                                      ),
-                                                      BlocProvider(
-                                                        create:
-                                                            (contextPlaylist) =>
-                                                                PlaylistCubit(),
-                                                        lazy: true,
-                                                        child: BlocBuilder<
-                                                            PlaylistCubit,
-                                                            PlaylistState>(
-                                                          builder:
-                                                              (contextPlaylist,
-                                                                      state) =>
-                                                                  Expanded(
-                                                            child:
-                                                                MaterialButton(
-                                                              shape: RoundedRectangleBorder(
-                                                                  borderRadius:
-                                                                      BorderRadius
-                                                                          .circular(
-                                                                              15.sp)),
-                                                              onPressed: () {
-                                                                deletePlaylist(
-                                                                    context:
-                                                                        context,
-                                                                    playlistContext:
-                                                                        contextPlaylist);
-                                                              },
-                                                              child: Padding(
-                                                                padding: EdgeInsets
-                                                                    .symmetric(
-                                                                        vertical:
-                                                                            4.h),
-                                                                child: Text(
-                                                                  'Confirm',
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          16.sp,
-                                                                      color: Colors
-                                                                          .red),
+                                                        Container(
+                                                          width: 1,
+                                                          height: 15.h,
+                                                          color: Colors.white,
+                                                        ),
+                                                        BlocProvider(
+                                                          create:
+                                                              (contextPlaylist) =>
+                                                                  PlaylistCubit(),
+                                                          lazy: true,
+                                                          child: BlocBuilder<
+                                                              PlaylistCubit,
+                                                              PlaylistState>(
+                                                            builder:
+                                                                (contextPlaylist,
+                                                                        state) =>
+                                                                    Expanded(
+                                                              child:
+                                                                  MaterialButton(
+                                                                shape: RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            15.sp)),
+                                                                onPressed: () {
+                                                                  deletePlaylist(
+                                                                      context:
+                                                                          context,
+                                                                      playlistContext:
+                                                                          contextPlaylist);
+                                                                },
+                                                                child: Padding(
+                                                                  padding: EdgeInsets
+                                                                      .symmetric(
+                                                                          vertical:
+                                                                              4.h),
+                                                                  child: Text(
+                                                                    'Confirm',
+                                                                    style: TextStyle(
+                                                                        fontSize: 16
+                                                                            .sp,
+                                                                        color: Colors
+                                                                            .red),
+                                                                  ),
                                                                 ),
                                                               ),
                                                             ),
                                                           ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  )
-                                                ],
-                                              ),
-                                            );
-                                          })
-                                    ],
-                                  );
-                                },
-                                icon: Icon(
-                                  size: 24.sp,
-                                  Icons.more_vert_sharp,
+                                                      ],
+                                                    )
+                                                  ],
+                                                ),
+                                              );
+                                            })
+                                      ],
+                                    );
+                                  },
+                                  icon: Icon(
+                                    size: 24.sp,
+                                    Icons.more_vert_sharp,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
-                    ),
-                    Column(
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
+                  Container(
+                    // decoration: BoxDecoration(
+                    //   border: Border.all(color: Colors.yellow),
+                    // ),
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
@@ -802,298 +803,299 @@ class _PlaylistPageState extends State<PlaylistPage> {
                           ),
                         ),
                       ],
-                    )
-                  ],
-                ),
+                    ),
+                  )
+                ],
+              ),
 
-                // Body Scrollable
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: EdgeInsets.only(top: 10.h),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Album Songs
-                        BlocBuilder<PlaylistSongsCubit, PlaylistSongsState>(
-                          builder: (context, state) {
-                            if (state is PlaylistSongsLoading) {
-                              return Container(
-                                height: 100.h,
-                                width: double.infinity,
-                                alignment: Alignment.center,
-                                child: const CircularProgressIndicator(
-                                  color: AppColors.primary,
-                                ),
-                              );
-                            }
-                            if (state is PlaylistSongsFailure) {
-                              return Container(
-                                height: 100.h,
-                                width: double.infinity,
-                                alignment: Alignment.center,
-                                child: const Text('Failed to fetch songs'),
-                              );
-                            }
-                            if (state is PlaylistSongsLoaded) {
-                              exceptionalSongs = state.songs;
+              // Body Scrollable
+              Expanded(
+                child: SingleChildScrollView(
+                  // padding: EdgeInsets.only(top: 10.h),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Album Songs
+                      BlocBuilder<PlaylistSongsCubit, PlaylistSongsState>(
+                        builder: (context, state) {
+                          if (state is PlaylistSongsLoading) {
+                            return Container(
+                              height: 100.h,
+                              width: double.infinity,
+                              alignment: Alignment.center,
+                              child: const CircularProgressIndicator(
+                                color: AppColors.primary,
+                              ),
+                            );
+                          }
+                          if (state is PlaylistSongsFailure) {
+                            return Container(
+                              height: 100.h,
+                              width: double.infinity,
+                              alignment: Alignment.center,
+                              child: const Text('Failed to fetch songs'),
+                            );
+                          }
+                          if (state is PlaylistSongsLoaded) {
+                            exceptionalSongs = state.songs;
 
-                              // getting artist name by the playlist song's artist name and removes the dupe
-                              List<String> artistsName = state.songs
-                                  .map((e) => e.song.artist)
-                                  .toSet()
-                                  .toList();
+                            // getting artist name by the playlist song's artist name and removes the dupe
+                            List<String> artistsName = state.songs
+                                .map((e) => e.song.artist)
+                                .toSet()
+                                .toList();
 
-                              return state.songs.isNotEmpty
-                                  ? SingleChildScrollView(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          ListView.builder(
-                                            // padding: EdgeInsets.only(
-                                            //   left: 13.w + paddingAddition.w,
-                                            // ),
-                                            physics:
-                                                const NeverScrollableScrollPhysics(),
-                                            shrinkWrap: true,
-                                            itemBuilder: (context, index) {
-                                              return PlaylistSongTileWidget(
-                                                index: index,
-                                                songList: state.songs,
-                                                playlistId:
-                                                    widget.playlistEntity.id!,
-                                              );
-                                            },
-                                            itemCount: state.songs.length,
-                                          ),
-                                          state.songs.length < 7
-                                              ? Container(
-                                                  height: 100.h,
-                                                  width: double.infinity,
-                                                  alignment: Alignment.center,
-                                                  child: const Text(
-                                                    'No other songs',
-                                                    style: TextStyle(
-                                                      fontStyle:
-                                                          FontStyle.italic,
-                                                      color: Colors.white54,
-                                                    ),
+                            return state.songs.isNotEmpty
+                                ? SingleChildScrollView(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        ListView.builder(
+                                          // padding: EdgeInsets.only(
+                                          //   left: 13.w + paddingAddition.w,
+                                          // ),
+                                          padding: EdgeInsets.only(top: 5.h),
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          shrinkWrap: true,
+                                          itemBuilder: (context, index) {
+                                            return PlaylistSongTileWidget(
+                                              index: index,
+                                              songList: state.songs,
+                                              playlistId:
+                                                  widget.playlistEntity.id!,
+                                            );
+                                          },
+                                          itemCount: state.songs.length,
+                                        ),
+                                        state.songs.length < 7
+                                            ? Container(
+                                                height: 100.h,
+                                                width: double.infinity,
+                                                alignment: Alignment.center,
+                                                child: const Text(
+                                                  'No other songs',
+                                                  style: TextStyle(
+                                                    fontStyle: FontStyle.italic,
+                                                    color: Colors.white54,
                                                   ),
-                                                )
-                                              : const SizedBox.shrink(),
-                                          SizedBox(
-                                            height: 12.h,
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                                left: 16.w, right: 22.w),
-                                            child: Text(
-                                              'Check out more from these artists',
-                                              style: TextStyle(
-                                                letterSpacing: 0.3,
-                                                fontSize: 14.sp,
-                                                fontWeight: FontWeight.bold,
-                                              ),
+                                                ),
+                                              )
+                                            : const SizedBox.shrink(),
+                                        SizedBox(
+                                          height: 12.h,
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              left: 16.w, right: 22.w),
+                                          child: Text(
+                                            'Check out more from these artists',
+                                            style: TextStyle(
+                                              letterSpacing: 0.3,
+                                              fontSize: 14.sp,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                           ),
-                                          SizedBox(
-                                            height: 5.h,
-                                          ),
-                                          BlocProvider(
-                                            create: (context) =>
-                                                GetRecommendedArtistsCubit()
-                                                  ..getRecommendedArtists(
-                                                      artistsName),
-                                            child: BlocBuilder<
-                                                GetRecommendedArtistsCubit,
-                                                GetRecommendedArtistsState>(
-                                              builder: (context, state) {
-                                                if (state
-                                                    is GetRecommendedArtistsLoading) {
-                                                  return Container(
+                                        ),
+                                        SizedBox(
+                                          height: 5.h,
+                                        ),
+                                        BlocProvider(
+                                          create: (context) =>
+                                              GetRecommendedArtistsCubit()
+                                                ..getRecommendedArtists(
+                                                    artistsName),
+                                          child: BlocBuilder<
+                                              GetRecommendedArtistsCubit,
+                                              GetRecommendedArtistsState>(
+                                            builder: (context, state) {
+                                              if (state
+                                                  is GetRecommendedArtistsLoading) {
+                                                return Container(
+                                                  height: 100.h,
+                                                  alignment: Alignment.center,
+                                                  child:
+                                                      const CircularProgressIndicator(
+                                                    color: AppColors.primary,
+                                                  ),
+                                                );
+                                              }
+                                              if (state
+                                                  is GetRecommendedArtistsFailure) {
+                                                return Container(
                                                     height: 100.h,
                                                     alignment: Alignment.center,
-                                                    child:
-                                                        const CircularProgressIndicator(
-                                                      color: AppColors.primary,
-                                                    ),
-                                                  );
-                                                }
-                                                if (state
-                                                    is GetRecommendedArtistsFailure) {
-                                                  return Container(
-                                                      height: 100.h,
-                                                      alignment:
-                                                          Alignment.center,
-                                                      child: const Text(
-                                                          'Failed getting your artists recommendations'));
-                                                }
-                                                if (state
-                                                    is GetRecommendedArtistsLoaded) {
-                                                  return SingleChildScrollView(
-                                                    scrollDirection:
-                                                        Axis.horizontal,
-                                                    child: Row(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: List.generate(
-                                                        state.artists.length,
-                                                        (index) {
-                                                          ArtistEntity
-                                                              artistList =
-                                                              state.artists[
-                                                                  index];
+                                                    child: const Text(
+                                                        'Failed getting your artists recommendations'));
+                                              }
+                                              if (state
+                                                  is GetRecommendedArtistsLoaded) {
+                                                return SingleChildScrollView(
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  child: Row(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: List.generate(
+                                                      state.artists.length,
+                                                      (index) {
+                                                        ArtistEntity
+                                                            artistList = state
+                                                                .artists[index];
 
-                                                          return Padding(
-                                                            padding:
-                                                                EdgeInsets.only(
-                                                              left: 12.w,
-                                                            ),
-                                                            child: Row(
-                                                              children: [
-                                                                GestureDetector(
-                                                                  onTap: () {
-                                                                    Navigator
-                                                                        .pushReplacement(
-                                                                      context,
-                                                                      MaterialPageRoute(
-                                                                        builder:
-                                                                            (context) =>
-                                                                                ArtistPage(artistId: artistList.id!),
-                                                                      ),
-                                                                    );
-                                                                  },
-                                                                  child:
-                                                                      Container(
-                                                                    margin: EdgeInsets.symmetric(
-                                                                        vertical:
-                                                                            5.h),
-                                                                    padding:
-                                                                        EdgeInsets
-                                                                            .symmetric(
-                                                                      horizontal:
-                                                                          10.w,
-                                                                      vertical:
-                                                                          10.h,
+                                                        return Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                            left: 12.w,
+                                                          ),
+                                                          child: Row(
+                                                            children: [
+                                                              GestureDetector(
+                                                                onTap: () {
+                                                                  Navigator
+                                                                      .pushReplacement(
+                                                                    context,
+                                                                    MaterialPageRoute(
+                                                                      builder: (context) =>
+                                                                          ArtistPage(
+                                                                              artistId: artistList.id!),
                                                                     ),
-                                                                    decoration: BoxDecoration(
-                                                                        boxShadow: [
-                                                                          BoxShadow(
-                                                                            color:
-                                                                                Colors.black.withOpacity(
-                                                                              0.3,
-                                                                            ),
-                                                                            blurRadius:
-                                                                                10,
-                                                                            offset:
-                                                                                const Offset(3, 3),
+                                                                  );
+                                                                },
+                                                                child:
+                                                                    Container(
+                                                                  margin: EdgeInsets
+                                                                      .symmetric(
+                                                                          vertical:
+                                                                              5.h),
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .symmetric(
+                                                                    horizontal:
+                                                                        10.w,
+                                                                    vertical:
+                                                                        10.h,
+                                                                  ),
+                                                                  decoration: BoxDecoration(
+                                                                      boxShadow: [
+                                                                        BoxShadow(
+                                                                          color: Colors
+                                                                              .black
+                                                                              .withOpacity(
+                                                                            0.3,
                                                                           ),
-                                                                        ],
-                                                                        color: const Color
-                                                                            .fromARGB(
-                                                                            115,
-                                                                            54,
-                                                                            54,
-                                                                            54),
-                                                                        borderRadius:
-                                                                            BorderRadius.circular(10.sp)),
-                                                                    child:
-                                                                        Column(
-                                                                      crossAxisAlignment:
-                                                                          CrossAxisAlignment
-                                                                              .start,
-                                                                      children: [
-                                                                        Center(
-                                                                          child:
-                                                                              CircleAvatar(
-                                                                            radius:
-                                                                                50.sp,
-                                                                            backgroundImage:
-                                                                                NetworkImage(
-                                                                              '${AppURLs.supabaseArtistStorage}${artistList.name!.toLowerCase()}.jpg',
-                                                                            ),
-                                                                          ),
-                                                                        ),
-                                                                        SizedBox(
-                                                                          height:
-                                                                              18.h,
-                                                                        ),
-                                                                        Text(
-                                                                          artistList
-                                                                              .name!,
-                                                                          style:
-                                                                              TextStyle(
-                                                                            fontSize:
-                                                                                12.sp,
-                                                                            fontWeight:
-                                                                                FontWeight.w600,
-                                                                          ),
-                                                                        ),
-                                                                        SizedBox(
-                                                                          height:
-                                                                              4.h,
-                                                                        ),
-                                                                        Text(
-                                                                          'Artist',
-                                                                          style:
-                                                                              TextStyle(
-                                                                            fontSize:
-                                                                                11.sp,
-                                                                            color:
-                                                                                Colors.white70,
-                                                                            fontWeight:
-                                                                                FontWeight.w500,
-                                                                          ),
+                                                                          blurRadius:
+                                                                              10,
+                                                                          offset: const Offset(
+                                                                              3,
+                                                                              3),
                                                                         ),
                                                                       ],
-                                                                    ),
+                                                                      color: const Color
+                                                                          .fromARGB(
+                                                                          115,
+                                                                          54,
+                                                                          54,
+                                                                          54),
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              10.sp)),
+                                                                  child: Column(
+                                                                    crossAxisAlignment:
+                                                                        CrossAxisAlignment
+                                                                            .start,
+                                                                    children: [
+                                                                      Center(
+                                                                        child:
+                                                                            CircleAvatar(
+                                                                          radius:
+                                                                              50.sp,
+                                                                          backgroundImage:
+                                                                              NetworkImage(
+                                                                            '${AppURLs.supabaseArtistStorage}${artistList.name!.toLowerCase()}.jpg',
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(
+                                                                        height:
+                                                                            18.h,
+                                                                      ),
+                                                                      Text(
+                                                                        artistList
+                                                                            .name!,
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontSize:
+                                                                              12.sp,
+                                                                          fontWeight:
+                                                                              FontWeight.w600,
+                                                                        ),
+                                                                      ),
+                                                                      SizedBox(
+                                                                        height:
+                                                                            4.h,
+                                                                      ),
+                                                                      Text(
+                                                                        'Artist',
+                                                                        style:
+                                                                            TextStyle(
+                                                                          fontSize:
+                                                                              11.sp,
+                                                                          color:
+                                                                              Colors.white70,
+                                                                          fontWeight:
+                                                                              FontWeight.w500,
+                                                                        ),
+                                                                      ),
+                                                                    ],
                                                                   ),
                                                                 ),
-                                                                SizedBox(
-                                                                  width: 8.w,
-                                                                )
-                                                              ],
-                                                            ),
-                                                          );
-                                                        },
-                                                      ),
+                                                              ),
+                                                              SizedBox(
+                                                                width: 8.w,
+                                                              )
+                                                            ],
+                                                          ),
+                                                        );
+                                                      },
                                                     ),
-                                                  );
-                                                }
+                                                  ),
+                                                );
+                                              }
 
-                                                return Container();
-                                              },
-                                            ),
+                                              return Container();
+                                            },
                                           ),
-                                          SizedBox(
-                                            height: 20.h,
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                  : Container(
-                                      alignment: Alignment.center,
-                                      height: 200.h,
-                                      child: const Text(
-                                        'No songs added to this playlist',
-                                        style: TextStyle(
-                                          fontStyle: FontStyle.italic,
-                                          color: Colors.white54,
                                         ),
+                                        SizedBox(
+                                          height: 20.h,
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                : Container(
+                                    alignment: Alignment.center,
+                                    height: 200.h,
+                                    child: const Text(
+                                      'No songs added to this playlist',
+                                      style: TextStyle(
+                                        fontStyle: FontStyle.italic,
+                                        color: Colors.white54,
                                       ),
-                                    );
-                            }
+                                    ),
+                                  );
+                          }
 
-                            return Container();
-                          },
-                        ),
-                      ],
-                    ),
+                          return Container();
+                        },
+                      ),
+                    ],
                   ),
-                )
-              ],
-            ),
+                ),
+              )
+            ],
           )
           //   },
           // ),
@@ -1177,6 +1179,4 @@ class _PlaylistPageState extends State<PlaylistPage> {
     //   },
     // );
   }
-
-
 }

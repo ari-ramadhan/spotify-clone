@@ -86,89 +86,85 @@ class _ProfilePageState extends State<ProfilePage> {
                     )
                   : const SizedBox.shrink(),
             ),
-            body: Stack(
-              children: [
-                SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _profileInfo(context),
-                      // _testing(),
-                      SizedBox(
-                        height: 0.h,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 0)
-                            .copyWith(right: 5.w),
-                        // child: playlistsList(),
-                        child: MultiBlocProvider(
-                          providers: [
-                            BlocProvider(
-                              create: (context) => PlaylistCubit()
-                                ..getCurrentuserPlaylist(isCurrentUser
-                                    ? ''
-                                    : widget.userEntity.userEntity.userId!),
-                            ),
-                            BlocProvider(
-                              create: (context) => FavoriteSongCubit()
-                                ..getFavoriteSongs(isCurrentUser
-                                    ? ''
-                                    : widget.userEntity.userEntity.userId!),
-                            ),
-                            BlocProvider(
-                              create: (context) => FollowedArtistsCubit()
-                                ..getFollowedArtists(isCurrentUser
-                                    ? ''
-                                    : widget.userEntity.userEntity.userId!),
-                            ),
-                          ],
-                          child: BlocBuilder<PlaylistCubit, PlaylistState>(
-                            key: const ValueKey(PlaylistState),
-                            builder: (context, state) => Column(
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                          horizontal: 10.w,
-                                          vertical: isCurrentUser ? 5.h : 10.h)
-                                      .copyWith(
-                                          bottom: isCurrentUser ? 0 : 10.h),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        'My Library',
-                                        style: TextStyle(
-                                            fontSize: 14.sp,
-                                            fontWeight: FontWeight.bold,
-                                            color: context.isDarkMode
-                                                ? AppColors.grey
-                                                : AppColors.darkGrey),
-                                      ),
-                                      isCurrentUser
-                                          ? createPlaylistButton(context)
-                                          : const SizedBox.shrink(),
-                                    ],
+            body: SingleChildScrollView(
+              padding: EdgeInsets.zero,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _profileInfo(context),
+                  // _testing(),
+                  SizedBox(
+                    height: 0.h,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0)
+                        .copyWith(right: 5.w),
+                    // child: playlistsList(),
+                    child: MultiBlocProvider(
+                      providers: [
+                        BlocProvider(
+                          create: (context) => PlaylistCubit()
+                            ..getCurrentuserPlaylist(isCurrentUser
+                                ? ''
+                                : widget.userEntity.userEntity.userId!),
+                        ),
+                        BlocProvider(
+                          create: (context) => FavoriteSongCubit()
+                            ..getFavoriteSongs(isCurrentUser
+                                ? ''
+                                : widget.userEntity.userEntity.userId!),
+                        ),
+                        BlocProvider(
+                          create: (context) => FollowedArtistsCubit()
+                            ..getFollowedArtists(isCurrentUser
+                                ? ''
+                                : widget.userEntity.userEntity.userId!),
+                        ),
+                      ],
+                      child: BlocBuilder<PlaylistCubit, PlaylistState>(
+                        key: const ValueKey(PlaylistState),
+                        builder: (context, state) => Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                      horizontal: 10.w,
+                                      vertical: isCurrentUser ? 5.h : 10.h)
+                                  .copyWith(bottom: isCurrentUser ? 0 : 10.h),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'My Library',
+                                    style: TextStyle(
+                                        fontSize: 14.sp,
+                                        fontWeight: FontWeight.bold,
+                                        color: context.isDarkMode
+                                            ? AppColors.grey
+                                            : AppColors.darkGrey),
                                   ),
-                                ),
-                                // Favorite page button
-                                favoriteSongsButton(),
-                                // list of playlists
-                                playlistListBuilder(state),
-                                // list of followed artists
-                                artistFollowedBuilder()
-                              ],
+                                  isCurrentUser
+                                      ? createPlaylistButton(context)
+                                      : const SizedBox.shrink(),
+                                ],
+                              ),
                             ),
-                          ),
+                            // Favorite page button
+                            favoriteSongsButton(),
+                            // list of playlists
+                            playlistListBuilder(state),
+                            // list of followed artists
+                            artistFollowedBuilder()
+                          ],
                         ),
                       ),
-                      SizedBox(
-                        height: 20.h,
-                      )
-                    ],
+                    ),
                   ),
-                ),
-              ],
+                  SizedBox(
+                    height: 20.h,
+                  )
+                ],
+              ),
             ),
           )
         : Container(
@@ -911,12 +907,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ),
 
-                // if (state is AvatarUploading)
-                //   const Padding(
-                //     padding: EdgeInsets.all(20.0),
-                //     child: CircularProgressIndicator(),
-                //   ),
-
                 // Error Message Display
                 if (state is AvatarError)
                   Padding(
@@ -984,7 +974,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         },
                         (r) {
                           customSnackBar(
-                              isSuccess: false, text: r, context: context);
+                              isSuccess: true, text: r, context: context);
                           AuthService().saveUserLoggedInInfo(UserModel(
                               userId: userId,
                               email: email,
@@ -1158,152 +1148,6 @@ class _ProfilePageState extends State<ProfilePage> {
         },
       ),
     );
-
-    // return MultiBlocProvider(
-    //   providers: [
-    //     BlocProvider(
-    //         create: (context) => FollowerCubit()
-    //           ..getFollowerAndFollowing(
-    //             isCurrentUser ? userId : widget.userEntity.userEntity.userId!,
-    //           )),
-    //   ],
-    //   child: BlocBuilder<FollowerCubit, FollowerState>(
-    //     builder: (context, state) {
-    //       if (state is FollowerLoading) {
-    //         return Container(
-    //           alignment: Alignment.center,
-    //           height: 100.h,
-    //           child: const CircularProgressIndicator(
-    //             color: AppColors.darkGrey,
-    //           ),
-    //         );
-    //       }
-    //       if (state is FollowerFailure) {
-    //         return Container(
-    //           alignment: Alignment.center,
-    //           height: 100.h,
-    //           child: const Text('Failed to get follower statistic'),
-    //         );
-    //       }
-
-    //       if (state is FollowerLoaded) {
-    //         return Container(
-    //             decoration: BoxDecoration(
-    //               color: context.isDarkMode
-    //                   ? const Color(0xff2c2b2b)
-    //                   : Colors.white,
-    //               borderRadius: BorderRadius.only(
-    //                 bottomLeft: Radius.circular(60.w),
-    //                 bottomRight: Radius.circular(60.w),
-    //               ),
-    //             ),
-    //             width: double.infinity,
-    //             child: Stack(
-    //               children: [
-    //                 Row(
-    //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-    //                   children: [
-    //                     SvgPicture.asset(AppVectors.profilePattern),
-    //                     RotatedBox(
-    //                       quarterTurns: 90,
-    //                       child: SvgPicture.asset(
-    //                         AppVectors.profilePattern,
-    //                       ),
-    //                     )
-    //                   ],
-    //                 ),
-    //                 Align(
-    //                   alignment: Alignment.center,
-    //                   child: Column(
-    //                     mainAxisAlignment: MainAxisAlignment.center,
-    //                     crossAxisAlignment: CrossAxisAlignment.center,
-    //                     children: [
-    //                       SizedBox(
-    //                         height: 10.h,
-    //                       ),
-    //                       isCurrentUser
-    //                           ? currentUserProfileImage()
-    //                           : SizedBox(
-    //                               height: 92.sp,
-    //                               width: 92.sp,
-    //                               child: ClipOval(
-    //                                 child: widget.userEntity.userEntity
-    //                                             .avatarUrl !=
-    //                                         ''
-    //                                     ? CachedNetworkImage(
-    //                                         imageUrl: widget.userEntity
-    //                                             .userEntity.avatarUrl!,
-    //                                         fit: BoxFit.cover,
-    //                                       )
-    //                                     : Container(
-    //                                         color: Colors.grey.shade700,
-    //                                         child: Icon(
-    //                                           Icons.person,
-    //                                           color: Colors.grey,
-    //                                           size: 70.sp,
-    //                                         ),
-    //                                       ),
-    //                               ),
-    //                             ),
-    //                       SizedBox(
-    //                         height: isCurrentUser ? 10.h : 0,
-    //                       ),
-    //                       isCurrentUser
-    //                           ? Text(
-    //                               email,
-    //                               style: TextStyle(
-    //                                   fontSize: 13.sp,
-    //                                   fontWeight: FontWeight.w300,
-    //                                   letterSpacing: 0.3),
-    //                             )
-    //                           : const SizedBox.shrink(),
-    //                       SizedBox(
-    //                         height: 10.h,
-    //                       ),
-    //                       Text(
-    //                         isCurrentUser
-    //                             ? fullName
-    //                             : widget.userEntity.userEntity.fullName!,
-    //                         style: TextStyle(
-    //                             fontSize: 18.sp,
-    //                             fontWeight: FontWeight.w500,
-    //                             letterSpacing: 0.3),
-    //                       ),
-    //                       SizedBox(
-    //                         height: 7.h,
-    //                       ),
-    //                       !isCurrentUser
-    //                           ? FollowUserButton(user: widget.userEntity)
-    //                           : const SizedBox.shrink(),
-    //                       SizedBox(
-    //                         height: 4.h,
-    //                       ),
-    //                       Row(
-    //                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-    //                         children: [
-    //                           FollowCount(
-    //                             count: state.followEntity.following!.count,
-    //                             title: 'Following',
-    //                           ),
-    //                           FollowCount(
-    //                             count: state.followEntity.follower!.count,
-    //                             title: 'Followers',
-    //                           ),
-    //                         ],
-    //                       ),
-    //                       SizedBox(
-    //                         height: 20.h,
-    //                       )
-    //                     ],
-    //                   ),
-    //                 ),
-    //               ],
-    //             ));
-    //       }
-    //       return Container();
-    //     },
-    //   ),
-    // );
   }
 
   BlocBuilder<AvatarCubit, AvatarState> currentUserProfileImage() {
