@@ -10,6 +10,7 @@ import 'package:spotify_clone/presentation/album/bloc/artist_album/artist_album_
 import 'package:spotify_clone/presentation/album/bloc/artist_album/artist_album_state.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_cubit.dart';
 import 'package:spotify_clone/presentation/artist_page/bloc/album/album_list_state.dart';
+import 'package:spotify_clone/presentation/artist_page/pages/artist_page.dart';
 import 'package:spotify_clone/presentation/profile/pages/export.dart';
 
 class ArtistAlbum extends StatefulWidget {
@@ -140,28 +141,38 @@ class _ArtistAlbumState extends State<ArtistAlbum> {
                         ),
                         isAllSong
                             ? const SizedBox.shrink()
-                            : Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  CircleAvatar(
-                                    radius: 10.sp,
-                                    backgroundImage: NetworkImage(
-                                      '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
+                            : GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => ArtistPage(
+                                          artistId: widget.artist.id!),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 10.w,
-                                  ),
-                                  Text(
-                                    '${artist.name!} ',
-                                    style: TextStyle(
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w500,
-                                      // color: Colors.white70,
-                                      height: 1,
+                                  );
+                                },
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    CircleAvatar(
+                                      radius: 10.sp,
+                                      backgroundImage: NetworkImage(
+                                        '${AppURLs.supabaseArtistStorage}${artist.name!.toLowerCase()}.jpg',
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(
+                                      width: 10.w,
+                                    ),
+                                    Text(
+                                      '${artist.name!} ',
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        fontWeight: FontWeight.w500,
+                                        // color: Colors.white70,
+                                        height: 1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                         SizedBox(
                           height: 15.h,

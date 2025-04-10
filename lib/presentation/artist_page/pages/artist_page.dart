@@ -78,10 +78,10 @@ class _ArtistPageState extends State<ArtistPage>
                   Column(
                     children: [
                       ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(20),
-                          bottomRight: Radius.circular(20),
-                        ),
+                        // borderRadius: const BorderRadius.only(
+                        //   bottomLeft: Radius.circular(20),
+                        //   bottomRight: Radius.circular(20),
+                        // ),
                         child: BackdropFilter(
                           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
                           child: Container(
@@ -259,6 +259,7 @@ class _ArtistPageState extends State<ArtistPage>
       padding: EdgeInsets.zero,
       onTap: (value) {
         setState(() {});
+
       },
       tabs: [
         Padding(

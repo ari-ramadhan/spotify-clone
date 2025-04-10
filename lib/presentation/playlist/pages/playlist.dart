@@ -1,5 +1,5 @@
 import 'dart:ui';
-
+import 'package:skeletonizer/skeletonizer.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/favorite_button/playlist_song_tile_widget.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget_selectable.dart';
@@ -15,6 +15,8 @@ import 'package:spotify_clone/presentation/playlist/bloc/playlist_songs_cubit.da
 import 'package:spotify_clone/presentation/playlist/bloc/playlist_songs_state.dart';
 import 'package:spotify_clone/presentation/playlist/bloc/recommended_artist_state.dart';
 import 'package:spotify_clone/presentation/playlist/bloc/recommended_artists_cubit.dart';
+import 'package:spotify_clone/presentation/playlist/bloc/search_song/search_song_for_playlist_cubit.dart';
+import 'package:spotify_clone/presentation/playlist/bloc/search_song/search_song_for_playlist_state.dart';
 import 'package:spotify_clone/presentation/playlist/widgets/EditInfoField.dart';
 import 'package:spotify_clone/presentation/profile/bloc/favorite_song/favorite_song_cubit.dart';
 import 'package:spotify_clone/presentation/profile/bloc/favorite_song/favorite_song_state.dart';
@@ -37,7 +39,8 @@ class PlaylistPage extends StatefulWidget {
   State<PlaylistPage> createState() => _PlaylistPageState();
 }
 
-class _PlaylistPageState extends State<PlaylistPage> {
+class _PlaylistPageState extends State<PlaylistPage>
+    with SingleTickerProviderStateMixin {
   String playlistName = '';
   String playlistDesc = '';
 
@@ -53,6 +56,18 @@ class _PlaylistPageState extends State<PlaylistPage> {
   List<SongWithFavorite> exceptionalSongs = [];
   List<SongWithFavorite> selectedSongs = [];
 
+  late TabController _tabController;
+
+  final TextEditingController _searchSongController = TextEditingController();
+
+  final SearchSongForPlaylistCubit _searchCubit = SearchSongForPlaylistCubit();
+
+  int selectedSongCount = 0;
+
+  bool _isNotEmpty = false;
+  late FocusNode _focusNode;
+  bool _isFocused = false;
+
   @override
   void initState() {
     super.initState();
@@ -61,13 +76,38 @@ class _PlaylistPageState extends State<PlaylistPage> {
     playlistDesc = widget.playlistEntity.description!;
     AppColors.gradientList.shuffle();
     gradientAcak = AppColors.gradientList.first;
+
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      setState(() {});
+    });
+
+    _searchSongController.addListener(() {
+      setState(() {
+        _isNotEmpty = _searchSongController.text.isNotEmpty;
+      });
+    });
+    _focusNode = FocusNode();
+
+    _focusNode.addListener(() {
+      setState(() {
+        _isFocused = _focusNode.hasFocus;
+      });
+      if (_isFocused) {
+      } else {}
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _searchSongController.clear();
   }
 
   bool isShowSelectedSongError = false;
+
   @override
   Widget build(BuildContext context) {
-    int selectedSongCount = 0;
-
     return Scaffold(
       backgroundColor: AppColors.medDarkBackground,
       body: MultiBlocProvider(
@@ -83,1023 +123,1129 @@ class _PlaylistPageState extends State<PlaylistPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Header Section
               Column(
                 children: [
                   // Header Section (Album Picture)
-                  Stack(
-                    children: [
-                      BlocBuilder<PlaylistSongsCubit, PlaylistSongsState>(
-                        builder: (context, state) {
-                          return Container(
-                            width: double.infinity,
-                            alignment: Alignment.bottomCenter,
-                            // padding: EdgeInsets.only(top: 10),
-                            height:
-                                180.h + MediaQuery.of(context).viewPadding.top,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  gradientAcak['primaryGradient']!,
-                                  AppColors.medDarkBackground.withOpacity(0.1),
-                                ],
-                              ),
-                            ),
-                            child: Container(
-                                height: 180.h,
-                                width: 180.h,
-                                // decoration: BoxDecoration(
-                                //     border: Border.all(color: Colors.red)),
-                                decoration: const BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      Color(0xff091e3a),
-                                      Color(0xff2d6cbe),
-                                      Color(0xff64a9dd),
-                                    ],
-                                    stops: [0, 0.5, 0.75],
-                                    begin: Alignment.bottomRight,
-                                    end: Alignment.topLeft,
-                                  ),
-                                ),
-                                child: Stack(
-                                  children: [
-                                    Center(
-                                      child: SvgPicture.asset(
-                                        AppVectors.playlist,
-                                        height: 90.w,
-                                        width: 90.w,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    if (state is PlaylistSongsLoaded) ...[
-                                      GridView.count(
-                                          crossAxisCount: 2,
-                                          padding: EdgeInsets.zero,
-                                          children: (state.songs.take(4)).map(
-                                            (e) {
-                                              return Image.network(
-                                                  '${AppURLs.supabaseCoverStorage}${e.song.artist} - ${e.song.title}.jpg');
-                                            },
-                                          ).toList())
-                                    ],
-                                  ],
-                                )),
-                          );
-                        },
+                  _headerSection(context),
+                  _playlistInfoSection()
+                ],
+              ),
+
+              // Body Scrollable Section
+              Expanded(
+                child: SingleChildScrollView(
+                  child: _playlistSongsSection(),
+                ),
+              )
+            ],
+          )),
+    );
+  }
+
+  Stack _headerSection(BuildContext context) {
+    return Stack(
+      children: [
+        BlocBuilder<PlaylistSongsCubit, PlaylistSongsState>(
+          builder: (context, state) {
+            return Container(
+              width: double.infinity,
+              alignment: Alignment.bottomCenter,
+              height: 180.h + MediaQuery.of(context).viewPadding.top,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    gradientAcak['primaryGradient']!,
+                    AppColors.medDarkBackground.withOpacity(0.1),
+                  ],
+                ),
+              ),
+              child: Container(
+                height: 180.h,
+                width: 180.h,
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(0xff091e3a),
+                      Color(0xff2d6cbe),
+                      Color(0xff64a9dd),
+                    ],
+                    stops: [0, 0.5, 0.75],
+                    begin: Alignment.bottomRight,
+                    end: Alignment.topLeft,
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    Center(
+                      child: SvgPicture.asset(
+                        AppVectors.playlist,
+                        height: 90.w,
+                        width: 90.w,
+                        color: Colors.white,
                       ),
-                      Container(
-                        margin: EdgeInsets.only(
-                            top: MediaQuery.of(context).viewPadding.top),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                IconButton(
-                                  onPressed: () {
-                                    Navigator.pop(context, true);
-                                  },
-                                  icon: Icon(
-                                    size: 24.sp,
-                                    Icons.arrow_back_ios_rounded,
-                                  ),
-                                ),
-                                IconButton(
-                                  onPressed: () async {
-                                    return showMenu(
-                                      context: context,
-                                      position:
-                                          RelativeRect.fromLTRB(1, 60.h, 0, 0),
-                                      menuPadding: EdgeInsets.zero,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                          8.h,
-                                        ),
-                                      ),
-                                      items: [
-                                        PopupMenuItem(
-                                            onTap: () async {
-                                              blurryDialog(
-                                                  context: context,
-                                                  horizontalPadding: 21,
-                                                  onClosed: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  content: Column(
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .stretch,
-                                                    children: [
-                                                      Form(
-                                                        key: _formKey,
-                                                        child: Column(
-                                                          children: [
-                                                            EditInfoField(
-                                                              validator:
-                                                                  (value) {
-                                                                if (value!
-                                                                    .isEmpty) {
-                                                                  return 'You must add some title';
-                                                                }
-                                                                return null;
-                                                              },
-                                                              value:
-                                                                  playlistName,
-                                                              controller:
-                                                                  _playlistNameController,
-                                                              label: 'Title',
-                                                            ),
-                                                            SizedBox(
-                                                              height: 10.h,
-                                                            ),
-                                                            SizedBox(
-                                                              height: 80.h,
-                                                              width: double
-                                                                  .maxFinite,
-                                                              child:
-                                                                  EditInfoField(
-                                                                validator:
-                                                                    (value) {
-                                                                  return null;
-                                                                },
-                                                                value:
-                                                                    playlistDesc,
-                                                                isExpanded:
-                                                                    true,
-                                                                controller:
-                                                                    _playlistDescController,
-                                                                label:
-                                                                    'Description',
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      SizedBox(
-                                                        height: 16.h,
-                                                      ),
-                                                      MaterialButton(
-                                                        onPressed: () async {
-                                                          await updatePlaylist(
-                                                              context);
-                                                        },
-                                                        focusColor:
-                                                            Colors.black45,
-                                                        highlightColor:
-                                                            Colors.black12,
-                                                        splashColor: AppColors
-                                                            .darkBackground
-                                                            .withOpacity(0.3),
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                            15.sp,
-                                                          ),
-                                                        ),
-                                                        color:
-                                                            AppColors.primary,
-                                                        padding: EdgeInsets
-                                                            .symmetric(
-                                                                vertical: 5.h),
-                                                        child: Text(
-                                                          'Update',
-                                                          style: TextStyle(
-                                                              fontSize: 17.sp),
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  dialogTitle:
-                                                      'Edit playlist Info');
-                                            },
-                                            child: const Text(
-                                                'Edit Playlist Info')),
-                                        PopupMenuItem(
-                                            child:
-                                                const Text('Delete playlist'),
-                                            onTap: () {
-                                              blurryDialog(
-                                                onClosed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                context: context,
-                                                dialogTitle:
-                                                    'Delete this playlisttt',
-                                                horizontalPadding: 21,
-                                                content: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      'Confirm to delete this playlist?',
-                                                      style: TextStyle(
-                                                          fontSize: 16.sp),
-                                                    ),
-                                                    SizedBox(
-                                                      height: 10.h,
-                                                    ),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Expanded(
-                                                          child: MaterialButton(
-                                                            shape: RoundedRectangleBorder(
-                                                                borderRadius:
-                                                                    BorderRadius
-                                                                        .circular(
-                                                                            15.sp)),
-                                                            onPressed: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            child: Padding(
-                                                              padding: EdgeInsets
-                                                                  .symmetric(
-                                                                      vertical:
-                                                                          4.h),
-                                                              child: Text(
-                                                                'Cancel',
-                                                                style: TextStyle(
-                                                                    fontSize:
-                                                                        16.sp,
-                                                                    color: Colors
-                                                                        .white70),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Container(
-                                                          width: 1,
-                                                          height: 15.h,
-                                                          color: Colors.white,
-                                                        ),
-                                                        BlocProvider(
-                                                          create:
-                                                              (contextPlaylist) =>
-                                                                  PlaylistCubit(),
-                                                          lazy: true,
-                                                          child: BlocBuilder<
-                                                              PlaylistCubit,
-                                                              PlaylistState>(
-                                                            builder:
-                                                                (contextPlaylist,
-                                                                        state) =>
-                                                                    Expanded(
-                                                              child:
-                                                                  MaterialButton(
-                                                                shape: RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            15.sp)),
-                                                                onPressed: () {
-                                                                  deletePlaylist(
-                                                                      context:
-                                                                          context,
-                                                                      playlistContext:
-                                                                          contextPlaylist);
-                                                                },
-                                                                child: Padding(
-                                                                  padding: EdgeInsets
-                                                                      .symmetric(
-                                                                          vertical:
-                                                                              4.h),
-                                                                  child: Text(
-                                                                    'Confirm',
-                                                                    style: TextStyle(
-                                                                        fontSize: 16
-                                                                            .sp,
-                                                                        color: Colors
-                                                                            .red),
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    )
-                                                  ],
-                                                ),
-                                              );
-                                            })
-                                      ],
-                                    );
-                                  },
-                                  icon: Icon(
-                                    size: 24.sp,
-                                    Icons.more_vert_sharp,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                    ),
+                    if (state is PlaylistSongsLoaded) ...[
+                      GridView.count(
+                        crossAxisCount: 2,
+                        padding: EdgeInsets.zero,
+                        children: (state.songs.take(4)).map(
+                          (e) {
+                            return Image.network(
+                                '${AppURLs.supabaseCoverStorage}${e.song.artist} - ${e.song.title}.jpg');
+                          },
+                        ).toList(),
                       )
                     ],
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        Container(
+          margin: EdgeInsets.only(top: MediaQuery.of(context).viewPadding.top),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      Navigator.pop(context, true);
+                    },
+                    icon: Icon(
+                      size: 24.sp,
+                      Icons.arrow_back_ios_rounded,
+                    ),
                   ),
-                  Container(
-                    // decoration: BoxDecoration(
-                    //   border: Border.all(color: Colors.yellow),
-                    // ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 13.w + paddingAddition.w),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              SizedBox(
-                                height: 10.h,
-                              ),
-                              Text(
-                                playlistName,
-                                style: TextStyle(
-                                  fontSize:
-                                      playlistName.length < 17 ? 21.sp : 17.sp,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 0.4,
-                                ),
-                              ),
-                              SizedBox(
-                                height: 5.h,
-                              ),
-                              playlistDesc.isEmpty
-                                  ? const SizedBox.shrink()
-                                  : Text(
-                                      "~ $playlistDesc",
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white54,
-                                        height: 1,
-                                      ),
-                                    ),
-                              playlistDesc.isEmpty
-                                  ? const SizedBox.shrink()
-                                  : SizedBox(
-                                      height: 10.h,
-                                    ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'created by',
-                                    style: TextStyle(
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white70,
-                                      height: 1,
-                                    ),
-                                  ),
-                                  Text(
-                                    ' ${widget.userEntity.fullName} ',
-                                    style: TextStyle(
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: AppColors.primary,
-                                      height: 1,
-                                    ),
-                                  ),
-                                  Icon(
-                                    Icons.circle,
-                                    color: Colors.white70,
-                                    size: 4.sp,
-                                  ),
-                                  Text(
-                                    ' 2019',
-                                    style: TextStyle(
-                                      fontSize: 12.sp,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white70,
-                                      height: 1,
-                                    ),
-                                  ),
-                                ],
-                              )
-                            ],
+                  IconButton(
+                    onPressed: () async {
+                      return showMenu(
+                        context: context,
+                        position: RelativeRect.fromLTRB(1, 60.h, 0, 0),
+                        menuPadding: EdgeInsets.zero,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            8.h,
                           ),
                         ),
-                        SizedBox(
-                          height: 5.h,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 4.w + paddingAddition.w),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  BlocBuilder<PlaylistSongsCubit,
-                                      PlaylistSongsState>(
-                                    builder: (playctx, state) {
-                                      if (state is PlaylistSongsLoaded) {
-                                        return IconButton(
-                                          iconSize: 20.sp,
-                                          onPressed: () async {
-                                            setState(() {
-                                              selectedSongs = [];
-                                            });
+                        items: [
+                          PopupMenuItem(
+                              onTap: () async {
+                                _updatePlaylistInfoPopUp(context);
+                              },
+                              child: const Text('Edit Playlist Info')),
+                          PopupMenuItem(
+                            child: const Text('Delete playlist'),
+                            onTap: () {
+                              _deletePlaylistPopUp(context);
+                            },
+                          )
+                        ],
+                      );
+                    },
+                    icon: Icon(
+                      size: 24.sp,
+                      Icons.more_vert_sharp,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        )
+      ],
+    );
+  }
 
-                                            await blurryDialog(
-                                              context: context,
-                                              horizontalPadding: 21,
-                                              dialogTitle: 'Add songs',
-                                              onClosed: () {
-                                                Navigator.pop(context);
+  Container _playlistInfoSection() {
+    return Container(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 13.w + paddingAddition.w),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 10.h,
+                ),
+                Text(
+                  playlistName,
+                  style: TextStyle(
+                    fontSize: playlistName.length < 17 ? 21.sp : 17.sp,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+                SizedBox(
+                  height: 5.h,
+                ),
+                playlistDesc.isEmpty
+                    ? const SizedBox.shrink()
+                    : Text(
+                        "~ $playlistDesc",
+                        style: TextStyle(
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white54,
+                          height: 1,
+                        ),
+                      ),
+                playlistDesc.isEmpty
+                    ? const SizedBox.shrink()
+                    : SizedBox(
+                        height: 10.h,
+                      ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text(
+                      'created by',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white70,
+                        height: 1,
+                      ),
+                    ),
+                    Text(
+                      ' ${widget.userEntity.fullName} ',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.primary,
+                        height: 1,
+                      ),
+                    ),
+                    Icon(
+                      Icons.circle,
+                      color: Colors.white70,
+                      size: 4.sp,
+                    ),
+                    Text(
+                      ' 2019',
+                      style: TextStyle(
+                        fontSize: 12.sp,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white70,
+                        height: 1,
+                      ),
+                    ),
+                  ],
+                )
+              ],
+            ),
+          ),
+          SizedBox(
+            height: 5.h,
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 4.w + paddingAddition.w),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    BlocBuilder<PlaylistSongsCubit, PlaylistSongsState>(
+                      builder: (playctx, state) {
+                        if (state is PlaylistSongsLoaded) {
+                          return _addSongToPlaylistButton(playctx);
+                        }
+                        return Container();
+                      },
+                    ),
+                    IconButton(
+                      splashRadius: 22.sp,
+                      onPressed: () {},
+                      icon: Icon(
+                        Icons.more_horiz_rounded,
+                        color: Colors.white70,
+                        size: 28.w,
+                      ),
+                    ),
+                  ],
+                ),
+                BlocBuilder<PlaylistSongsCubit, PlaylistSongsState>(
+                  builder: (context, state) {
+                    if (state is PlaylistSongsLoading) {
+                      return Container();
+                    }
+                    if (state is PlaylistFailure) {
+                      return Container(
+                        margin: EdgeInsets.only(right: 10.w),
+                        padding: EdgeInsets.all(5.h),
+                        decoration: const BoxDecoration(
+                          color: Colors.grey,
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          onPressed: () {},
+                          icon: Icon(
+                            Icons.play_disabled_rounded,
+                            size: 25.h,
+                            color: Colors.white,
+                          ),
+                        ),
+                      );
+                    }
+                    if (state is PlaylistSongsLoaded) {
+                      return Container(
+                        // margin: EdgeInsets.only(right: 10.w),
+                        padding: EdgeInsets.all(5.h),
+                        decoration: BoxDecoration(
+                          color: state.songs.isEmpty
+                              ? Colors.grey
+                              : AppColors.primary,
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          onPressed: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) => SongPlayerPage(
+                                  songs: state.songs,
+                                  startIndex: 0,
+                                ),
+                              ),
+                            );
+                          },
+                          icon: Icon(
+                            Icons.play_arrow_rounded,
+                            size: 25.h,
+                            color: Colors.white,
+                          ),
+                        ),
+                      );
+                    }
+                    return Container();
+                  },
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<Object?> _deletePlaylistPopUp(BuildContext context) {
+    return blurryDialog(
+      onClosed: () {
+        Navigator.pop(context);
+      },
+      context: context,
+      dialogTitle: 'Delete this playlisttt',
+      horizontalPadding: 21,
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Confirm to delete this playlist?',
+            style: TextStyle(fontSize: 16.sp),
+          ),
+          SizedBox(
+            height: 10.h,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: MaterialButton(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                      15.sp,
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(
+                      context,
+                    );
+                  },
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                      vertical: 4.h,
+                    ),
+                    child: Text(
+                      'Cancel',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Container(
+                width: 1,
+                height: 15.h,
+                color: Colors.white,
+              ),
+              BlocProvider(
+                create: (contextPlaylist) => PlaylistCubit(),
+                lazy: true,
+                child: BlocBuilder<PlaylistCubit, PlaylistState>(
+                  builder: (contextPlaylist, state) => Expanded(
+                    child: MaterialButton(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15.sp)),
+                      onPressed: () {
+                        deletePlaylist(
+                            context: context, playlistContext: contextPlaylist);
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 4.h,
+                        ),
+                        child: Text(
+                          'Confirm',
+                          style: TextStyle(fontSize: 16.sp, color: Colors.red),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+
+  Future<Object?> _updatePlaylistInfoPopUp(BuildContext context) {
+    return blurryDialog(
+        context: context,
+        horizontalPadding: 21,
+        onClosed: () {
+          Navigator.pop(context);
+        },
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  EditInfoField(
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'You must add some title';
+                      }
+                      return null;
+                    },
+                    value: playlistName,
+                    controller: _playlistNameController,
+                    label: 'Title',
+                  ),
+                  SizedBox(
+                    height: 10.h,
+                  ),
+                  SizedBox(
+                    height: 80.h,
+                    width: double.maxFinite,
+                    child: EditInfoField(
+                      validator: (value) {
+                        return null;
+                      },
+                      value: playlistDesc,
+                      isExpanded: true,
+                      controller: _playlistDescController,
+                      label: 'Description',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 16.h,
+            ),
+            MaterialButton(
+              onPressed: () async {
+                await updatePlaylist(context);
+              },
+              focusColor: Colors.black45,
+              highlightColor: Colors.black12,
+              splashColor: AppColors.darkBackground.withOpacity(0.3),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                  15.sp,
+                ),
+              ),
+              color: AppColors.primary,
+              padding: EdgeInsets.symmetric(vertical: 5.h),
+              child: Text(
+                'Update',
+                style: TextStyle(fontSize: 17.sp),
+              ),
+            ),
+          ],
+        ),
+        dialogTitle: 'Edit playlist Info');
+  }
+
+  BlocBuilder<PlaylistSongsCubit, PlaylistSongsState> _playlistSongsSection() {
+    return BlocBuilder<PlaylistSongsCubit, PlaylistSongsState>(
+      builder: (context, state) {
+        if (state is PlaylistSongsLoading) {
+          return Container(
+            height: 100.h,
+            width: double.infinity,
+            alignment: Alignment.center,
+            child: const CircularProgressIndicator(
+              color: AppColors.primary,
+            ),
+          );
+        }
+        if (state is PlaylistSongsFailure) {
+          return Container(
+            height: 100.h,
+            width: double.infinity,
+            alignment: Alignment.center,
+            child: const Text('Failed to fetch songs'),
+          );
+        }
+        if (state is PlaylistSongsLoaded) {
+          exceptionalSongs = state.songs;
+
+          // getting artist name by the playlist song's artist name and removes the dupe
+          List<String> artistsName =
+              state.songs.map((e) => e.song.artist).toSet().toList();
+
+          return state.songs.isNotEmpty
+              ? SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ListView.builder(
+                        padding: EdgeInsets.only(top: 5.h),
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemBuilder: (context, index) {
+                          return PlaylistSongTileWidget(
+                            index: index,
+                            songList: state.songs,
+                            playlistId: widget.playlistEntity.id!,
+                          );
+                        },
+                        itemCount: state.songs.length,
+                      ),
+                      state.songs.length < 7
+                          ? Container(
+                              height: 100.h,
+                              width: double.infinity,
+                              alignment: Alignment.center,
+                              child: const Text(
+                                'No other songs',
+                                style: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                  color: Colors.white54,
+                                ),
+                              ),
+                            )
+                          : const SizedBox.shrink(),
+                      SizedBox(
+                        height: 12.h,
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(left: 16.w, right: 22.w),
+                        child: Text(
+                          'Check out more from these artists',
+                          style: TextStyle(
+                            letterSpacing: 0.3,
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 5.h,
+                      ),
+                      BlocProvider(
+                        create: (context) => GetRecommendedArtistsCubit()
+                          ..getRecommendedArtists(artistsName),
+                        child: BlocBuilder<GetRecommendedArtistsCubit,
+                            GetRecommendedArtistsState>(
+                          builder: (context, state) {
+                            if (state is GetRecommendedArtistsLoading) {
+                              return Container(
+                                height: 100.h,
+                                alignment: Alignment.center,
+                                child: const CircularProgressIndicator(
+                                  color: AppColors.primary,
+                                ),
+                              );
+                            }
+                            if (state is GetRecommendedArtistsFailure) {
+                              return Container(
+                                  height: 100.h,
+                                  alignment: Alignment.center,
+                                  child: const Text(
+                                      'Failed getting your artists recommendations'));
+                            }
+                            if (state is GetRecommendedArtistsLoaded) {
+                              return SingleChildScrollView(
+                                scrollDirection: Axis.horizontal,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: List.generate(
+                                    state.artists.length,
+                                    (index) {
+                                      ArtistEntity artistList =
+                                          state.artists[index];
+
+                                      return Padding(
+                                        padding: EdgeInsets.only(
+                                          left: 12.w,
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            GestureDetector(
+                                              onTap: () {
+                                                Navigator.pushReplacement(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ArtistPage(
+                                                            artistId:
+                                                                artistList.id!),
+                                                  ),
+                                                );
                                               },
-                                              content: SizedBox(
-                                                width: double.maxFinite,
+                                              child: Container(
+                                                margin: EdgeInsets.symmetric(
+                                                    vertical: 5.h),
+                                                padding: EdgeInsets.symmetric(
+                                                  horizontal: 10.w,
+                                                  vertical: 10.h,
+                                                ),
+                                                decoration: BoxDecoration(
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withOpacity(
+                                                          0.3,
+                                                        ),
+                                                        blurRadius: 10,
+                                                        offset:
+                                                            const Offset(3, 3),
+                                                      ),
+                                                    ],
+                                                    color: const Color.fromARGB(
+                                                        115, 54, 54, 54),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10.sp)),
                                                 child: Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
                                                   children: [
-                                                    Text(
-                                                      'From your favorites',
-                                                      style: TextStyle(
-                                                          fontSize: 16.sp),
-                                                    ),
-                                                    SizedBox(
-                                                      height: 5.h,
-                                                    ),
-                                                    BlocProvider(
-                                                      create: (context) =>
-                                                          FavoriteSongCubit()
-                                                            ..getFavoriteSongs(
-                                                                ''),
-                                                      child: BlocBuilder<
-                                                          FavoriteSongCubit,
-                                                          FavoriteSongState>(
-                                                        builder:
-                                                            (context, state) {
-                                                          if (state
-                                                              is FavoriteSongLoading) {
-                                                            return const CircularProgressIndicator();
-                                                          }
-                                                          if (state
-                                                              is FavoriteSongFailure) {
-                                                            return const Center(
-                                                              child: Text(
-                                                                  'failed'),
-                                                            );
-                                                          }
-                                                          if (state
-                                                              is FavoriteSongLoaded) {
-                                                            state.songs
-                                                                .removeWhere(
-                                                              (song) {
-                                                                return exceptionalSongs
-                                                                    .any(
-                                                                  (excludeSong) {
-                                                                    return excludeSong
-                                                                            .song
-                                                                            .id ==
-                                                                        song.song
-                                                                            .id;
-                                                                  },
-                                                                );
-                                                              },
-                                                            );
-
-                                                            List<SongWithFavorite>
-                                                                realList =
-                                                                state.songs;
-
-                                                            return ListView
-                                                                .separated(
-                                                              itemCount:
-                                                                  realList
-                                                                      .length,
-                                                              shrinkWrap: true,
-                                                              separatorBuilder:
-                                                                  (context,
-                                                                      index) {
-                                                                return SizedBox(
-                                                                  height: 6.h,
-                                                                );
-                                                              },
-                                                              itemBuilder:
-                                                                  (context,
-                                                                      index) {
-                                                                return SongTileWidgetSelectable(
-                                                                  songEntity:
-                                                                      realList[
-                                                                          index],
-                                                                  onSelectionChanged:
-                                                                      (selectedSong) {
-                                                                    setState(
-                                                                        () {
-                                                                      if (selectedSong !=
-                                                                          null) {
-                                                                        // Tambahkan jika tidak ada di daftar
-                                                                        if (!selectedSongs
-                                                                            .contains(selectedSong)) {
-                                                                          selectedSongs
-                                                                              .add(selectedSong);
-                                                                          setState(
-                                                                              () {
-                                                                            selectedSongCount++;
-                                                                          });
-                                                                        }
-                                                                      } else {
-                                                                        // Hapus berdasarkan id jika ada
-                                                                        selectedSongs.removeWhere((song) =>
-                                                                            song.song.id ==
-                                                                            realList[index].song.id);
-                                                                        setState(
-                                                                            () {
-                                                                          selectedSongCount--;
-                                                                        });
-                                                                      }
-                                                                    });
-
-                                                                    // Debugging: Tampilkan semua ID lagu yang dipilih
-                                                                  },
-                                                                );
-                                                              },
-                                                            );
-                                                          }
-
-                                                          return Container();
-                                                        },
+                                                    Center(
+                                                      child: CircleAvatar(
+                                                        radius: 50.sp,
+                                                        backgroundImage:
+                                                            NetworkImage(
+                                                          '${AppURLs.supabaseArtistStorage}${artistList.name!.toLowerCase()}.jpg',
+                                                        ),
                                                       ),
                                                     ),
-                                                    isShowSelectedSongError
-                                                        ? const Text(
-                                                            'please select at least 1 song',
-                                                            style: TextStyle(
-                                                                color:
-                                                                    Colors.red),
-                                                          )
-                                                        : const SizedBox
-                                                            .shrink(),
                                                     SizedBox(
-                                                      height: 12.h,
+                                                      height: 18.h,
                                                     ),
-                                                    Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .end,
-                                                      children: [
-                                                        Text(
-                                                          '$selectedSongCount song selected',
-                                                          style: TextStyle(
-                                                              fontSize: 16.sp,
-                                                              color:
-                                                                  Colors.white),
-                                                        ),
-                                                        Align(
-                                                          alignment: Alignment
-                                                              .centerRight,
-                                                          child: MaterialButton(
-                                                            onPressed:
-                                                                () async {
-                                                              await playctx
-                                                                  .read<
-                                                                      PlaylistSongsCubit>()
-                                                                  .addSongToPlaylist(
-                                                                      widget
-                                                                          .playlistEntity
-                                                                          .id!,
-                                                                      selectedSongs,
-                                                                      context);
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            focusColor:
-                                                                Colors.black45,
-                                                            highlightColor:
-                                                                Colors.black12,
-                                                            splashColor: AppColors
-                                                                .darkBackground
-                                                                .withOpacity(
-                                                                    0.3),
-                                                            shape:
-                                                                RoundedRectangleBorder(
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                15.sp,
-                                                              ),
-                                                            ),
-                                                            color: selectedSongs
-                                                                    .isNotEmpty
-                                                                ? AppColors
-                                                                    .primary
-                                                                : AppColors
-                                                                    .darkGrey,
-                                                            padding: EdgeInsets
-                                                                .symmetric(
-                                                                    vertical:
-                                                                        5.h),
-                                                            child: Text(
-                                                              'Add',
-                                                              style: TextStyle(
-                                                                fontSize: 17.sp,
-                                                              ),
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
+                                                    Text(
+                                                      artistList.name!,
+                                                      style: TextStyle(
+                                                        fontSize: 12.sp,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      height: 4.h,
+                                                    ),
+                                                    Text(
+                                                      'Artist',
+                                                      style: TextStyle(
+                                                        fontSize: 11.sp,
+                                                        color: Colors.white70,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
-                                            );
-                                          },
-                                          splashRadius: 20.sp,
-                                          icon: Icon(
-                                            Icons.add_circle_outline_rounded,
-                                            color: AppColors.primary,
-                                            size: 28.w,
-                                          ),
-                                        );
-                                      }
-                                      return Container();
+                                            ),
+                                            SizedBox(
+                                              width: 8.w,
+                                            )
+                                          ],
+                                        ),
+                                      );
                                     },
                                   ),
-                                  IconButton(
-                                    splashRadius: 22.sp,
-                                    onPressed: () {},
-                                    icon: Icon(
-                                      Icons.more_horiz_rounded,
-                                      color: Colors.white70,
-                                      size: 28.w,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              BlocBuilder<PlaylistSongsCubit,
-                                  PlaylistSongsState>(
-                                builder: (context, state) {
-                                  if (state is PlaylistSongsLoading) {
-                                    return Container();
-                                  }
-                                  if (state is PlaylistFailure) {
-                                    return Container(
-                                      margin: EdgeInsets.only(right: 10.w),
-                                      padding: EdgeInsets.all(5.h),
-                                      decoration: const BoxDecoration(
-                                        color: Colors.grey,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: IconButton(
-                                        onPressed: () {},
-                                        icon: Icon(
-                                          Icons.play_disabled_rounded,
-                                          size: 25.h,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                  if (state is PlaylistSongsLoaded) {
-                                    return Container(
-                                      // margin: EdgeInsets.only(right: 10.w),
-                                      padding: EdgeInsets.all(5.h),
-                                      decoration: BoxDecoration(
-                                        color: state.songs.isEmpty
-                                            ? Colors.grey
-                                            : AppColors.primary,
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: IconButton(
-                                        onPressed: () {
-                                          Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      SongPlayerPage(
-                                                          songs: state.songs,
-                                                          startIndex: 0)));
-                                        },
-                                        icon: Icon(
-                                          Icons.play_arrow_rounded,
-                                          size: 25.h,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                  return Container();
-                                },
-                              )
-                            ],
-                          ),
+                                ),
+                              );
+                            }
+
+                            return Container();
+                          },
                         ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-
-              // Body Scrollable
-              Expanded(
-                child: SingleChildScrollView(
-                  // padding: EdgeInsets.only(top: 10.h),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Album Songs
-                      BlocBuilder<PlaylistSongsCubit, PlaylistSongsState>(
-                        builder: (context, state) {
-                          if (state is PlaylistSongsLoading) {
-                            return Container(
-                              height: 100.h,
-                              width: double.infinity,
-                              alignment: Alignment.center,
-                              child: const CircularProgressIndicator(
-                                color: AppColors.primary,
-                              ),
-                            );
-                          }
-                          if (state is PlaylistSongsFailure) {
-                            return Container(
-                              height: 100.h,
-                              width: double.infinity,
-                              alignment: Alignment.center,
-                              child: const Text('Failed to fetch songs'),
-                            );
-                          }
-                          if (state is PlaylistSongsLoaded) {
-                            exceptionalSongs = state.songs;
-
-                            // getting artist name by the playlist song's artist name and removes the dupe
-                            List<String> artistsName = state.songs
-                                .map((e) => e.song.artist)
-                                .toSet()
-                                .toList();
-
-                            return state.songs.isNotEmpty
-                                ? SingleChildScrollView(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        ListView.builder(
-                                          // padding: EdgeInsets.only(
-                                          //   left: 13.w + paddingAddition.w,
-                                          // ),
-                                          padding: EdgeInsets.only(top: 5.h),
-                                          physics:
-                                              const NeverScrollableScrollPhysics(),
-                                          shrinkWrap: true,
-                                          itemBuilder: (context, index) {
-                                            return PlaylistSongTileWidget(
-                                              index: index,
-                                              songList: state.songs,
-                                              playlistId:
-                                                  widget.playlistEntity.id!,
-                                            );
-                                          },
-                                          itemCount: state.songs.length,
-                                        ),
-                                        state.songs.length < 7
-                                            ? Container(
-                                                height: 100.h,
-                                                width: double.infinity,
-                                                alignment: Alignment.center,
-                                                child: const Text(
-                                                  'No other songs',
-                                                  style: TextStyle(
-                                                    fontStyle: FontStyle.italic,
-                                                    color: Colors.white54,
-                                                  ),
-                                                ),
-                                              )
-                                            : const SizedBox.shrink(),
-                                        SizedBox(
-                                          height: 12.h,
-                                        ),
-                                        Padding(
-                                          padding: EdgeInsets.only(
-                                              left: 16.w, right: 22.w),
-                                          child: Text(
-                                            'Check out more from these artists',
-                                            style: TextStyle(
-                                              letterSpacing: 0.3,
-                                              fontSize: 14.sp,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 5.h,
-                                        ),
-                                        BlocProvider(
-                                          create: (context) =>
-                                              GetRecommendedArtistsCubit()
-                                                ..getRecommendedArtists(
-                                                    artistsName),
-                                          child: BlocBuilder<
-                                              GetRecommendedArtistsCubit,
-                                              GetRecommendedArtistsState>(
-                                            builder: (context, state) {
-                                              if (state
-                                                  is GetRecommendedArtistsLoading) {
-                                                return Container(
-                                                  height: 100.h,
-                                                  alignment: Alignment.center,
-                                                  child:
-                                                      const CircularProgressIndicator(
-                                                    color: AppColors.primary,
-                                                  ),
-                                                );
-                                              }
-                                              if (state
-                                                  is GetRecommendedArtistsFailure) {
-                                                return Container(
-                                                    height: 100.h,
-                                                    alignment: Alignment.center,
-                                                    child: const Text(
-                                                        'Failed getting your artists recommendations'));
-                                              }
-                                              if (state
-                                                  is GetRecommendedArtistsLoaded) {
-                                                return SingleChildScrollView(
-                                                  scrollDirection:
-                                                      Axis.horizontal,
-                                                  child: Row(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: List.generate(
-                                                      state.artists.length,
-                                                      (index) {
-                                                        ArtistEntity
-                                                            artistList = state
-                                                                .artists[index];
-
-                                                        return Padding(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                            left: 12.w,
-                                                          ),
-                                                          child: Row(
-                                                            children: [
-                                                              GestureDetector(
-                                                                onTap: () {
-                                                                  Navigator
-                                                                      .pushReplacement(
-                                                                    context,
-                                                                    MaterialPageRoute(
-                                                                      builder: (context) =>
-                                                                          ArtistPage(
-                                                                              artistId: artistList.id!),
-                                                                    ),
-                                                                  );
-                                                                },
-                                                                child:
-                                                                    Container(
-                                                                  margin: EdgeInsets
-                                                                      .symmetric(
-                                                                          vertical:
-                                                                              5.h),
-                                                                  padding:
-                                                                      EdgeInsets
-                                                                          .symmetric(
-                                                                    horizontal:
-                                                                        10.w,
-                                                                    vertical:
-                                                                        10.h,
-                                                                  ),
-                                                                  decoration: BoxDecoration(
-                                                                      boxShadow: [
-                                                                        BoxShadow(
-                                                                          color: Colors
-                                                                              .black
-                                                                              .withOpacity(
-                                                                            0.3,
-                                                                          ),
-                                                                          blurRadius:
-                                                                              10,
-                                                                          offset: const Offset(
-                                                                              3,
-                                                                              3),
-                                                                        ),
-                                                                      ],
-                                                                      color: const Color
-                                                                          .fromARGB(
-                                                                          115,
-                                                                          54,
-                                                                          54,
-                                                                          54),
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              10.sp)),
-                                                                  child: Column(
-                                                                    crossAxisAlignment:
-                                                                        CrossAxisAlignment
-                                                                            .start,
-                                                                    children: [
-                                                                      Center(
-                                                                        child:
-                                                                            CircleAvatar(
-                                                                          radius:
-                                                                              50.sp,
-                                                                          backgroundImage:
-                                                                              NetworkImage(
-                                                                            '${AppURLs.supabaseArtistStorage}${artistList.name!.toLowerCase()}.jpg',
-                                                                          ),
-                                                                        ),
-                                                                      ),
-                                                                      SizedBox(
-                                                                        height:
-                                                                            18.h,
-                                                                      ),
-                                                                      Text(
-                                                                        artistList
-                                                                            .name!,
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontSize:
-                                                                              12.sp,
-                                                                          fontWeight:
-                                                                              FontWeight.w600,
-                                                                        ),
-                                                                      ),
-                                                                      SizedBox(
-                                                                        height:
-                                                                            4.h,
-                                                                      ),
-                                                                      Text(
-                                                                        'Artist',
-                                                                        style:
-                                                                            TextStyle(
-                                                                          fontSize:
-                                                                              11.sp,
-                                                                          color:
-                                                                              Colors.white70,
-                                                                          fontWeight:
-                                                                              FontWeight.w500,
-                                                                        ),
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              ),
-                                                              SizedBox(
-                                                                width: 8.w,
-                                                              )
-                                                            ],
-                                                          ),
-                                                        );
-                                                      },
-                                                    ),
-                                                  ),
-                                                );
-                                              }
-
-                                              return Container();
-                                            },
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          height: 20.h,
-                                        )
-                                      ],
-                                    ),
-                                  )
-                                : Container(
-                                    alignment: Alignment.center,
-                                    height: 200.h,
-                                    child: const Text(
-                                      'No songs added to this playlist',
-                                      style: TextStyle(
-                                        fontStyle: FontStyle.italic,
-                                        color: Colors.white54,
-                                      ),
-                                    ),
-                                  );
-                          }
-
-                          return Container();
-                        },
                       ),
+                      SizedBox(
+                        height: 20.h,
+                      )
+                    ],
+                  ),
+                )
+              : Container(
+                  alignment: Alignment.center,
+                  height: 200.h,
+                  child: const Text(
+                    'No songs added to this playlist',
+                    style: TextStyle(
+                      fontStyle: FontStyle.italic,
+                      color: Colors.white54,
+                    ),
+                  ),
+                );
+        }
+
+        return Container();
+      },
+    );
+  }
+
+  Widget _addSongToPlaylistButton(BuildContext playctx) {
+    return IconButton(
+      iconSize: 20.sp,
+      onPressed: () async {
+        setState(() {
+          selectedSongs = [];
+        });
+
+        bool isShowError = false;
+
+        await blurryDialog(
+          context: context,
+          horizontalPadding: 21,
+          dialogTitle: 'Add songs',
+          onClosed: () {
+            Navigator.pop(context);
+            _searchCubit.emit(SearchSongForPlaylistInitial());
+            _searchSongController.clear();
+            // _searchCubit.close();
+          },
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _addSongToPlaylistTabBar(),
+                SizedBox(
+                  height: 5.h,
+                ),
+                SizedBox(
+                  height: 180.h,
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _searchSongSection(),
+                      _favoriteSongListSection(),
                     ],
                   ),
                 ),
-              )
-            ],
-          )
-          //   },
-          // ),
+                isShowSelectedSongError
+                    ? const Text(
+                        'please select at least 1 song',
+                        style: TextStyle(color: Colors.red),
+                      )
+                    : const SizedBox.shrink(),
+                SizedBox(
+                  height: 12.h,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    isShowError
+                        ? const Text(
+                            'Please select minimal song',
+                            style: TextStyle(
+                              color: Colors.red,
+                            ),
+                          )
+                        : const SizedBox.shrink(),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: MaterialButton(
+                        onPressed: () async {
+                          if (selectedSongs.isEmpty) {
+                            customSnackBar(
+                                isSuccess: false,
+                                text: 'Select atleast one song!',
+                                context: context);
+                          } else {
+                            await playctx
+                                .read<PlaylistSongsCubit>()
+                                .addSongToPlaylist(widget.playlistEntity.id!,
+                                    selectedSongs, context);
+                            customSnackBar(
+                                isSuccess: true,
+                                text: 'Success adding a song',
+                                context: context);
+                            Navigator.pop(context);
+                          }
+                        },
+                        focusColor: Colors.black45,
+                        highlightColor: Colors.black12,
+                        splashColor: AppColors.darkBackground.withOpacity(0.3),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            15.sp,
+                          ),
+                        ),
+                        color: selectedSongs.isNotEmpty
+                            ? AppColors.primary
+                            : AppColors.darkGrey,
+                        padding: EdgeInsets.symmetric(vertical: 5.h),
+                        child: Text(
+                          'Add',
+                          style: TextStyle(
+                            fontSize: 17.sp,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
+        );
+      },
+      splashRadius: 20.sp,
+      icon: Icon(
+        Icons.add_circle_outline_rounded,
+        color: AppColors.primary,
+        size: 28.w,
+      ),
+    );
+  }
+
+  TabBar _addSongToPlaylistTabBar() {
+    return TabBar(
+      indicatorPadding: EdgeInsets.symmetric(
+        horizontal: 5.w,
+      ),
+      labelPadding: EdgeInsets.symmetric(
+        vertical: 4.h,
+        horizontal: 5.w,
+      ),
+      labelStyle: TextStyle(
+        color: Colors.white,
+        fontSize: 14.sp,
+      ),
+      unselectedLabelStyle:
+          TextStyle(color: Colors.grey.shade600, fontSize: 12.5.sp),
+      controller: _tabController,
+      isScrollable: true,
+      indicatorColor: AppColors.primary,
+      unselectedLabelColor: Colors.grey,
+      onTap: (value) {
+        setState(() {});
+      },
+      tabs: const [
+        Text(
+          'Search for the song',
+        ),
+        Text(
+          'From your favorites',
+        ),
+      ],
+    );
+  }
+
+  BlocProvider<SearchSongForPlaylistCubit> _searchSongSection() {
+    return BlocProvider(
+      create: (context) => SearchSongForPlaylistCubit(),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 5.h,
+          ),
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 10.w),
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(255, 34, 34, 34).withOpacity(1),
+              borderRadius: BorderRadius.circular(7.sp),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Form(
+                    key: _formKey,
+                    child: TextFormField(
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please fill with the desired keyword';
+                        }
+                      },
+                      onChanged: (value) {
+                        setState(() {
+                          print(_searchSongController.value.text);
+                        });
+                      },
+                      focusNode: _focusNode,
+                      controller: _searchSongController,
+                      style: TextStyle(
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.w500,
+                        letterSpacing: 0.4,
+                      ),
+                      decoration: InputDecoration(
+                        isDense: true,
+                        contentPadding: EdgeInsets.symmetric(vertical: 10.h),
+                        hintText: 'Find the song to add',
+                        hintStyle: TextStyle(fontSize: 14.sp),
+                        border: const OutlineInputBorder(
+                            borderSide: BorderSide.none),
+                        focusedBorder: const OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        errorBorder: const OutlineInputBorder(
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide.none),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 8.w,
+                ),
+                SizedBox(
+                  width: 45.w,
+                  child: MaterialButton(
+                    color: _isNotEmpty ? Colors.red : Colors.grey,
+                    // color: _searchCubit.state is SearchSongForPlaylistLoading || _searchCubit.state is SearchSongForPlaylistLoaded ? Colors.redAccent.shade400 : Colors.grey.shade700,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.sp)),
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        await _searchCubit.searchSongByKeyword(
+                            _searchSongController.value.text);
+                      }
+                    },
+                    child: Icon(
+                      _searchCubit.state is SearchSongForPlaylistInitial
+                          ? Icons.search
+                          : Icons.close,
+                      size: 14.sp,
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+          Flexible(
+            child: BlocBuilder<SearchSongForPlaylistCubit,
+                SearchSongForPlaylistState>(
+              bloc: _searchCubit,
+              builder: (context, state) {
+                if (state is SearchSongForPlaylistInitial) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 5.h),
+                      Container(
+                        margin: EdgeInsets.symmetric(horizontal: 1.w),
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.grey.shade600,
+                            ),
+                            borderRadius: BorderRadius.circular(10.sp)),
+                        height: 100.h,
+                        child: Center(
+                          child: Text(
+                            'Type something to search',
+                            style: TextStyle(color: Colors.grey.shade600),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                if (state is SearchSongForPlaylistLoading) {
+                  SongWithFavorite emptySong = SongWithFavorite(
+                    SongEntity(
+                      title: 'data data data',
+                      id: 1,
+                      artist: 'data data',
+                      duration: 1,
+                      artistId: 1,
+                      playCount: 0,
+                      releaseDate: 'data data',
+                    ),
+                    false,
+                  );
+
+                  return Column(
+                    children: [
+                      SizedBox(
+                        height: 5.h,
+                      ),
+                      Skeletonizer(
+                        enabled: true,
+                        child: SongTileWidgetSelectable(
+                          songEntity: emptySong,
+                          isLoading: true,
+                          onSelectionChanged: (p0) {},
+                        ),
+                      ),
+                      SizedBox(
+                        height: 6.h,
+                      ),
+                      Skeletonizer(
+                        enabled: true,
+                        child: SongTileWidgetSelectable(
+                          songEntity: emptySong,
+                          isLoading: true,
+                          onSelectionChanged: (p0) {},
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                if (state is SearchSongForPlaylistLoaded) {
+                  final songs = state.songs;
+
+                  if (songs.isEmpty) {
+                    return SizedBox(
+                      height: 100.h,
+                      child: const Center(
+                        child: Text('Nothing related to that keyword'),
+                      ),
+                    );
+                  }
+
+                  return ListView.separated(
+                    itemCount: songs.take(3).length,
+                    padding: EdgeInsets.only(top: 5.h),
+                    itemBuilder: (context, index) {
+                      var songModel = songs[index];
+
+                      return SongTileWidgetSelectable(
+                        songEntity: songModel,
+                        onSelectionChanged: (p0) {},
+                      );
+                    },
+                    separatorBuilder: (context, index) {
+                      return SizedBox(
+                        height: 6.h,
+                      );
+                    },
+                  );
+                }
+                return Container();
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _favoriteSongListSection() {
+    return BlocProvider(
+      create: (context) => FavoriteSongCubit()..getFavoriteSongs(''),
+      child: BlocBuilder<FavoriteSongCubit, FavoriteSongState>(
+        builder: (context, state) {
+          if (state is FavoriteSongLoading) {
+            return SizedBox(
+              height: 10.sp,
+              width: 10.sp,
+              child: const Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.primary,
+                ),
+              ),
+            );
+          }
+          if (state is FavoriteSongFailure) {
+            return const Center(
+              child: Text('failed'),
+            );
+          }
+          if (state is FavoriteSongLoaded) {
+            state.songs.removeWhere(
+              (song) {
+                return exceptionalSongs.any(
+                  (excludeSong) {
+                    return excludeSong.song.id == song.song.id;
+                  },
+                );
+              },
+            );
+
+            List<SongWithFavorite> realList = state.songs;
+
+            return Column(
+              children: [
+                ListView.separated(
+                  padding: EdgeInsets.zero,
+                  itemCount: realList.take(4).length,
+                  shrinkWrap: true,
+                  separatorBuilder: (context, index) {
+                    return SizedBox(
+                      height: 6.h,
+                    );
+                  },
+                  itemBuilder: (context, index) {
+                    return SongTileWidgetSelectable(
+                      songEntity: realList[index],
+                      onSelectionChanged: (selectedSong) {
+                        setState(() {
+                          if (selectedSong != null) {
+                            // Tambahkan jika tidak ada di daftar
+                            if (!selectedSongs.contains(selectedSong)) {
+                              selectedSongs.add(selectedSong);
+                              setState(() {
+                                selectedSongCount++;
+                              });
+                            }
+                          } else {
+                            // Hapus berdasarkan id jika ada
+                            selectedSongs.removeWhere((song) =>
+                                song.song.id == realList[index].song.id);
+                            setState(() {
+                              selectedSongCount--;
+                            });
+                          }
+                        });
+
+                        // Debugging: Tampilkan semua ID lagu yang dipilih
+                      },
+                    );
+                  },
+                ),
+              ],
+            );
+          }
+
+          return Container();
+        },
+      ),
     );
   }
 
