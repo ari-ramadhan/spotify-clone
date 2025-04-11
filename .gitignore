@@ -44,3 +44,4 @@ app.*.map.json
 
 # my hiding preferences
 /lib/core/configs/constants/app_key.dart
+/android/app/.cxx

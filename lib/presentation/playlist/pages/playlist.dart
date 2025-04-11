@@ -54,7 +54,7 @@ class _PlaylistPageState extends State<PlaylistPage>
   final _formKey = GlobalKey<FormState>();
 
   List<SongWithFavorite> exceptionalSongs = [];
-  List<SongWithFavorite> selectedSongs = [];
+  // List<SongWithFavorite> selectedSongs = [];
 
   late TabController _tabController;
 
@@ -68,10 +68,19 @@ class _PlaylistPageState extends State<PlaylistPage>
   late FocusNode _focusNode;
   bool _isFocused = false;
 
+  ValueNotifier<List<SongWithFavorite>> _selectedSongs =
+      ValueNotifier<List<SongWithFavorite>>([]);
+
+  void _updateValue() {
+    setState(() {
+      selectedSongCount++;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
-    selectedSongs.clear();
+    _selectedSongs.value.clear();
     playlistName = widget.playlistEntity.name!;
     playlistDesc = widget.playlistEntity.description!;
     AppColors.gradientList.shuffle();
@@ -357,7 +366,10 @@ class _PlaylistPageState extends State<PlaylistPage>
                     BlocBuilder<PlaylistSongsCubit, PlaylistSongsState>(
                       builder: (playctx, state) {
                         if (state is PlaylistSongsLoaded) {
-                          return _addSongToPlaylistButton(playctx);
+                          List exceptionalSongs = state.songs;
+
+                          return _addSongToPlaylistButton(
+                              playctx, exceptionalSongs);
                         }
                         return Container();
                       },
@@ -824,15 +836,15 @@ class _PlaylistPageState extends State<PlaylistPage>
     );
   }
 
-  Widget _addSongToPlaylistButton(BuildContext playctx) {
+  Widget _addSongToPlaylistButton(BuildContext playctx, List exceptionalSongs) {
     return IconButton(
       iconSize: 20.sp,
       onPressed: () async {
-        setState(() {
-          selectedSongs = [];
-        });
-
-        bool isShowError = false;
+        setState(
+          () {
+            _selectedSongs.value = [];
+          },
+        );
 
         await blurryDialog(
           context: context,
@@ -842,6 +854,7 @@ class _PlaylistPageState extends State<PlaylistPage>
             Navigator.pop(context);
             _searchCubit.emit(SearchSongForPlaylistInitial());
             _searchSongController.clear();
+            _selectedSongs.value.clear();
             // _searchCubit.close();
           },
           content: SizedBox(
@@ -853,16 +866,66 @@ class _PlaylistPageState extends State<PlaylistPage>
                 SizedBox(
                   height: 5.h,
                 ),
-                SizedBox(
-                  height: 180.h,
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      _searchSongSection(),
-                      _favoriteSongListSection(),
-                    ],
+                BlocProvider(
+                  create: (context) =>
+                      FavoriteSongCubit()..getFavoriteSongs(''),
+                  child: BlocBuilder<FavoriteSongCubit, FavoriteSongState>(
+                    builder: (context, state) {
+                      if (state is FavoriteSongLoading) {
+                        return SizedBox(
+                          height: 10.sp,
+                          width: 10.sp,
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        );
+                      }
+                      if (state is FavoriteSongFailure) {
+                        return const Center(
+                          child: Text('failed'),
+                        );
+                      }
+                      if (state is FavoriteSongLoaded) {
+                        state.songs.removeWhere(
+                          (song) {
+                            return exceptionalSongs.any(
+                              (excludeSong) {
+                                return excludeSong.song.id == song.song.id;
+                              },
+                            );
+                          },
+                        );
+
+                        List<SongWithFavorite> realList = state.songs;
+
+                        return SizedBox(
+                          height: 180.h,
+                          child: TabBarView(
+                            controller: _tabController,
+                            children: [
+                              _searchSongSection(realList),
+                              _favoriteSongListSection(realList),
+                            ],
+                          ),
+                        );
+                      }
+
+                      return Container();
+                    },
                   ),
                 ),
+                // SizedBox(
+                //   height: 180.h,
+                //   child: TabBarView(
+                //     controller: _tabController,
+                //     children: [
+                //       _searchSongSection(),
+                //       _favoriteSongListSection(),
+                //     ],
+                //   ),
+                // ),
                 isShowSelectedSongError
                     ? const Text(
                         'please select at least 1 song',
@@ -872,60 +935,140 @@ class _PlaylistPageState extends State<PlaylistPage>
                 SizedBox(
                   height: 12.h,
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    isShowError
-                        ? const Text(
-                            'Please select minimal song',
-                            style: TextStyle(
-                              color: Colors.red,
+                ValueListenableBuilder(
+                  valueListenable: _selectedSongs,
+                  builder: (context, value, child) {
+                    return Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Expanded(
+                          child: value.isEmpty
+                              ? Text(
+                                  'no song is selected',
+                                  style: TextStyle(
+                                      fontSize: 10.sp,
+                                      color: Colors.grey.shade300,
+                                      letterSpacing: 0.4),
+                                )
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '  Selected',
+                                      style: TextStyle(
+                                          fontSize: 10.sp,
+                                          color: Colors.grey.shade300,
+                                          letterSpacing: 0.4),
+                                    ),
+                                    SizedBox(
+                                      height: 4.h,
+                                    ),
+                                    Container(
+                                      // width: 50.w,
+                                      height: 30.h, // Add a finite height here
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: List.generate(
+                                          value.length > 3 ? 4 : value.length,
+                                          (index) {
+                                            if (index == 3) {
+                                              return Positioned(
+                                                left: index * 18.sp,
+                                                child: Container(
+                                                  padding: EdgeInsets.all(2.sp),
+                                                  decoration:
+                                                      const BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: AppColors.darkGrey,
+                                                  ),
+                                                  child: CircleAvatar(
+                                                    radius: 12.sp,
+                                                    backgroundColor:
+                                                        AppColors.darkGrey,
+                                                    child: Text(
+                                                      '+${value.length - 3}',
+                                                      style: TextStyle(
+                                                        fontSize: 10.sp,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                            return Positioned(
+                                              left: index * 18.sp,
+                                              child: Container(
+                                                padding: EdgeInsets.all(1.sp),
+                                                decoration: const BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.white,
+                                                ),
+                                                child: CircleAvatar(
+                                                  radius: 13.sp,
+                                                  foregroundImage: NetworkImage(
+                                                    '${AppURLs.supabaseCoverStorage}${value[index].song.artist} - ${value[index].song.title}.jpg',
+                                                    scale: 0.9,
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                        ),
+                        Container(
+                          height: 30.h,
+                          child: MaterialButton(
+                            onPressed: () async {
+                              if (_selectedSongs.value.isEmpty) {
+                                customSnackBar(
+                                    isSuccess: false,
+                                    text: 'Select atleast one song!',
+                                    context: context);
+                              } else {
+                                await playctx
+                                    .read<PlaylistSongsCubit>()
+                                    .addSongToPlaylist(
+                                        widget.playlistEntity.id!,
+                                        _selectedSongs.value,
+                                        context);
+                                customSnackBar(
+                                    isSuccess: true,
+                                    text: 'Success adding a song',
+                                    context: context);
+                                Navigator.pop(context);
+                              }
+                            },
+                            focusColor: Colors.black45,
+                            highlightColor: Colors.black12,
+                            splashColor:
+                                AppColors.darkBackground.withOpacity(0.3),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                15.sp,
+                              ),
                             ),
-                          )
-                        : const SizedBox.shrink(),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: MaterialButton(
-                        onPressed: () async {
-                          if (selectedSongs.isEmpty) {
-                            customSnackBar(
-                                isSuccess: false,
-                                text: 'Select atleast one song!',
-                                context: context);
-                          } else {
-                            await playctx
-                                .read<PlaylistSongsCubit>()
-                                .addSongToPlaylist(widget.playlistEntity.id!,
-                                    selectedSongs, context);
-                            customSnackBar(
-                                isSuccess: true,
-                                text: 'Success adding a song',
-                                context: context);
-                            Navigator.pop(context);
-                          }
-                        },
-                        focusColor: Colors.black45,
-                        highlightColor: Colors.black12,
-                        splashColor: AppColors.darkBackground.withOpacity(0.3),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(
-                            15.sp,
+                            color: value.isNotEmpty
+                                ? AppColors.primary
+                                : AppColors.darkGrey,
+                            padding: EdgeInsets.zero,
+                            elevation: 0,
+                            child: Text(
+                              'Add',
+                              style: TextStyle(
+                                fontSize: 17.sp,
+                              ),
+                            ),
                           ),
-                        ),
-                        color: selectedSongs.isNotEmpty
-                            ? AppColors.primary
-                            : AppColors.darkGrey,
-                        padding: EdgeInsets.symmetric(vertical: 5.h),
-                        child: Text(
-                          'Add',
-                          style: TextStyle(
-                            fontSize: 17.sp,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                        )
+                      ],
+                    );
+                  },
                 ),
               ],
             ),
@@ -974,7 +1117,8 @@ class _PlaylistPageState extends State<PlaylistPage>
     );
   }
 
-  BlocProvider<SearchSongForPlaylistCubit> _searchSongSection() {
+  BlocProvider<SearchSongForPlaylistCubit> _searchSongSection(
+      List<SongWithFavorite> realList) {
     return BlocProvider(
       create: (context) => SearchSongForPlaylistCubit(),
       child: Column(
@@ -1145,9 +1289,45 @@ class _PlaylistPageState extends State<PlaylistPage>
                     itemBuilder: (context, index) {
                       var songModel = songs[index];
 
+                      bool isAdded = exceptionalSongs
+                          .any((song) => song.song.id == songModel.song.id);
+                      bool isSelected = _selectedSongs.value.any(
+                        (element) => element.song.id == songModel.song.id,
+                      );
+
                       return SongTileWidgetSelectable(
                         songEntity: songModel,
-                        onSelectionChanged: (p0) {},
+                        isSelected: isSelected,
+                        onSelectionChanged: (selectedSong) {
+                          if (isAdded) {
+                            customSnackBar(
+                              isSuccess: false,
+                              text:
+                                  'This song is already exist in your playlist',
+                              context: context,
+                            );
+                          } else if (isSelected) {
+                            setState(() {
+                              if (selectedSong != null) {
+                                if (!_selectedSongs.value
+                                    .contains(selectedSong)) {
+                                  _selectedSongs.value =
+                                      List.from(_selectedSongs.value)
+                                        ..add(selectedSong);
+                                  selectedSongCount++;
+                                }
+                              } else {
+                                _selectedSongs
+                                    .value = List.from(_selectedSongs.value)
+                                  ..removeWhere((song) =>
+                                      song.song.id == realList[index].song.id);
+                                selectedSongCount--;
+                              }
+                              print(_selectedSongs.value.length);
+                            });
+                          }
+                        },
+                        isAdded: isAdded,
                       );
                     },
                     separatorBuilder: (context, index) {
@@ -1166,86 +1346,50 @@ class _PlaylistPageState extends State<PlaylistPage>
     );
   }
 
-  Widget _favoriteSongListSection() {
-    return BlocProvider(
-      create: (context) => FavoriteSongCubit()..getFavoriteSongs(''),
-      child: BlocBuilder<FavoriteSongCubit, FavoriteSongState>(
-        builder: (context, state) {
-          if (state is FavoriteSongLoading) {
+  Widget _favoriteSongListSection(List<SongWithFavorite> realList) {
+    return Column(
+      children: [
+        ListView.separated(
+          padding: EdgeInsets.zero,
+          itemCount: realList.take(4).length,
+          shrinkWrap: true,
+          separatorBuilder: (context, index) {
             return SizedBox(
-              height: 10.sp,
-              width: 10.sp,
-              child: const Center(
-                child: CircularProgressIndicator(
-                  color: AppColors.primary,
-                ),
-              ),
+              height: 6.h,
             );
-          }
-          if (state is FavoriteSongFailure) {
-            return const Center(
-              child: Text('failed'),
-            );
-          }
-          if (state is FavoriteSongLoaded) {
-            state.songs.removeWhere(
-              (song) {
-                return exceptionalSongs.any(
-                  (excludeSong) {
-                    return excludeSong.song.id == song.song.id;
-                  },
-                );
+          },
+          itemBuilder: (context, index) {
+
+            bool isSelected = _selectedSongs.value.any(
+                        (element) => element.song.id == realList[index].song.id,
+                      );
+
+            return SongTileWidgetSelectable(
+              songEntity: realList[index],
+              isSelected: isSelected,
+              onSelectionChanged: (selectedSong) {
+                setState(() {
+                  if (selectedSong != null) {
+                    if (!_selectedSongs.value.contains(selectedSong)) {
+                      _selectedSongs.value = List.from(_selectedSongs.value)
+                        ..add(selectedSong);
+                      selectedSongCount++;
+                    }
+                  } else {
+                    _selectedSongs.value = List.from(_selectedSongs.value)
+                      ..removeWhere(
+                          (song) => song.song.id == realList[index].song.id);
+                    selectedSongCount--;
+                  }
+                  print(_selectedSongs.value.length);
+                });
+
+                // Debugging: Tampilkan semua ID lagu yang dipilih
               },
             );
-
-            List<SongWithFavorite> realList = state.songs;
-
-            return Column(
-              children: [
-                ListView.separated(
-                  padding: EdgeInsets.zero,
-                  itemCount: realList.take(4).length,
-                  shrinkWrap: true,
-                  separatorBuilder: (context, index) {
-                    return SizedBox(
-                      height: 6.h,
-                    );
-                  },
-                  itemBuilder: (context, index) {
-                    return SongTileWidgetSelectable(
-                      songEntity: realList[index],
-                      onSelectionChanged: (selectedSong) {
-                        setState(() {
-                          if (selectedSong != null) {
-                            // Tambahkan jika tidak ada di daftar
-                            if (!selectedSongs.contains(selectedSong)) {
-                              selectedSongs.add(selectedSong);
-                              setState(() {
-                                selectedSongCount++;
-                              });
-                            }
-                          } else {
-                            // Hapus berdasarkan id jika ada
-                            selectedSongs.removeWhere((song) =>
-                                song.song.id == realList[index].song.id);
-                            setState(() {
-                              selectedSongCount--;
-                            });
-                          }
-                        });
-
-                        // Debugging: Tampilkan semua ID lagu yang dipilih
-                      },
-                    );
-                  },
-                ),
-              ],
-            );
-          }
-
-          return Container();
-        },
-      ),
+          },
+        ),
+      ],
     );
   }
 
