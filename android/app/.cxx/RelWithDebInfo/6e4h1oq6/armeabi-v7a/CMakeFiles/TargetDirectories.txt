@@ -1,2 +1,0 @@
-C:/Users/t495s/Documents/Flutter Projects/spotify-clone/android/app/.cxx/RelWithDebInfo/6e4h1oq6/armeabi-v7a/CMakeFiles/edit_cache.dir
-C:/Users/t495s/Documents/Flutter Projects/spotify-clone/android/app/.cxx/RelWithDebInfo/6e4h1oq6/armeabi-v7a/CMakeFiles/rebuild_cache.dir
