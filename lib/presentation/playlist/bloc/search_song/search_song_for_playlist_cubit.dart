@@ -21,4 +21,8 @@ class SearchSongForPlaylistCubit extends Cubit<SearchSongForPlaylistState> {
       },
     );
   }
+
+  Future<void> restartState() async {
+    emit(SearchSongForPlaylistInitial());
+  }
 }

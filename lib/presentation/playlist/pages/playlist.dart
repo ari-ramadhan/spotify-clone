@@ -1,8 +1,11 @@
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:spotify_clone/common/helpers/export.dart';
 import 'package:spotify_clone/common/widgets/favorite_button/playlist_song_tile_widget.dart';
+import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget_deletable.dart';
 import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget_selectable.dart';
+import 'package:spotify_clone/common/widgets/song_tile/song_tile_widget_controllable.dart';
 import 'package:spotify_clone/core/configs/constants/app_methods.dart';
 import 'package:spotify_clone/core/configs/constants/app_urls.dart';
 import 'package:spotify_clone/domain/entity/artist/artist.dart';
@@ -850,10 +853,11 @@ class _PlaylistPageState extends State<PlaylistPage>
           context: context,
           horizontalPadding: 21,
           dialogTitle: 'Add songs',
-          onClosed: () {
+          onClosed: () async {
             Navigator.pop(context);
-            _searchCubit.emit(SearchSongForPlaylistInitial());
+            _searchCubit.restartState();
             _searchSongController.clear();
+
             _selectedSongs.value.clear();
             // _searchCubit.close();
           },
@@ -873,8 +877,8 @@ class _PlaylistPageState extends State<PlaylistPage>
                     builder: (context, state) {
                       if (state is FavoriteSongLoading) {
                         return SizedBox(
-                          height: 10.sp,
-                          width: 10.sp,
+                          height: 180.h,
+                          width: double.infinity,
                           child: const Center(
                             child: CircularProgressIndicator(
                               color: AppColors.primary,
@@ -916,16 +920,6 @@ class _PlaylistPageState extends State<PlaylistPage>
                     },
                   ),
                 ),
-                // SizedBox(
-                //   height: 180.h,
-                //   child: TabBarView(
-                //     controller: _tabController,
-                //     children: [
-                //       _searchSongSection(),
-                //       _favoriteSongListSection(),
-                //     ],
-                //   ),
-                // ),
                 isShowSelectedSongError
                     ? const Text(
                         'please select at least 1 song',
@@ -940,7 +934,9 @@ class _PlaylistPageState extends State<PlaylistPage>
                   builder: (context, value, child) {
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                      crossAxisAlignment: value.isEmpty
+                          ? CrossAxisAlignment.center
+                          : CrossAxisAlignment.end,
                       children: [
                         Expanded(
                           child: value.isEmpty
@@ -955,7 +951,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      '  Selected',
+                                      'Selected',
                                       style: TextStyle(
                                           fontSize: 10.sp,
                                           color: Colors.grey.shade300,
@@ -964,60 +960,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                                     SizedBox(
                                       height: 4.h,
                                     ),
-                                    Container(
-                                      // width: 50.w,
-                                      height: 30.h, // Add a finite height here
-                                      child: Stack(
-                                        alignment: Alignment.center,
-                                        children: List.generate(
-                                          value.length > 3 ? 4 : value.length,
-                                          (index) {
-                                            if (index == 3) {
-                                              return Positioned(
-                                                left: index * 18.sp,
-                                                child: Container(
-                                                  padding: EdgeInsets.all(2.sp),
-                                                  decoration:
-                                                      const BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: AppColors.darkGrey,
-                                                  ),
-                                                  child: CircleAvatar(
-                                                    radius: 12.sp,
-                                                    backgroundColor:
-                                                        AppColors.darkGrey,
-                                                    child: Text(
-                                                      '+${value.length - 3}',
-                                                      style: TextStyle(
-                                                        fontSize: 10.sp,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                              );
-                                            }
-                                            return Positioned(
-                                              left: index * 18.sp,
-                                              child: Container(
-                                                padding: EdgeInsets.all(1.sp),
-                                                decoration: const BoxDecoration(
-                                                  shape: BoxShape.circle,
-                                                  color: Colors.white,
-                                                ),
-                                                child: CircleAvatar(
-                                                  radius: 13.sp,
-                                                  foregroundImage: NetworkImage(
-                                                    '${AppURLs.supabaseCoverStorage}${value[index].song.artist} - ${value[index].song.title}.jpg',
-                                                    scale: 0.9,
-                                                  ),
-                                                ),
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    )
+                                    selectedSongsPreview(playctx, value)
                                   ],
                                 ),
                         ),
@@ -1084,6 +1027,234 @@ class _PlaylistPageState extends State<PlaylistPage>
     );
   }
 
+  Widget selectedSongsPreview(
+      BuildContext playctx, List<SongWithFavorite> value) {
+    return GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          barrierColor: Colors.black.withOpacity(0.7),
+          builder: (BuildContext context) {
+            return BlocProvider(
+              create: (context) => FavoriteSongCubit(),
+              child: Dialog(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                insetPadding: EdgeInsets.symmetric(
+                  horizontal: 12.w,
+                  vertical: 12.h,
+                ),
+                child: Container(
+                    padding: EdgeInsets.all(17.w).copyWith(right: 6.w),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [
+                          Color(0xff21fd6e),
+                          Color.fromARGB(255, 30, 26, 26)
+                        ],
+                        stops: [0.01, 0.75],
+                        begin: Alignment.bottomRight,
+                        end: Alignment.topLeft,
+                      ),
+                      borderRadius: BorderRadius.circular(10.sp),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Songs to add',
+                                style: TextStyle(
+                                  fontSize: 18.sp,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Align(
+                                alignment: Alignment.centerRight,
+                                child: Padding(
+                                  padding: EdgeInsets.only(right: 10.w),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Icon(
+                                      Icons.close,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          height: 16.h,
+                        ),
+                        Scrollbar(
+                          trackVisibility: true,
+                          thumbVisibility: true,
+                          child: SizedBox(
+                            height: 172.h,
+                            child:
+                                ValueListenableBuilder<List<SongWithFavorite>>(
+                              valueListenable: _selectedSongs,
+                              builder: (context, value, child) {
+                                return ListView.separated(
+                                  shrinkWrap: true,
+                                  padding: EdgeInsets.only(right: 10.w),
+                                  itemCount: value.length,
+                                  separatorBuilder: (context, index) =>
+                                      SizedBox(
+                                    height: 5.h,
+                                  ),
+                                  itemBuilder: (context, index) {
+                                    return SongTileWidgetDeletable(
+                                      songEntity: value[index],
+                                      onSelectionChanged: (p0) {},
+                                      deleteButtonEvent: () {
+                                        if (value.length == 1) {
+                                          _selectedSongs.value =
+                                              List.from(_selectedSongs.value)
+                                                ..removeWhere((song) =>
+                                                    song.song.id ==
+                                                    value[index].song.id);
+                                          Navigator.pop(context);
+                                        } else {
+                                          _selectedSongs.value =
+                                              List.from(_selectedSongs.value)
+                                                ..removeWhere((song) =>
+                                                    song.song.id ==
+                                                    value[index].song.id);
+                                        }
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 16.h,
+                        ),
+                        Container(
+                          height: 30.h,
+                          width: double.maxFinite,
+                          margin: EdgeInsets.only(right: 11.w),
+                          child: MaterialButton(
+                            onPressed: () async {
+                              await playctx
+                                  .read<PlaylistSongsCubit>()
+                                  .addSongToPlaylist(widget.playlistEntity.id!,
+                                      _selectedSongs.value, context);
+                              customSnackBar(
+                                  isSuccess: true,
+                                  text: 'Success adding a song',
+                                  context: context);
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            },
+                            focusColor: Colors.black45,
+                            highlightColor: Colors.black12,
+                            splashColor:
+                                AppColors.darkBackground.withOpacity(0.3),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                15.sp,
+                              ),
+                            ),
+                            color: value.isNotEmpty
+                                ? AppColors.primary
+                                : AppColors.darkGrey,
+                            padding: EdgeInsets.zero,
+                            elevation: 0,
+                            child: Text(
+                              'Add to playlist',
+                              style: TextStyle(
+                                fontSize: 17.sp,
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    )
+                    // child: Column(
+                    //   mainAxisSize: MainAxisSize.min,
+                    //   children: value.map((song) {
+                    //     return SongTileWidgetSelectable(
+                    //       songEntity: song,
+                    //       isSelected: true,
+                    //       onSelectionChanged: (selectedSong) {
+                    //         // Handle selection change if needed
+                    //       },
+                    //     );
+                    //   }).toList(),
+                    // ),
+                    ),
+              ),
+            );
+          },
+        );
+      },
+      child: Container(
+        // width: 50.w,
+        height: 30.h, // Add a finite height here
+        child: Stack(
+          alignment: Alignment.center,
+          children: List.generate(
+            value.length > 3 ? 4 : value.length,
+            (index) {
+              if (index == 3) {
+                return Positioned(
+                  left: index * 18.sp,
+                  child: Container(
+                    padding: EdgeInsets.all(2.sp),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.darkGrey,
+                    ),
+                    child: CircleAvatar(
+                      radius: 12.sp,
+                      backgroundColor: AppColors.darkGrey,
+                      child: Text(
+                        '+${value.length - 3}',
+                        style: TextStyle(
+                          fontSize: 10.sp,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+              return Positioned(
+                left: index * 18.sp,
+                child: Container(
+                  padding: EdgeInsets.all(1.sp),
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                  ),
+                  child: CircleAvatar(
+                    radius: 13.sp,
+                    foregroundImage: CachedNetworkImageProvider(
+                      '${AppURLs.supabaseCoverStorage}${value[index].song.artist} - ${value[index].song.title}.jpg',
+                      scale: 0.9,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
   TabBar _addSongToPlaylistTabBar() {
     return TabBar(
       indicatorPadding: EdgeInsets.symmetric(
@@ -1145,9 +1316,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                         }
                       },
                       onChanged: (value) {
-                        setState(() {
-                          print(_searchSongController.value.text);
-                        });
+                        setState(() {});
                       },
                       focusNode: _focusNode,
                       controller: _searchSongController,
@@ -1295,6 +1464,61 @@ class _PlaylistPageState extends State<PlaylistPage>
                         (element) => element.song.id == songModel.song.id,
                       );
 
+                      return ValueListenableBuilder<List<SongWithFavorite>>(
+                        valueListenable: _selectedSongs,
+                        builder: (context, selectedSongs, child) {
+                          return SongTileWidgetControllable(
+                            songEntity: songModel,
+                            selectedSongsNotifier: _selectedSongs,
+                            onSelectionChanged: (selectedSong) {
+                              if (isAdded) {
+                                customSnackBar(
+                                  isSuccess: false,
+                                  text:
+                                      'This song is already exist in your playlist',
+                                  context: context,
+                                );
+                              } else {
+                                if (selectedSong != null) {
+                                  _selectedSongs.value =
+                                      List.from(_selectedSongs.value)
+                                        ..add(selectedSong);
+                                } else {
+                                  _selectedSongs.value =
+                                      List.from(_selectedSongs.value)
+                                        ..removeWhere((song) =>
+                                            song.song.id ==
+                                            realList[index].song.id);
+                                }
+                              }
+                            },
+                          );
+
+                          // return SongTileWidgetSelectable(
+                          //   songEntity: realList[index],
+                          //   isSelected: isSelected,
+                          //   onSelectionChanged: (selectedSong) {
+                          //     setState(() {
+                          //       if (selectedSong != null) {
+                          //         if (!_selectedSongs.value.contains(selectedSong)) {
+                          //           _selectedSongs.value = List.from(_selectedSongs.value)
+                          //             ..add(selectedSong);
+                          //           selectedSongCount++;
+                          //         }
+                          //       } else {
+                          //         _selectedSongs.value = List.from(_selectedSongs.value)
+                          //           ..removeWhere((song) =>
+                          //               song.song.id == realList[index].song.id);
+                          //         selectedSongCount--;
+                          //       }
+
+                          //       print(_selectedSongs.value.length);
+                          //     });
+                          //   },
+                          // );
+                        },
+                      );
+
                       return SongTileWidgetSelectable(
                         songEntity: songModel,
                         isSelected: isSelected,
@@ -1306,7 +1530,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                                   'This song is already exist in your playlist',
                               context: context,
                             );
-                          } else if (isSelected) {
+                          } else {
                             setState(() {
                               if (selectedSong != null) {
                                 if (!_selectedSongs.value
@@ -1321,9 +1545,16 @@ class _PlaylistPageState extends State<PlaylistPage>
                                     .value = List.from(_selectedSongs.value)
                                   ..removeWhere((song) =>
                                       song.song.id == realList[index].song.id);
+                                _selectedSongs
+                                    .value = List.from(_selectedSongs.value)
+                                  ..removeWhere(
+                                    (song) =>
+                                        song.song.id == realList[index].song.id,
+                                  );
                                 selectedSongCount--;
+                                _selectedSongs
+                                    .notifyListeners(); // Notify UI about changes
                               }
-                              print(_selectedSongs.value.length);
                             });
                           }
                         },
@@ -1359,32 +1590,50 @@ class _PlaylistPageState extends State<PlaylistPage>
             );
           },
           itemBuilder: (context, index) {
+            // bool isSelected = _selectedSongs.value.any(
+            //   (element) => element.song.id == realList[index].song.id,
+            // );
 
-            bool isSelected = _selectedSongs.value.any(
-                        (element) => element.song.id == realList[index].song.id,
-                      );
-
-            return SongTileWidgetSelectable(
-              songEntity: realList[index],
-              isSelected: isSelected,
-              onSelectionChanged: (selectedSong) {
-                setState(() {
-                  if (selectedSong != null) {
-                    if (!_selectedSongs.value.contains(selectedSong)) {
+            return ValueListenableBuilder<List<SongWithFavorite>>(
+              valueListenable: _selectedSongs,
+              builder: (context, selectedSongs, child) {
+                return SongTileWidgetControllable(
+                  songEntity: realList[index],
+                  selectedSongsNotifier: _selectedSongs,
+                  onSelectionChanged: (selectedSong) {
+                    if (selectedSong != null) {
                       _selectedSongs.value = List.from(_selectedSongs.value)
                         ..add(selectedSong);
-                      selectedSongCount++;
+                    } else {
+                      _selectedSongs.value = List.from(_selectedSongs.value)
+                        ..removeWhere(
+                            (song) => song.song.id == realList[index].song.id);
                     }
-                  } else {
-                    _selectedSongs.value = List.from(_selectedSongs.value)
-                      ..removeWhere(
-                          (song) => song.song.id == realList[index].song.id);
-                    selectedSongCount--;
-                  }
-                  print(_selectedSongs.value.length);
-                });
+                  },
+                );
 
-                // Debugging: Tampilkan semua ID lagu yang dipilih
+                // return SongTileWidgetSelectable(
+                //   songEntity: realList[index],
+                //   isSelected: isSelected,
+                //   onSelectionChanged: (selectedSong) {
+                //     setState(() {
+                //       if (selectedSong != null) {
+                //         if (!_selectedSongs.value.contains(selectedSong)) {
+                //           _selectedSongs.value = List.from(_selectedSongs.value)
+                //             ..add(selectedSong);
+                //           selectedSongCount++;
+                //         }
+                //       } else {
+                //         _selectedSongs.value = List.from(_selectedSongs.value)
+                //           ..removeWhere((song) =>
+                //               song.song.id == realList[index].song.id);
+                //         selectedSongCount--;
+                //       }
+
+                //       print(_selectedSongs.value.length);
+                //     });
+                //   },
+                // );
               },
             );
           },
