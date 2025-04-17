@@ -33,6 +33,8 @@ class _PlaylistSongTileWidgetState extends State<PlaylistSongTileWidget> {
   Widget build(BuildContext context) {
     final songList = widget.songList[widget.index];
     final song = widget.songList[widget.index].song;
+    String songDuration =
+        song.duration.toString().replaceAll('.', ':');
 
     SongWithFavorite songEntity = widget.songList[widget.index];
     Color textColor = Colors.white;
@@ -97,7 +99,9 @@ class _PlaylistSongTileWidgetState extends State<PlaylistSongTileWidget> {
             Row(
               children: [
                 Text(
-                  songEntity.song.duration.toString(),
+                  songDuration.length == 3
+                                ? '${songDuration}0'
+                                : songDuration,
                   style: TextStyle(
                     color: textColor,
                   ),

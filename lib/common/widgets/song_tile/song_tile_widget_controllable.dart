@@ -6,7 +6,6 @@ import 'package:spotify_clone/domain/entity/song/song.dart';
 //Song tile widget that can listen to value notifier, so it changing UI when it has a change occur to the related to item list
 //used for the playlist page inside 'Add song to playlist' section, it tracks the change of the existance status of the corresponding item when other widget gives a changes to it
 
-
 class SongTileWidgetControllable extends StatefulWidget {
   final SongWithFavorite songEntity;
   final ValueNotifier<List<SongWithFavorite>> selectedSongsNotifier;
@@ -26,7 +25,8 @@ class SongTileWidgetControllable extends StatefulWidget {
       _SongTileWidgetControllableState();
 }
 
-class _SongTileWidgetControllableState extends State<SongTileWidgetControllable> {
+class _SongTileWidgetControllableState
+    extends State<SongTileWidgetControllable> {
   late bool isSelected;
 
   @override
@@ -63,6 +63,9 @@ class _SongTileWidgetControllableState extends State<SongTileWidgetControllable>
   @override
   Widget build(BuildContext context) {
     Color textColor = Colors.white;
+    SongWithFavorite songEntity = widget.songEntity;
+    String songDuration =
+        songEntity.song.duration.toString().replaceAll('.', ':');
 
     return Opacity(
       opacity: isSelected ? 1 : 0.8,
@@ -131,7 +134,9 @@ class _SongTileWidgetControllableState extends State<SongTileWidgetControllable>
               Row(
                 children: [
                   Text(
-                    widget.songEntity.song.duration.toString(),
+                    songDuration.length == 3
+                        ? '${songDuration}0'
+                        : songDuration,
                     style: TextStyle(color: textColor, fontSize: 11.sp),
                   ),
                   SizedBox(

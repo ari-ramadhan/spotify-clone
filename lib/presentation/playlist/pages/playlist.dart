@@ -340,7 +340,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                       size: 4.sp,
                     ),
                     Text(
-                      ' 2019',
+                      ' ${widget.playlistEntity.createdAt.toString().substring(0,4)}',
                       style: TextStyle(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w500,
@@ -905,7 +905,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                         List<SongWithFavorite> realList = state.songs;
 
                         return SizedBox(
-                          height: 180.h,
+                          height: 220.h,
                           child: TabBarView(
                             controller: _tabController,
                             children: [
@@ -1578,63 +1578,103 @@ class _PlaylistPageState extends State<PlaylistPage>
   }
 
   Widget _favoriteSongListSection(List<SongWithFavorite> realList) {
+    int itemsPerPage = 4;
+    int totalPages = (realList.length / itemsPerPage).ceil();
+    ValueNotifier<int> currentPage = ValueNotifier<int>(1);
+
     return Column(
       children: [
-        ListView.separated(
-          padding: EdgeInsets.zero,
-          itemCount: realList.take(4).length,
-          shrinkWrap: true,
-          separatorBuilder: (context, index) {
-            return SizedBox(
-              height: 6.h,
-            );
-          },
-          itemBuilder: (context, index) {
-            // bool isSelected = _selectedSongs.value.any(
-            //   (element) => element.song.id == realList[index].song.id,
-            // );
+        ValueListenableBuilder<int>(
+          valueListenable: currentPage,
+          builder: (context, page, child) {
+            int startIndex = (page - 1) * itemsPerPage;
+            int endIndex = startIndex + itemsPerPage;
+            List<SongWithFavorite> paginatedList = realList.sublist(startIndex,
+                endIndex > realList.length ? realList.length : endIndex);
 
-            return ValueListenableBuilder<List<SongWithFavorite>>(
-              valueListenable: _selectedSongs,
-              builder: (context, selectedSongs, child) {
-                return SongTileWidgetControllable(
-                  songEntity: realList[index],
-                  selectedSongsNotifier: _selectedSongs,
-                  onSelectionChanged: (selectedSong) {
-                    if (selectedSong != null) {
-                      _selectedSongs.value = List.from(_selectedSongs.value)
-                        ..add(selectedSong);
-                    } else {
-                      _selectedSongs.value = List.from(_selectedSongs.value)
-                        ..removeWhere(
-                            (song) => song.song.id == realList[index].song.id);
-                    }
+            return ListView.separated(
+              padding: EdgeInsets.zero,
+              itemCount: paginatedList.length,
+              shrinkWrap: true,
+              separatorBuilder: (context, index) {
+                return SizedBox(
+                  height: 6.h,
+                );
+              },
+              itemBuilder: (context, index) {
+                return ValueListenableBuilder<List<SongWithFavorite>>(
+                  valueListenable: _selectedSongs,
+                  builder: (context, selectedSongs, child) {
+                    return SongTileWidgetControllable(
+                      songEntity: paginatedList[index],
+                      selectedSongsNotifier: _selectedSongs,
+                      onSelectionChanged: (selectedSong) {
+                        if (selectedSong != null) {
+                          _selectedSongs.value = List.from(_selectedSongs.value)
+                            ..add(selectedSong);
+                        } else {
+                          _selectedSongs.value = List.from(_selectedSongs.value)
+                            ..removeWhere((song) =>
+                                song.song.id == paginatedList[index].song.id);
+                        }
+                      },
+                    );
                   },
                 );
-
-                // return SongTileWidgetSelectable(
-                //   songEntity: realList[index],
-                //   isSelected: isSelected,
-                //   onSelectionChanged: (selectedSong) {
-                //     setState(() {
-                //       if (selectedSong != null) {
-                //         if (!_selectedSongs.value.contains(selectedSong)) {
-                //           _selectedSongs.value = List.from(_selectedSongs.value)
-                //             ..add(selectedSong);
-                //           selectedSongCount++;
-                //         }
-                //       } else {
-                //         _selectedSongs.value = List.from(_selectedSongs.value)
-                //           ..removeWhere((song) =>
-                //               song.song.id == realList[index].song.id);
-                //         selectedSongCount--;
-                //       }
-
-                //       print(_selectedSongs.value.length);
-                //     });
-                //   },
-                // );
               },
+            );
+          },
+        ),
+        SizedBox(
+          height: 5.h,
+        ),
+        // Pagination
+        ValueListenableBuilder(
+          valueListenable: currentPage,
+          builder: (context, value, child) {
+            return Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    onPressed: () {
+                      if (currentPage.value > 1) {
+                        setState(() {
+                          currentPage.value--;
+                        });
+                      }
+                    },
+                    icon: Icon(
+                      Icons.arrow_back_ios,
+                      size: 16.sp,
+                      color: currentPage.value > 1 ? Colors.white : Colors.grey,
+                    ),
+                  ),
+                  Text(
+                    '${currentPage.value} / $totalPages',
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: Colors.white,
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      if (currentPage.value < totalPages) {
+                        setState(() {
+                          currentPage.value++;
+                        });
+                      }
+                    },
+                    icon: Icon(
+                      Icons.arrow_forward_ios,
+                      size: 16.sp,
+                      color: currentPage.value < totalPages
+                          ? Colors.white
+                          : Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
             );
           },
         ),

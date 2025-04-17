@@ -309,7 +309,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                         ),
                                                       ),
                                                       child: Text(
-                                                        '$selectedSongCount Create playlist',
+                                                        'Create playlist',
                                                         style: TextStyle(
                                                           fontSize: 14.sp,
                                                         ),
@@ -371,24 +371,14 @@ class _ProfilePageState extends State<ProfilePage> {
                                                               children: [
                                                                 Text(
                                                                   'From your favorites',
-                                                                  style: TextStyle(
-                                                                      fontSize:
-                                                                          16.sp,
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w500),
-                                                                ),
-                                                                ElevatedButton(
-                                                                  onPressed:
-                                                                      () {
-                                                                    selectedSongCount++;
-                                                                    print(
-                                                                        selectedSongCount);
-                                                                    setState(
-                                                                        () {});
-                                                                  },
-                                                                  child: Text(
-                                                                      'HIT'),
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontSize:
+                                                                        16.sp,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .w500,
+                                                                  ),
                                                                 ),
                                                                 ListView
                                                                     .separated(
