@@ -10,8 +10,7 @@ import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_cubit.
 import 'package:spotify_clone/presentation/profile/bloc/playlist/playlist_state.dart';
 import 'package:spotify_clone/presentation/profile/widgets/PlaylistTileWidget.dart';
 
-void customLoadingSnackBar(
-    {required String loadingText, required BuildContext context}) {
+void customLoadingSnackBar({required String loadingText, required BuildContext context}) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Row(
@@ -39,10 +38,7 @@ void customLoadingSnackBar(
   );
 }
 
-void customSnackBar(
-    {required bool isSuccess,
-    required String text,
-    required BuildContext context}) {
+void customSnackBar({required bool isSuccess, required String text, required BuildContext context}) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
       content: Text(
@@ -72,9 +68,7 @@ Future<Object?> blurryDialogForSongTile({
         body: Align(
           alignment: Alignment.bottomCenter,
           child: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15.sp),
-                color: AppColors.medDarkBackground),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.sp), color: AppColors.medDarkBackground),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -86,8 +80,7 @@ Future<Object?> blurryDialogForSongTile({
                           15.sp,
                         ),
                       ),
-                      gradient: LinearGradient(
-                          colors: [Colors.blue.shade900, Colors.black])),
+                      gradient: LinearGradient(colors: [Colors.blue.shade900, Colors.black])),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
@@ -98,8 +91,7 @@ Future<Object?> blurryDialogForSongTile({
                           children: [
                             Text(
                               'Add to playlist',
-                              style: TextStyle(
-                                  fontSize: 18.sp, fontWeight: FontWeight.bold),
+                              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
                             ),
                             IconButton(
                               onPressed: () {
@@ -139,20 +131,14 @@ Future<Object?> blurryDialogForSongTile({
                                   // padding: EdgeInsets.symmetric(horizontal: 4.w),
                                   child: Text(
                                     '${song.song.artist}\'s',
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white70,
-                                        fontSize: 11.2.sp),
+                                    style: TextStyle(fontWeight: FontWeight.w500, color: Colors.white70, fontSize: 11.2.sp),
                                   ),
                                 ),
                                 Container(
                                   // padding: EdgeInsets.symmetric(horizontal: 4.w),
                                   child: Text(
                                     song.song.title,
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 16.sp,
-                                        letterSpacing: 0.4),
+                                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 16.sp, letterSpacing: 0.4),
                                   ),
                                 ),
                               ],
@@ -169,8 +155,7 @@ Future<Object?> blurryDialogForSongTile({
                 Column(
                   children: [
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 15.w)
-                          .copyWith(top: 5.h),
+                      padding: EdgeInsets.symmetric(horizontal: 15.w).copyWith(top: 5.h),
                       child: Row(
                         children: [
                           Icon(
@@ -182,15 +167,13 @@ Future<Object?> blurryDialogForSongTile({
                           ),
                           Text(
                             'Select a playlist',
-                            style: TextStyle(
-                                fontSize: 15.sp, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                     ),
                     BlocProvider(
-                      create: (context) =>
-                          PlaylistCubit()..getCurrentuserPlaylist(''),
+                      create: (context) => PlaylistCubit()..getCurrentuserPlaylist(''),
                       child: BlocBuilder<PlaylistCubit, PlaylistState>(
                         builder: (context, state) {
                           if (state is PlaylistLoading) {
@@ -206,8 +189,7 @@ Future<Object?> blurryDialogForSongTile({
                             return state.playlistModel.isNotEmpty
                                 ? ListView.builder(
                                     padding: EdgeInsets.only(top: 5.h),
-                                    physics:
-                                        const NeverScrollableScrollPhysics(),
+                                    physics: const NeverScrollableScrollPhysics(),
                                     shrinkWrap: true,
                                     itemBuilder: (context, index) {
                                       var playlist = state.playlistModel[index];
@@ -215,53 +197,30 @@ Future<Object?> blurryDialogForSongTile({
                                       return PlaylistTileWidget(
                                         playlist: playlist,
                                         onTap: () async {
-                                          var result = await sl<
-                                                  BatchAddToPlaylistUseCase>()
-                                              .call(
-                                                  params:
-                                                      BatchAddToPlaylistParams(
-                                                          playlistId:
-                                                              playlist.id!,
-                                                          songList: [song]));
+                                          var result = await sl<BatchAddToPlaylistUseCase>().call(params: BatchAddToPlaylistParams(playlistId: playlist.id!, songList: [song]));
 
                                           Navigator.pop(context);
 
-                                          customLoadingSnackBar(
-                                              loadingText: 'Adding the songs',
-                                              context: context);
+                                          customLoadingSnackBar(loadingText: 'Adding the songs', context: context);
 
                                           result.fold(
                                             (l) {
-                                              customSnackBar(
-                                                  isSuccess: false,
-                                                  text: l,
-                                                  context: context);
+                                              customSnackBar(isSuccess: false, text: l, context: context);
                                             },
                                             (r) {
-                                              customSnackBar(
-                                                  isSuccess: true,
-                                                  text: r,
-                                                  context: context);
+                                              customSnackBar(isSuccess: true, text: r, context: context);
                                             },
                                           );
                                         },
                                       );
                                     },
-                                    itemCount:
-                                        state.playlistModel.take(4).length,
+                                    itemCount: state.playlistModel.take(4).length,
                                   )
                                 : Container(
                                     height: 100.h,
-                                    margin:
-                                        EdgeInsets.symmetric(horizontal: 15.w)
-                                            .copyWith(top: 10.h),
-                                    decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(10.sp),
-                                        color: const Color.fromARGB(
-                                            235, 27, 27, 27)),
-                                    child: const Center(
-                                        child: Text('You have no playlist')),
+                                    margin: EdgeInsets.symmetric(horizontal: 15.w).copyWith(top: 10.h),
+                                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.sp), color: const Color.fromARGB(235, 27, 27, 27)),
+                                    child: const Center(child: Text('You have no playlist')),
                                   );
                           }
 
@@ -281,8 +240,7 @@ Future<Object?> blurryDialogForSongTile({
       ),
     ),
     transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
-      filter:
-          ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
+      filter: ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
       child: FadeTransition(
         opacity: anim1,
         child: child,
@@ -293,11 +251,7 @@ Future<Object?> blurryDialogForSongTile({
 }
 
 Future<Object?> blurryDialogForPlaylist(
-    {required String backgroundImage,
-    required BuildContext context,
-    required ArtistEntity artist,
-    required List<SongWithFavorite> songList,
-    required Widget contentToCopy}) async {
+    {required String backgroundImage, required BuildContext context, required ArtistEntity artist, required List<SongWithFavorite> songList, required Widget contentToCopy}) async {
   return showGeneralDialog(
     barrierDismissible: true,
     barrierLabel: '',
@@ -310,9 +264,7 @@ Future<Object?> blurryDialogForPlaylist(
         body: Align(
           alignment: Alignment.bottomCenter,
           child: Container(
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15.sp),
-                color: AppColors.medDarkBackground),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.sp), color: AppColors.medDarkBackground),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -326,9 +278,7 @@ Future<Object?> blurryDialogForPlaylist(
                             fit: BoxFit.cover,
                             image: NetworkImage(backgroundImage),
                             alignment: const Alignment(0, -0.2),
-                            colorFilter: ColorFilter.mode(
-                                AppColors.darkBackground.withOpacity(0.4),
-                                BlendMode.color)),
+                            colorFilter: ColorFilter.mode(AppColors.darkBackground.withOpacity(0.4), BlendMode.color)),
                         borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(15.sp),
                           topRight: Radius.circular(15.sp),
@@ -378,15 +328,13 @@ Future<Object?> blurryDialogForPlaylist(
                           ),
                           Text(
                             'Add this to your playlist',
-                            style: TextStyle(
-                                fontSize: 15.sp, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),
                     ),
                     BlocProvider(
-                      create: (context) =>
-                          PlaylistCubit()..getCurrentuserPlaylist(''),
+                      create: (context) => PlaylistCubit()..getCurrentuserPlaylist(''),
                       child: BlocBuilder<PlaylistCubit, PlaylistState>(
                         builder: (context, state) {
                           if (state is PlaylistLoading) {
@@ -409,31 +357,16 @@ Future<Object?> blurryDialogForPlaylist(
                                 return PlaylistTileWidget(
                                   playlist: playlist,
                                   onTap: () async {
-                                    var result =
-                                        await sl<BatchAddToPlaylistUseCase>()
-                                            .call(
-                                                params:
-                                                    BatchAddToPlaylistParams(
-                                                        playlistId:
-                                                            playlist.id!,
-                                                        songList: songList));
+                                    var result = await sl<BatchAddToPlaylistUseCase>().call(params: BatchAddToPlaylistParams(playlistId: playlist.id!, songList: songList));
                                     Navigator.pop(context);
-                                    customLoadingSnackBar(
-                                        loadingText: 'Adding the songs',
-                                        context: context);
+                                    customLoadingSnackBar(loadingText: 'Adding the songs', context: context);
 
                                     result.fold(
                                       (l) {
-                                        customSnackBar(
-                                            isSuccess: false,
-                                            text: l,
-                                            context: context);
+                                        customSnackBar(isSuccess: false, text: l, context: context);
                                       },
                                       (r) {
-                                        customSnackBar(
-                                            isSuccess: true,
-                                            text: r,
-                                            context: context);
+                                        customSnackBar(isSuccess: true, text: r, context: context);
                                       },
                                     );
                                   },
@@ -459,8 +392,7 @@ Future<Object?> blurryDialogForPlaylist(
       ),
     ),
     transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
-      filter:
-          ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
+      filter: ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
       child: FadeTransition(
         opacity: anim1,
         child: child,
@@ -475,6 +407,8 @@ Future<Object?> blurryDialog(
     required String dialogTitle,
     required Widget content,
     required double horizontalPadding,
+    bool isDoubleTitled = false,
+    Widget? secondTitle,
     required VoidCallback onClosed}) {
   return showGeneralDialog(
     barrierDismissible: true,
@@ -489,11 +423,8 @@ Future<Object?> blurryDialog(
           alignment: Alignment.bottomCenter,
           child: Container(
             // alignment: Alignment.topLeft,
-            padding: EdgeInsets.symmetric(
-                horizontal: horizontalPadding.w, vertical: 15.h),
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(15.sp),
-                color: AppColors.medDarkBackground),
+            padding: EdgeInsets.symmetric(horizontal: horizontalPadding.w, vertical: 15.h),
+            decoration: BoxDecoration(borderRadius: BorderRadius.circular(15.sp), color: AppColors.medDarkBackground),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -502,11 +433,21 @@ Future<Object?> blurryDialog(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 21.w),
-                      child: Text(
-                        dialogTitle,
-                        style: TextStyle(
-                            fontSize: 18.sp, fontWeight: FontWeight.bold),
+                      padding: EdgeInsets.symmetric(horizontal: 6.w),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            dialogTitle,
+                            style: TextStyle(fontSize: isDoubleTitled ? 13.sp : 18.sp, fontWeight: isDoubleTitled ? FontWeight.w500 : FontWeight.bold),
+                          ),
+                          isDoubleTitled
+                              ? Padding(
+                                  padding: EdgeInsets.only(top: 0.h),
+                                  child: secondTitle!,
+                                )
+                              : const SizedBox.shrink()
+                        ],
                       ),
                     ),
                     SizedBox(
@@ -531,8 +472,7 @@ Future<Object?> blurryDialog(
       ),
     ),
     transitionBuilder: (ctx, anim1, anim2, child) => BackdropFilter(
-      filter:
-          ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
+      filter: ImageFilter.blur(sigmaX: 4 * anim1.value, sigmaY: 4 * anim1.value),
       child: FadeTransition(
         opacity: anim1,
         child: child,
@@ -544,8 +484,7 @@ Future<Object?> blurryDialog(
 
 class NoGlowScrollBehavior extends ScrollBehavior {
   @override
-  Widget buildViewportChrome(
-      BuildContext context, Widget child, AxisDirection axisDirection) {
+  Widget buildViewportChrome(BuildContext context, Widget child, AxisDirection axisDirection) {
     return child;
   }
 }

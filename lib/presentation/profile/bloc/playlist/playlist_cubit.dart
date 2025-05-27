@@ -11,8 +11,7 @@ class PlaylistCubit extends Cubit<PlaylistState> {
   PlaylistCubit() : super(PlaylistLoading());
 
   Future<void> getCurrentuserPlaylist(String userId) async {
-    var playlists =
-        await sl<GetCurrentuserPlaylistUseCase>().call(params: userId);
+    var playlists = await sl<GetCurrentuserPlaylistUseCase>().call(params: userId);
 
     playlists.fold(
       (l) {
@@ -28,31 +27,23 @@ class PlaylistCubit extends Cubit<PlaylistState> {
 
   Future<String> deletePlaylist(String playlistId) async {
     try {
-      emit(PlaylistLoading()); // Emit loading state before deleting
+      emit(PlaylistLoading());
 
-      final deleteResult =
-          await sl<DeletePlaylistUseCase>().call(params: playlistId);
+      final deleteResult = await sl<DeletePlaylistUseCase>().call(params: playlistId);
       String returnObject = "";
 
       deleteResult.fold(
         (l) {
-          emit(PlaylistFailure()); // Emit failure state if deletion fails
+          emit(PlaylistFailure());
           returnObject = l;
         },
         (r) {
-          // IMPORTANT: Check the state before casting
           if (state is PlaylistLoaded) {
             final currentState = state as PlaylistLoaded;
-            // final updatedPlaylists = currentState.playlistModel.where((playlist) => playlist.id != playlistId).toList();
 
-            final updatedPlaylists =
-                List<PlaylistEntity>.from(currentState.playlistModel)
-                  ..removeWhere((playlist) => playlist.id == playlistId);
-            emit(PlaylistLoaded(
-                playlistModel: updatedPlaylists)); // Emit updated state
+            final updatedPlaylists = List<PlaylistEntity>.from(currentState.playlistModel)..removeWhere((playlist) => playlist.id == playlistId);
+            emit(PlaylistLoaded(playlistModel: updatedPlaylists));
           } else if (state is PlaylistLoading) {
-            // Handle the case where the state is PlaylistLoading (though unlikely at this point)
-            // You might want to re-fetch the data or show a message.
             getCurrentuserPlaylist("");
           }
           returnObject = "success";
@@ -60,21 +51,10 @@ class PlaylistCubit extends Cubit<PlaylistState> {
       );
       return returnObject;
     } catch (e) {
-      emit(PlaylistFailure()); // Emit failure state if an exception occurs
+      emit(PlaylistFailure());
       return "an error occured";
     }
   }
-
-  // Future<void> deletePlaylist(String playlistId) async {
-  //   try {
-  //     var currentState = state as PlaylistLoaded;
-  //     final updatedPlaylists = currentState.playlistModel.where((playlist) => playlist.id != playlistId).toList();
-
-  //     emit(PlaylistLoaded(playlistModel: updatedPlaylists));
-  //   } catch (e) {
-  //     emit(PlaylistFailure());
-  //   }
-  // }
 
   Future<Either> createPlaylist({
     required String playlistTitle,
@@ -102,8 +82,7 @@ class PlaylistCubit extends Cubit<PlaylistState> {
         (r) async {
           final currentState = state as PlaylistLoaded;
 
-          final updatedPlaylists =
-              List<PlaylistEntity>.from(currentState.playlistModel)..add(r);
+          final updatedPlaylists = List<PlaylistEntity>.from(currentState.playlistModel)..add(r);
 
           emit(PlaylistLoaded(playlistModel: updatedPlaylists));
 

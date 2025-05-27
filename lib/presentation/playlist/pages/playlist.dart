@@ -42,8 +42,7 @@ class PlaylistPage extends StatefulWidget {
   State<PlaylistPage> createState() => _PlaylistPageState();
 }
 
-class _PlaylistPageState extends State<PlaylistPage>
-    with SingleTickerProviderStateMixin {
+class _PlaylistPageState extends State<PlaylistPage> with SingleTickerProviderStateMixin {
   String playlistName = '';
   String playlistDesc = '';
 
@@ -71,14 +70,7 @@ class _PlaylistPageState extends State<PlaylistPage>
   late FocusNode _focusNode;
   bool _isFocused = false;
 
-  ValueNotifier<List<SongWithFavorite>> _selectedSongs =
-      ValueNotifier<List<SongWithFavorite>>([]);
-
-  void _updateValue() {
-    setState(() {
-      selectedSongCount++;
-    });
-  }
+  ValueNotifier<List<SongWithFavorite>> _selectedSongs = ValueNotifier<List<SongWithFavorite>>([]);
 
   @override
   void initState() {
@@ -110,11 +102,11 @@ class _PlaylistPageState extends State<PlaylistPage>
     });
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    _searchSongController.clear();
-  }
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  //   _searchSongController.clear();
+  // }
 
   bool isShowSelectedSongError = false;
 
@@ -125,8 +117,7 @@ class _PlaylistPageState extends State<PlaylistPage>
       body: MultiBlocProvider(
           providers: [
             BlocProvider(
-              create: (context) => PlaylistSongsCubit()
-                ..getPlaylistSongs(widget.playlistEntity.id!),
+              create: (context) => PlaylistSongsCubit()..getPlaylistSongs(widget.playlistEntity.id!),
             ),
             BlocProvider(
               create: (context) => FavoriteSongCubit()..getFavoriteSongs(''),
@@ -205,8 +196,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                         padding: EdgeInsets.zero,
                         children: (state.songs.take(4)).map(
                           (e) {
-                            return Image.network(
-                                '${AppURLs.supabaseCoverStorage}${e.song.artist} - ${e.song.title}.jpg');
+                            return Image.network('${AppURLs.supabaseCoverStorage}${e.song.artist} - ${e.song.title}.jpg');
                           },
                         ).toList(),
                       )
@@ -340,7 +330,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                       size: 4.sp,
                     ),
                     Text(
-                      ' ${widget.playlistEntity.createdAt.toString().substring(0,4)}',
+                      ' ${widget.playlistEntity.createdAt.toString().substring(0, 4)}',
                       style: TextStyle(
                         fontSize: 12.sp,
                         fontWeight: FontWeight.w500,
@@ -371,8 +361,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                         if (state is PlaylistSongsLoaded) {
                           List exceptionalSongs = state.songs;
 
-                          return _addSongToPlaylistButton(
-                              playctx, exceptionalSongs);
+                          return _addSongToPlaylistButton(playctx, exceptionalSongs);
                         }
                         return Container();
                       },
@@ -416,9 +405,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                         // margin: EdgeInsets.only(right: 10.w),
                         padding: EdgeInsets.all(5.h),
                         decoration: BoxDecoration(
-                          color: state.songs.isEmpty
-                              ? Colors.grey
-                              : AppColors.primary,
+                          color: state.songs.isEmpty ? Colors.grey : AppColors.primary,
                           shape: BoxShape.circle,
                         ),
                         child: IconButton(
@@ -457,7 +444,7 @@ class _PlaylistPageState extends State<PlaylistPage>
         Navigator.pop(context);
       },
       context: context,
-      dialogTitle: 'Delete this playlisttt',
+      dialogTitle: 'Delete this playlist',
       horizontalPadding: 21,
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -509,11 +496,9 @@ class _PlaylistPageState extends State<PlaylistPage>
                 child: BlocBuilder<PlaylistCubit, PlaylistState>(
                   builder: (contextPlaylist, state) => Expanded(
                     child: MaterialButton(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15.sp)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.sp)),
                       onPressed: () {
-                        deletePlaylist(
-                            context: context, playlistContext: contextPlaylist);
+                        deletePlaylist(context: context, playlistContext: contextPlaylist);
                       },
                       child: Padding(
                         padding: EdgeInsets.symmetric(
@@ -632,8 +617,7 @@ class _PlaylistPageState extends State<PlaylistPage>
           exceptionalSongs = state.songs;
 
           // getting artist name by the playlist song's artist name and removes the dupe
-          List<String> artistsName =
-              state.songs.map((e) => e.song.artist).toSet().toList();
+          List<String> artistsName = state.songs.map((e) => e.song.artist).toSet().toList();
 
           return state.songs.isNotEmpty
               ? SingleChildScrollView(
@@ -685,10 +669,8 @@ class _PlaylistPageState extends State<PlaylistPage>
                         height: 5.h,
                       ),
                       BlocProvider(
-                        create: (context) => GetRecommendedArtistsCubit()
-                          ..getRecommendedArtists(artistsName),
-                        child: BlocBuilder<GetRecommendedArtistsCubit,
-                            GetRecommendedArtistsState>(
+                        create: (context) => GetRecommendedArtistsCubit()..getRecommendedArtists(artistsName),
+                        child: BlocBuilder<GetRecommendedArtistsCubit, GetRecommendedArtistsState>(
                           builder: (context, state) {
                             if (state is GetRecommendedArtistsLoading) {
                               return Container(
@@ -700,11 +682,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                               );
                             }
                             if (state is GetRecommendedArtistsFailure) {
-                              return Container(
-                                  height: 100.h,
-                                  alignment: Alignment.center,
-                                  child: const Text(
-                                      'Failed getting your artists recommendations'));
+                              return Container(height: 100.h, alignment: Alignment.center, child: const Text('Failed getting your artists recommendations'));
                             }
                             if (state is GetRecommendedArtistsLoaded) {
                               return SingleChildScrollView(
@@ -714,8 +692,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                                   children: List.generate(
                                     state.artists.length,
                                     (index) {
-                                      ArtistEntity artistList =
-                                          state.artists[index];
+                                      ArtistEntity artistList = state.artists[index];
 
                                       return Padding(
                                         padding: EdgeInsets.only(
@@ -728,46 +705,32 @@ class _PlaylistPageState extends State<PlaylistPage>
                                                 Navigator.pushReplacement(
                                                   context,
                                                   MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ArtistPage(
-                                                            artistId:
-                                                                artistList.id!),
+                                                    builder: (context) => ArtistPage(artistId: artistList.id!),
                                                   ),
                                                 );
                                               },
                                               child: Container(
-                                                margin: EdgeInsets.symmetric(
-                                                    vertical: 5.h),
+                                                margin: EdgeInsets.symmetric(vertical: 5.h),
                                                 padding: EdgeInsets.symmetric(
                                                   horizontal: 10.w,
                                                   vertical: 10.h,
                                                 ),
-                                                decoration: BoxDecoration(
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: Colors.black
-                                                            .withOpacity(
-                                                          0.3,
-                                                        ),
-                                                        blurRadius: 10,
-                                                        offset:
-                                                            const Offset(3, 3),
-                                                      ),
-                                                    ],
-                                                    color: const Color.fromARGB(
-                                                        115, 54, 54, 54),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10.sp)),
+                                                decoration: BoxDecoration(boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black.withOpacity(
+                                                      0.3,
+                                                    ),
+                                                    blurRadius: 10,
+                                                    offset: const Offset(3, 3),
+                                                  ),
+                                                ], color: const Color.fromARGB(115, 54, 54, 54), borderRadius: BorderRadius.circular(10.sp)),
                                                 child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
                                                   children: [
                                                     Center(
                                                       child: CircleAvatar(
                                                         radius: 50.sp,
-                                                        backgroundImage:
-                                                            NetworkImage(
+                                                        backgroundImage: NetworkImage(
                                                           '${AppURLs.supabaseArtistStorage}${artistList.name!.toLowerCase()}.jpg',
                                                         ),
                                                       ),
@@ -779,8 +742,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                                                       artistList.name!,
                                                       style: TextStyle(
                                                         fontSize: 12.sp,
-                                                        fontWeight:
-                                                            FontWeight.w600,
+                                                        fontWeight: FontWeight.w600,
                                                       ),
                                                     ),
                                                     SizedBox(
@@ -791,8 +753,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                                                       style: TextStyle(
                                                         fontSize: 11.sp,
                                                         color: Colors.white70,
-                                                        fontWeight:
-                                                            FontWeight.w500,
+                                                        fontWeight: FontWeight.w500,
                                                       ),
                                                     ),
                                                   ],
@@ -871,8 +832,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                   height: 5.h,
                 ),
                 BlocProvider(
-                  create: (context) =>
-                      FavoriteSongCubit()..getFavoriteSongs(''),
+                  create: (context) => FavoriteSongCubit()..getFavoriteSongs(''),
                   child: BlocBuilder<FavoriteSongCubit, FavoriteSongState>(
                     builder: (context, state) {
                       if (state is FavoriteSongLoading) {
@@ -934,28 +894,20 @@ class _PlaylistPageState extends State<PlaylistPage>
                   builder: (context, value, child) {
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: value.isEmpty
-                          ? CrossAxisAlignment.center
-                          : CrossAxisAlignment.end,
+                      crossAxisAlignment: value.isEmpty ? CrossAxisAlignment.center : CrossAxisAlignment.end,
                       children: [
                         Expanded(
                           child: value.isEmpty
                               ? Text(
                                   'no song is selected',
-                                  style: TextStyle(
-                                      fontSize: 10.sp,
-                                      color: Colors.grey.shade300,
-                                      letterSpacing: 0.4),
+                                  style: TextStyle(fontSize: 10.sp, color: Colors.grey.shade300, letterSpacing: 0.4),
                                 )
                               : Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       'Selected',
-                                      style: TextStyle(
-                                          fontSize: 10.sp,
-                                          color: Colors.grey.shade300,
-                                          letterSpacing: 0.4),
+                                      style: TextStyle(fontSize: 10.sp, color: Colors.grey.shade300, letterSpacing: 0.4),
                                     ),
                                     SizedBox(
                                       height: 4.h,
@@ -969,36 +921,22 @@ class _PlaylistPageState extends State<PlaylistPage>
                           child: MaterialButton(
                             onPressed: () async {
                               if (_selectedSongs.value.isEmpty) {
-                                customSnackBar(
-                                    isSuccess: false,
-                                    text: 'Select atleast one song!',
-                                    context: context);
+                                customSnackBar(isSuccess: false, text: 'Select atleast one song!', context: context);
                               } else {
-                                await playctx
-                                    .read<PlaylistSongsCubit>()
-                                    .addSongToPlaylist(
-                                        widget.playlistEntity.id!,
-                                        _selectedSongs.value,
-                                        context);
-                                customSnackBar(
-                                    isSuccess: true,
-                                    text: 'Success adding a song',
-                                    context: context);
+                                await playctx.read<PlaylistSongsCubit>().addSongToPlaylist(widget.playlistEntity.id!, _selectedSongs.value, context);
+                                customSnackBar(isSuccess: true, text: 'Success adding a song', context: context);
                                 Navigator.pop(context);
                               }
                             },
                             focusColor: Colors.black45,
                             highlightColor: Colors.black12,
-                            splashColor:
-                                AppColors.darkBackground.withOpacity(0.3),
+                            splashColor: AppColors.darkBackground.withOpacity(0.3),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
                                 15.sp,
                               ),
                             ),
-                            color: value.isNotEmpty
-                                ? AppColors.primary
-                                : AppColors.darkGrey,
+                            color: value.isNotEmpty ? AppColors.primary : AppColors.darkGrey,
                             padding: EdgeInsets.zero,
                             elevation: 0,
                             child: Text(
@@ -1027,8 +965,7 @@ class _PlaylistPageState extends State<PlaylistPage>
     );
   }
 
-  Widget selectedSongsPreview(
-      BuildContext playctx, List<SongWithFavorite> value) {
+  Widget selectedSongsPreview(BuildContext playctx, List<SongWithFavorite> value) {
     return GestureDetector(
       onTap: () {
         showDialog(
@@ -1048,10 +985,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                     padding: EdgeInsets.all(17.w).copyWith(right: 6.w),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [
-                          Color(0xff21fd6e),
-                          Color.fromARGB(255, 30, 26, 26)
-                        ],
+                        colors: [Color(0xff21fd6e), Color.fromARGB(255, 30, 26, 26)],
                         stops: [0.01, 0.75],
                         begin: Alignment.bottomRight,
                         end: Alignment.topLeft,
@@ -1099,16 +1033,14 @@ class _PlaylistPageState extends State<PlaylistPage>
                           thumbVisibility: true,
                           child: SizedBox(
                             height: 172.h,
-                            child:
-                                ValueListenableBuilder<List<SongWithFavorite>>(
+                            child: ValueListenableBuilder<List<SongWithFavorite>>(
                               valueListenable: _selectedSongs,
                               builder: (context, value, child) {
                                 return ListView.separated(
                                   shrinkWrap: true,
                                   padding: EdgeInsets.only(right: 10.w),
                                   itemCount: value.length,
-                                  separatorBuilder: (context, index) =>
-                                      SizedBox(
+                                  separatorBuilder: (context, index) => SizedBox(
                                     height: 5.h,
                                   ),
                                   itemBuilder: (context, index) {
@@ -1117,18 +1049,10 @@ class _PlaylistPageState extends State<PlaylistPage>
                                       onSelectionChanged: (p0) {},
                                       deleteButtonEvent: () {
                                         if (value.length == 1) {
-                                          _selectedSongs.value =
-                                              List.from(_selectedSongs.value)
-                                                ..removeWhere((song) =>
-                                                    song.song.id ==
-                                                    value[index].song.id);
+                                          _selectedSongs.value = List.from(_selectedSongs.value)..removeWhere((song) => song.song.id == value[index].song.id);
                                           Navigator.pop(context);
                                         } else {
-                                          _selectedSongs.value =
-                                              List.from(_selectedSongs.value)
-                                                ..removeWhere((song) =>
-                                                    song.song.id ==
-                                                    value[index].song.id);
+                                          _selectedSongs.value = List.from(_selectedSongs.value)..removeWhere((song) => song.song.id == value[index].song.id);
                                         }
                                       },
                                     );
@@ -1147,29 +1071,20 @@ class _PlaylistPageState extends State<PlaylistPage>
                           margin: EdgeInsets.only(right: 11.w),
                           child: MaterialButton(
                             onPressed: () async {
-                              await playctx
-                                  .read<PlaylistSongsCubit>()
-                                  .addSongToPlaylist(widget.playlistEntity.id!,
-                                      _selectedSongs.value, context);
-                              customSnackBar(
-                                  isSuccess: true,
-                                  text: 'Success adding a song',
-                                  context: context);
+                              await playctx.read<PlaylistSongsCubit>().addSongToPlaylist(widget.playlistEntity.id!, _selectedSongs.value, context);
+                              customSnackBar(isSuccess: true, text: 'Success adding a song', context: context);
                               Navigator.pop(context);
                               Navigator.pop(context);
                             },
                             focusColor: Colors.black45,
                             highlightColor: Colors.black12,
-                            splashColor:
-                                AppColors.darkBackground.withOpacity(0.3),
+                            splashColor: AppColors.darkBackground.withOpacity(0.3),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(
                                 15.sp,
                               ),
                             ),
-                            color: value.isNotEmpty
-                                ? AppColors.primary
-                                : AppColors.darkGrey,
+                            color: value.isNotEmpty ? AppColors.primary : AppColors.darkGrey,
                             padding: EdgeInsets.zero,
                             elevation: 0,
                             child: Text(
@@ -1268,8 +1183,7 @@ class _PlaylistPageState extends State<PlaylistPage>
         color: Colors.white,
         fontSize: 14.sp,
       ),
-      unselectedLabelStyle:
-          TextStyle(color: Colors.grey.shade600, fontSize: 12.5.sp),
+      unselectedLabelStyle: TextStyle(color: Colors.grey.shade600, fontSize: 12.5.sp),
       controller: _tabController,
       isScrollable: true,
       indicatorColor: AppColors.primary,
@@ -1288,8 +1202,7 @@ class _PlaylistPageState extends State<PlaylistPage>
     );
   }
 
-  BlocProvider<SearchSongForPlaylistCubit> _searchSongSection(
-      List<SongWithFavorite> realList) {
+  BlocProvider<SearchSongForPlaylistCubit> _searchSongSection(List<SongWithFavorite> realList) {
     return BlocProvider(
       create: (context) => SearchSongForPlaylistCubit(),
       child: Column(
@@ -1330,16 +1243,14 @@ class _PlaylistPageState extends State<PlaylistPage>
                         contentPadding: EdgeInsets.symmetric(vertical: 10.h),
                         hintText: 'Find the song to add',
                         hintStyle: TextStyle(fontSize: 14.sp),
-                        border: const OutlineInputBorder(
-                            borderSide: BorderSide.none),
+                        border: const OutlineInputBorder(borderSide: BorderSide.none),
                         focusedBorder: const OutlineInputBorder(
                           borderSide: BorderSide.none,
                         ),
                         errorBorder: const OutlineInputBorder(
                           borderSide: BorderSide.none,
                         ),
-                        enabledBorder: const OutlineInputBorder(
-                            borderSide: BorderSide.none),
+                        enabledBorder: const OutlineInputBorder(borderSide: BorderSide.none),
                       ),
                     ),
                   ),
@@ -1352,18 +1263,14 @@ class _PlaylistPageState extends State<PlaylistPage>
                   child: MaterialButton(
                     color: _isNotEmpty ? Colors.red : Colors.grey,
                     // color: _searchCubit.state is SearchSongForPlaylistLoading || _searchCubit.state is SearchSongForPlaylistLoaded ? Colors.redAccent.shade400 : Colors.grey.shade700,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.sp)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.sp)),
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
-                        await _searchCubit.searchSongByKeyword(
-                            _searchSongController.value.text);
+                        await _searchCubit.searchSongByKeyword(_searchSongController.value.text);
                       }
                     },
                     child: Icon(
-                      _searchCubit.state is SearchSongForPlaylistInitial
-                          ? Icons.search
-                          : Icons.close,
+                      _searchCubit.state is SearchSongForPlaylistInitial ? Icons.search : Icons.close,
                       size: 14.sp,
                     ),
                   ),
@@ -1372,8 +1279,7 @@ class _PlaylistPageState extends State<PlaylistPage>
             ),
           ),
           Flexible(
-            child: BlocBuilder<SearchSongForPlaylistCubit,
-                SearchSongForPlaylistState>(
+            child: BlocBuilder<SearchSongForPlaylistCubit, SearchSongForPlaylistState>(
               bloc: _searchCubit,
               builder: (context, state) {
                 if (state is SearchSongForPlaylistInitial) {
@@ -1458,8 +1364,7 @@ class _PlaylistPageState extends State<PlaylistPage>
                     itemBuilder: (context, index) {
                       var songModel = songs[index];
 
-                      bool isAdded = exceptionalSongs
-                          .any((song) => song.song.id == songModel.song.id);
+                      bool isAdded = exceptionalSongs.any((song) => song.song.id == songModel.song.id);
                       bool isSelected = _selectedSongs.value.any(
                         (element) => element.song.id == songModel.song.id,
                       );
@@ -1474,21 +1379,14 @@ class _PlaylistPageState extends State<PlaylistPage>
                               if (isAdded) {
                                 customSnackBar(
                                   isSuccess: false,
-                                  text:
-                                      'This song is already exist in your playlist',
+                                  text: 'This song is already exist in your playlist',
                                   context: context,
                                 );
                               } else {
                                 if (selectedSong != null) {
-                                  _selectedSongs.value =
-                                      List.from(_selectedSongs.value)
-                                        ..add(selectedSong);
+                                  _selectedSongs.value = List.from(_selectedSongs.value)..add(selectedSong);
                                 } else {
-                                  _selectedSongs.value =
-                                      List.from(_selectedSongs.value)
-                                        ..removeWhere((song) =>
-                                            song.song.id ==
-                                            realList[index].song.id);
+                                  _selectedSongs.value = List.from(_selectedSongs.value)..removeWhere((song) => song.song.id == realList[index].song.id);
                                 }
                               }
                             },
@@ -1526,34 +1424,24 @@ class _PlaylistPageState extends State<PlaylistPage>
                           if (isAdded) {
                             customSnackBar(
                               isSuccess: false,
-                              text:
-                                  'This song is already exist in your playlist',
+                              text: 'This song is already exist in your playlist',
                               context: context,
                             );
                           } else {
                             setState(() {
                               if (selectedSong != null) {
-                                if (!_selectedSongs.value
-                                    .contains(selectedSong)) {
-                                  _selectedSongs.value =
-                                      List.from(_selectedSongs.value)
-                                        ..add(selectedSong);
+                                if (!_selectedSongs.value.contains(selectedSong)) {
+                                  _selectedSongs.value = List.from(_selectedSongs.value)..add(selectedSong);
                                   selectedSongCount++;
                                 }
                               } else {
-                                _selectedSongs
-                                    .value = List.from(_selectedSongs.value)
-                                  ..removeWhere((song) =>
-                                      song.song.id == realList[index].song.id);
-                                _selectedSongs
-                                    .value = List.from(_selectedSongs.value)
+                                _selectedSongs.value = List.from(_selectedSongs.value)..removeWhere((song) => song.song.id == realList[index].song.id);
+                                _selectedSongs.value = List.from(_selectedSongs.value)
                                   ..removeWhere(
-                                    (song) =>
-                                        song.song.id == realList[index].song.id,
+                                    (song) => song.song.id == realList[index].song.id,
                                   );
                                 selectedSongCount--;
-                                _selectedSongs
-                                    .notifyListeners(); // Notify UI about changes
+                                _selectedSongs.notifyListeners(); // Notify UI about changes
                               }
                             });
                           }
@@ -1577,110 +1465,108 @@ class _PlaylistPageState extends State<PlaylistPage>
     );
   }
 
+
   Widget _favoriteSongListSection(List<SongWithFavorite> realList) {
-    int itemsPerPage = 4;
-    int totalPages = (realList.length / itemsPerPage).ceil();
-    ValueNotifier<int> currentPage = ValueNotifier<int>(1);
+  int itemsPerPage = 4;
+  int totalPages = (realList.length / itemsPerPage).ceil();
+  ValueNotifier<int> currentPage = ValueNotifier<int>(1);
 
-    return Column(
-      children: [
-        ValueListenableBuilder<int>(
-          valueListenable: currentPage,
-          builder: (context, page, child) {
-            int startIndex = (page - 1) * itemsPerPage;
-            int endIndex = startIndex + itemsPerPage;
-            List<SongWithFavorite> paginatedList = realList.sublist(startIndex,
-                endIndex > realList.length ? realList.length : endIndex);
+  return Column(
+    children: [
+      ValueListenableBuilder<int>(
+        valueListenable: currentPage,
+        builder: (context, page, child) {
+          int startIndex = (page - 1) * itemsPerPage;
+          int endIndex = startIndex + itemsPerPage;
+          List<SongWithFavorite> paginatedList =
+              realList.sublist(startIndex, endIndex > realList.length ? realList.length : endIndex);
 
-            return ListView.separated(
-              padding: EdgeInsets.zero,
-              itemCount: paginatedList.length,
-              shrinkWrap: true,
-              separatorBuilder: (context, index) {
-                return SizedBox(
-                  height: 6.h,
-                );
-              },
-              itemBuilder: (context, index) {
-                return ValueListenableBuilder<List<SongWithFavorite>>(
-                  valueListenable: _selectedSongs,
-                  builder: (context, selectedSongs, child) {
-                    return SongTileWidgetControllable(
-                      songEntity: paginatedList[index],
-                      selectedSongsNotifier: _selectedSongs,
-                      onSelectionChanged: (selectedSong) {
-                        if (selectedSong != null) {
-                          _selectedSongs.value = List.from(_selectedSongs.value)
-                            ..add(selectedSong);
-                        } else {
-                          _selectedSongs.value = List.from(_selectedSongs.value)
-                            ..removeWhere((song) =>
-                                song.song.id == paginatedList[index].song.id);
-                        }
-                      },
-                    );
+          return ListView.separated(
+            key: ValueKey<int>(page), // <-- Ensure new list rebuilds with different key
+            padding: EdgeInsets.zero,
+            itemCount: paginatedList.length,
+            shrinkWrap: true,
+            separatorBuilder: (context, index) {
+              return SizedBox(
+                height: 6.h,
+              );
+            },
+            itemBuilder: (context, index) {
+              SongWithFavorite song = paginatedList[index];
+              return ValueListenableBuilder<List<SongWithFavorite>>(
+                valueListenable: _selectedSongs,
+                builder: (context, selectedSongs, child) {
+                  bool isSelected = selectedSongs.any((s) => s.song.id == song.song.id);
+                  return SongTileWidgetControllable(
+                    songEntity: song,
+                    selectedSongsNotifier: _selectedSongs,
+                    // isSelected: isSelected, // <-- Pass selected state explicitly
+                    onSelectionChanged: (selectedSong) {
+                      if (selectedSong != null) {
+                        _selectedSongs.value = List.from(_selectedSongs.value)..add(selectedSong);
+                      } else {
+                        _selectedSongs.value = List.from(_selectedSongs.value)
+                          ..removeWhere((s) => s.song.id == song.song.id);
+                      }
+                    },
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
+      SizedBox(
+        height: 5.h,
+      ),
+      // Pagination
+      ValueListenableBuilder(
+        valueListenable: currentPage,
+        builder: (context, value, child) {
+          return Container(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    if (currentPage.value > 1) {
+                      currentPage.value--;
+                    }
                   },
-                );
-              },
-            );
-          },
-        ),
-        SizedBox(
-          height: 5.h,
-        ),
-        // Pagination
-        ValueListenableBuilder(
-          valueListenable: currentPage,
-          builder: (context, value, child) {
-            return Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      if (currentPage.value > 1) {
-                        setState(() {
-                          currentPage.value--;
-                        });
-                      }
-                    },
-                    icon: Icon(
-                      Icons.arrow_back_ios,
-                      size: 16.sp,
-                      color: currentPage.value > 1 ? Colors.white : Colors.grey,
-                    ),
+                  icon: Icon(
+                    Icons.arrow_back_ios,
+                    size: 16.sp,
+                    color: currentPage.value > 1 ? Colors.white : Colors.grey,
                   ),
-                  Text(
-                    '${currentPage.value} / $totalPages',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: Colors.white,
-                    ),
+                ),
+                Text(
+                  '${currentPage.value} / $totalPages',
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Colors.white,
                   ),
-                  IconButton(
-                    onPressed: () {
-                      if (currentPage.value < totalPages) {
-                        setState(() {
-                          currentPage.value++;
-                        });
-                      }
-                    },
-                    icon: Icon(
-                      Icons.arrow_forward_ios,
-                      size: 16.sp,
-                      color: currentPage.value < totalPages
-                          ? Colors.white
-                          : Colors.grey,
-                    ),
+                ),
+                IconButton(
+                  onPressed: () {
+                    if (currentPage.value < totalPages) {
+                      currentPage.value++;
+                    }
+                  },
+                  icon: Icon(
+                    Icons.arrow_forward_ios,
+                    size: 16.sp,
+                    color: currentPage.value < totalPages ? Colors.white : Colors.grey,
                   ),
-                ],
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    ],
+  );
+}
+
 
   Future<void> updatePlaylist(BuildContext context) async {
     if (_formKey.currentState!.validate()) {
@@ -1709,9 +1595,7 @@ class _PlaylistPageState extends State<PlaylistPage>
     } else {}
   }
 
-  Future<void> deletePlaylist(
-      {required BuildContext context,
-      required BuildContext playlistContext}) async {
+  Future<void> deletePlaylist({required BuildContext context, required BuildContext playlistContext}) async {
     showDialog(
       context: context,
       barrierDismissible: false, // Tidak bisa ditutup tanpa selesai
@@ -1739,23 +1623,8 @@ class _PlaylistPageState extends State<PlaylistPage>
     // Melakukan query
     context.read<PlaylistCubit>().deletePlaylist(widget.playlistEntity.id!);
     // Menghapus Dialog Loading
-    Navigator.of(context, rootNavigator: true).pop();
-
-    // Menampilkan hasil
-    // result.fold(
-    //   (l) {
-    //     customSnackBar(isSuccess: false, text: l, context: context);
-
-    //     Navigator.pop(context);
-    //   },
-    //   (r) {
-    //     context
-    //         .read<PlaylistSongsCubit>()
-    //         .getPlaylistSongs(widget.playlistEntity.id!);
-    //     customSnackBar(isSuccess: true, text: r, context: context);
-    //     Navigator.pop(context);
-    //     Navigator.pop(context);
-    //   },
-    // );
+    Navigator.of(context).pop();
+    Navigator.of(context).pop();
+    Navigator.of(context).pop();
   }
 }

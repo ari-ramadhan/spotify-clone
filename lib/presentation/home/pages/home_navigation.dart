@@ -3,6 +3,7 @@ import 'package:spotify_clone/data/repository/auth/auth_service.dart';
 import 'package:spotify_clone/domain/entity/auth/user.dart';
 import 'package:spotify_clone/presentation/home/pages/home.dart';
 import 'package:spotify_clone/presentation/search/search_page.dart';
+import 'package:spotify_clone/testing/profile_test_page.dart';
 
 class HomeNavigation extends StatefulWidget {
   const HomeNavigation({super.key});
@@ -42,6 +43,7 @@ class _HomeNavigationState extends State<HomeNavigation> {
       body: [
         const HomePage(),
         const SearchPage(),
+        // ProfileTestPage()
         ProfilePage(
           hideBackButton: true,
           userEntity: UserWithStatus(

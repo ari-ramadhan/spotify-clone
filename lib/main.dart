@@ -93,7 +93,7 @@ class _MyAppState extends State<MyApp> {
             BlocProvider(create: (_) => HotArtistsCubit()..getHotArtists()),
             BlocProvider(create: (_) => TopAlbumsCubit()..getTopAlbums()),
             BlocProvider(create: (_) => AllSongCubit()..getAllSong()),
-            BlocProvider(create: (_) => PlaylistCubit()),
+            BlocProvider(create: (_) => PlaylistCubit()..getCurrentuserPlaylist('')),
             BlocProvider(create: (_) => PlaylistSongsCubit()),
             BlocProvider(create: (_) => AvatarCubit(supabase)),
           ],
